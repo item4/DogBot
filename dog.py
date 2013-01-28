@@ -6,6 +6,7 @@ import socket
 import time
 import re
 import string
+import random
 from Queue import Queue
 from threading import Thread
 
@@ -32,19 +33,23 @@ class DogBotCommand:
     def __init__(self, con):
         self.con = con
         self.cmdlist = {}
-        self.reload()
         self.syscmd = ['load','reload','list']
+        self.reload()
 
     def reload(self, cmdname=None):
         if cmdname is None:
             self.cmdlist.clear()
-            os.chdir('c:/py/')
+            os.chdir('c:/py/DogBot/')
             cmdlist = os.listdir('./cmd/')
+            res = 0
+            total = 0
             for x in cmdlist:
                 if not x.endswith('.py') or x.startswith('__init__'):
                     continue
                 x = x.replace('.py', '')
-                self._load(x)
+                res += self._load(x)
+                total += 1
+            return res,total
         else:
             func = self.cmdlist.get(cmdname)
             if func:
@@ -56,7 +61,7 @@ class DogBotCommand:
                     aliasname = alias.pop()
                     if aliasname in self.cmdlist:
                         del self.cmdlist[aliasname]
-                self._load(cmdname)
+                return self._load(cmdname)
             else:
                 raise DogBotError(u'로딩된적 없는 명령어')
 
@@ -71,24 +76,28 @@ class DogBotCommand:
         print modname
 
         temp = sys.modules.get(modname)
-        if temp:
-            reload(temp)
+        try:
+            if temp:
+                reload(temp)
+            else:
+                __import__(modname)
+        except:
+            return 0
         else:
-            __import__(modname)
+            module = sys.modules[modname]
 
-        module = sys.modules[modname]
-
-        func = getattr(module, 'cmd_%s' % cmdname)
-        func._dogbot_modname = modname
-        self.cmdlist[cmdname] = func
-
-        alias = list(module.alias)
-        while alias:
-            aliasname = alias.pop()
-            #func = getattr(module,'cmd_%s' % aliasname)
-            func = getattr(module,'cmd_%s' % cmdname)
+            func = getattr(module, 'cmd_%s' % cmdname)
             func._dogbot_modname = modname
-            self.cmdlist[aliasname] = func
+            self.cmdlist[cmdname] = func
+
+            alias = list(module.alias)
+            while alias:
+                aliasname = alias.pop()
+                #func = getattr(module,'cmd_%s' % aliasname)
+                func = getattr(module,'cmd_%s' % cmdname)
+                func._dogbot_modname = modname
+                self.cmdlist[aliasname] = func
+            return 1
 
     def run(self, line):
         temp = line.message.split(' ', 1)
@@ -106,93 +115,90 @@ class DogBotCommand:
                     line.target,
                     u'%s: %s' % (e.__class__.__name__,e)
                 )
-        elif cmd=='load':
-            if not args:
+        elif cmd in self.syscmd:
+            func = getattr(self,'cmd_%s'%cmd)
+            func(line,args)
+
+    def cmd_load(self,line,args):
+        if not args:
+            self.con.query(
+                'PRIVMSG',
+                line.target,
+                u'뭘?'
+            )
+        else:
+            try:
                 self.con.query(
                     'PRIVMSG',
                     line.target,
-                    u'뭘?'
+                    u'%s 명령어 로드 시작' % args
+                )
+                self.load(args)
+            except Exception as e:
+                self.con.query(
+                    'PRIVMSG',
+                    line.target,
+                    u'%s 명령어 로드 실패 - %s: %s' % (args,e.__class__.__name__,e)
                 )
             else:
-                try:
-                    self.con.query(
-                        'PRIVMSG',
-                        line.target,
-                        u'%s 명령어 로드 시작' % args
-                    )
-                    self.load(args)
-                except Exception as e:
-                    self.con.query(
-                        'PRIVMSG',
-                        line.target,
-                        u'%s 명령어 로드 실패 - %s: %s' % (args,e.__class__.__name__,e)
-                    )
-                else:
-                    self.con.query(
-                        'PRIVMSG',
-                        line.target,
-                        u'%s 명령어 로드 성공' % args
-                    )
-        elif cmd=='reload':
-            if args:
-                try:
-                    self.con.query(
-                        'PRIVMSG',
-                        line.target,
-                        u'%s 명령어 리로드 시작' % args
-                    )
-                    self.reload(args)
-                except Exception as e:
-                    self.con.query(
-                        'PRIVMSG',
-                        line.target,
-                        u'%s 명령어 리로드 실패 - %s: %s' % (args,e.__class__.__name__,e)
-                    )
-                else:
-                    self.con.query(
-                        'PRIVMSG',
-                        line.target,
-                        u'%s 명령어 리로드 성공' % args
-                    )
+                self.con.query(
+                    'PRIVMSG',
+                    line.target,
+                    u'%s 명령어 로드 성공' % args
+                )
+    def cmd_reload(self,line,args):
+        if args:
+            try:
+                self.con.query(
+                    'PRIVMSG',
+                    line.target,
+                    u'%s 명령어 리로드 시작' % args
+                )
+                self.reload(args)
+            except Exception as e:
+                self.con.query(
+                    'PRIVMSG',
+                    line.target,
+                    u'%s 명령어 리로드 실패 - %s: %s' % (args,e.__class__.__name__,e)
+                )
             else:
-                try:
-                    self.con.query(
-                        'PRIVMSG',
-                        line.target,
-                        u'모든 명령어 리로드 시작'
-                    )
-                    self.reload()
-                except Exception as e:
-                    self.con.query(
-                        'PRIVMSG',
-                        line.target,
-                        u'모든 명령어 리로드 실패 - %s: %s' % (e.__class__.__name__,e)
-                    )
-                else:
-                    self.con.query(
-                        'PRIVMSG',
-                        line.target,
-                        u'총 %d개의 명령어 리로드 성공' % len(self.cmdlist)
-                    )
-
-        elif cmd=='list':
-            self.con.query(
-                'PRIVMSG',
-                line.target,
-                u'총 %d개의 명령어와 %d개의 시스템 명령어가 있습니다' % (len(self.cmdlist),len(self.syscmd))
-            )
-            self.con.query(
-                'PRIVMSG',
-                line.target,
-                ', '.join(sorted(self.cmdlist.keys()+self.syscmd))
-            )
-
+                self.con.query(
+                    'PRIVMSG',
+                    line.target,
+                    u'%s 명령어 리로드 성공' % args
+                )
         else:
-            self.con.query(
-                'PRIVMSG',
-                line.target,
-                u'%s는 없는 명령어' % (cmd)
-            )
+            try:
+                self.con.query(
+                    'PRIVMSG',
+                    line.target,
+                    u'모든 명령어 리로드 시작'
+                )
+                success,total = self.reload()
+            except Exception as e:
+                self.con.query(
+                    'PRIVMSG',
+                    line.target,
+                    u'모든 명령어 리로드 실패 - %s: %s' % (e.__class__.__name__,e)
+                )
+            else:
+                self.con.query(
+                    'PRIVMSG',
+                    line.target,
+                    u'총 %d개의 모듈중 %d개 모듈 로딩 성공, 총합 %d개의 명령어 리로드됨' % (total,success,len(self.cmdlist))
+                )
+
+    def cmd_list(self,line,args):
+        self.con.query(
+            'PRIVMSG',
+            line.target,
+            u'총 %d개의 명령어와 %d개의 시스템 명령어가 있습니다' % (len(self.cmdlist),len(self.syscmd))
+        )
+        self.con.query(
+            'PRIVMSG',
+            line.target,
+            ', '.join(sorted(self.cmdlist.keys()+self.syscmd))
+        )
 
 
 
@@ -222,9 +228,15 @@ class DogBotObject:
         lines = []
 
         while self.running and not self.restart:
-            recv = self.con.recv()
-            if not recv:
-                break
+            recv = ''
+            while not recv:
+                try:
+                    recv = self.con.recv()
+                except socket.timeout:
+                    pass
+                else:
+                    if not recv:
+                        return
 
             recv = temp + recv
             #lines = recv.splitlines()
@@ -255,15 +267,15 @@ class DogBotObject:
             if line.type == u'001':
                 self.con.send(u'MODE %s +x' % self.nick)
             elif line.type == u'433':
-                self.nick = u'으르릉'
+                self.nick = u'멍멍이%d호' % random.randint(1,9999)
                 self.con.send(u'NICK %s' % self.nick)
             elif line.type == u'396':
                 self.con.send(u'JOIN #item4')
-            elif line.type == u'PRIVMSG' and line.message == u'멍멍이':
+            elif line.type == u'PRIVMSG' and line.message == self.nick:
                 self.con.query(
                     u'PRIVMSG',
                     line.target,
-                    u'멍멍! 멍멍이는 item4가 키우는 파이썬 봇입니다.',
+                    u'멍멍! %s는 item4가 키우는 파이썬 봇입니다.' % self.nick
                 )
             elif line.type==u'PRIVMSG' and re.match(ur'멍+!*$',line.message):
                 self.con.query(
@@ -314,6 +326,7 @@ class DogBotConnection:
         self.running = True
         self.connect = socket.socket()
         self.connect.connect((self.host, self.port))
+        self.connect.settimeout(1)
         Thread(target=self.run).start()
 
     def recv(self):

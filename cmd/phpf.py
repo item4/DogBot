@@ -35,7 +35,9 @@ def cmd_phpf(con,line,args):
         con.query(
             'PRIVMSG',
             line.target,
-            u'\x02%s\x02: %s (%s)' % (data.group(2).replace('&gt;','>'),data.group(3),data.group(1).replace('&gt;','>'))
+            u'\x02%s\x02: %s (%s)' % (data.group(2).replace('&gt;','>'),
+                                    data.group(3).replace('&#039;',"'"),
+                                    data.group(1).replace('&gt;','>'))
         )
         con.query(
             'PRIVMSG',
