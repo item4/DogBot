@@ -22,7 +22,7 @@ def cmd_phpf(con,line,args):
 
 
     data = urllib.urlopen(url).read()
-    data = data.decode('utf8').replace('\r','').replace('\n','')
+    data = data.decode('utf8','ignore').replace('\r','').replace('\n','')
 
     data = re.search(ur'<p class="verinfo">\(([^\)]+)\)</p><p class="refpurpose"><span class="refname">([^<]+)</span> &mdash; <span class="dc-title">([^<]+)</span></p>\s*</div>\s*<div[^>]+>\s*<h3 class="title">[^<]+</h3>\s*<div class="methodsynopsis dc-description">(.+?)</div>',data)
     """
@@ -35,7 +35,7 @@ def cmd_phpf(con,line,args):
         con.query(
             'PRIVMSG',
             line.target,
-            u'[\x02%s\x02] - %s (%s)' % (data.group(2).replace('&gt;','>'),data.group(3),data.group(1).replace('&gt;','>'))
+            u'\x02%s\x02: %s (%s)' % (data.group(2).replace('&gt;','>'),data.group(3),data.group(1).replace('&gt;','>'))
         )
         con.query(
             'PRIVMSG',
