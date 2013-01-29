@@ -10,7 +10,15 @@ def cmd_tokyo(con,line,args):
     else:
         url = 'http://www.tokyotosho.info/search.php?%s' % urllib.urlencode({'terms':args.encode('utf8'),'type':7})
 
-    data = urllib.urlopen(url).read()
+    try:
+        data = urllib.urlopen(url).read()
+    except IOError:
+        con.query(
+            'PRIVMSG',
+            line.target,
+            u'timeout'
+        )
+        return
     data = data.decode('utf8').replace('\r','').replace('\n','')
     data = re.finditer(r'<tr[^>]+><td[^>]+><a[^>]+><span[^>]+></span></a></td><td[^>]+><a[^>]+><span[^>]+></span></a> <a rel="nofollow" type="application/x-bittorrent" href="([^"]+)">(.+?)</a></td><td[^>]+>(?:<a[^>]+>Website</a> \| )?<a[^>]+>Details</a></td></tr><tr[^>]+><td[^>]+>(?:Authorized: <span class="auth_ok">Yes</span> )?Submitter: (?:<a[^>]+>.*?</a>|Anonymous) \| Size: ([^\|]+) \| Date: ([^\|]+)(?: \| Comment: .*?)?</td><td[^>]+>S: <span[^>]+>(\d+)</span> L: <span[^>]+>(\d+)</span> C: <span[^>]+>(\d+)</span> ID: \d+</td></tr>',data)
     """

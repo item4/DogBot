@@ -33,7 +33,7 @@ class DogBotCommand:
     def __init__(self, con):
         self.con = con
         self.cmdlist = {}
-        self.syscmd = ['load','reload','list']
+        self.syscmd = ['load','reload','list','login']
         self.reload()
 
     def reload(self, cmdname=None):
@@ -110,16 +110,25 @@ class DogBotCommand:
             try:
                 self.cmdlist[cmd](self.con, line, args)
             except Exception as e:
-                self.con.query(
-                    'PRIVMSG',
-                    line.target,
-                    u'%s: %s' % (e.__class__.__name__,e)
-                )
+                try:
+                    self.con.query(
+                        'PRIVMSG',
+                        line.target,
+                        u'%s: %s' % (e.__class__.__name__,e)
+                    )
+                except:
+                    self.con.query(
+                        'PRIVMSG',
+                        line.target,
+                        u'%s: %s' % (e.__class__.__name__,e.decode('utf8'))
+                    )
         elif cmd in self.syscmd:
             func = getattr(self,'cmd_%s'%cmd)
             func(line,args)
 
     def cmd_load(self,line,args):
+        if line.login != 'item4':
+            return
         if not args:
             self.con.query(
                 'PRIVMSG',
@@ -147,6 +156,8 @@ class DogBotCommand:
                     u'%s 명령어 로드 성공' % args
                 )
     def cmd_reload(self,line,args):
+        if line.login != 'item4':
+            return
         if args:
             try:
                 self.con.query(
@@ -200,6 +211,12 @@ class DogBotCommand:
             ', '.join(sorted(self.cmdlist.keys()+self.syscmd))
         )
 
+    def cmd_login(self,line,args):
+        self.con.query(
+            'WHOIS',
+            line.nick
+        )
+
 
 
 class DogBotObject:
@@ -207,6 +224,7 @@ class DogBotObject:
         self.running = True
         self.con = connect
         self.nick = u'멍멍이'
+        self.login = {}
 
         self.cmd = DogBotCommand(connect)
         while True:
@@ -219,9 +237,10 @@ class DogBotObject:
     def _start(self):
         self.con.connect()
         self.restart = False
+        self.login.clear()
 
     def _run(self):
-        self.con.send(u'NICK 멍멍이')
+        self.con.send(u'NICK %s' % self.nick)
         self.con.send(u'USER dog %s dog : dog' % self.con.host)
 
         temp = ''
@@ -234,6 +253,8 @@ class DogBotObject:
                     recv = self.con.recv()
                 except socket.timeout:
                     pass
+                except socket.error:
+                    return
                 else:
                     if not recv:
                         return
@@ -261,60 +282,118 @@ class DogBotObject:
         elif msg.startswith(u'ERROR'):
             self.restart = True
         else:
-            line = DogBotLine(msg)
+            line = DogBotLine(msg,self.login)
             #print(repr(line.message))
+            try:
+                func = getattr(self,'on_%s' % line.type.upper())
+            except:
+                pass
+            else:
+                func(line)
 
-            if line.type == u'001':
-                self.con.send(u'MODE %s +x' % self.nick)
-            elif line.type == u'433':
-                self.nick = u'멍멍이%d호' % random.randint(1,9999)
-                self.con.send(u'NICK %s' % self.nick)
-            elif line.type == u'396':
-                self.con.send(u'JOIN #item4')
-            elif line.type == u'PRIVMSG' and line.message == self.nick:
-                self.con.query(
-                    u'PRIVMSG',
-                    line.target,
-                    u'멍멍! %s는 item4가 키우는 파이썬 봇입니다.' % self.nick
-                )
-            elif line.type==u'PRIVMSG' and re.match(ur'멍+!*$',line.message):
-                self.con.query(
-                    u'PRIVMSG',
-                    line.target,
-                    line.message,
-                )
-            elif line.type==u'PRIVMSG' and \
-            (line.message.startswith('/') or line.message.startswith('?')):
-                Thread(
-                    target = self.cmd.run,
-                    kwargs = {'line':line},
-                ).start()
+    def on_001(self,line): # 서버 접속
+        self.con.send(u'MODE %s +x' % self.nick)
+
+    def on_433(self,line): # nick 중복
+        self.nick = u'멍멍이%d호' % random.randint(1,9999)
+        self.con.send(u'NICK %s' % self.nick)
+
+    def on_330(self,line):
+        _, nick, id = line.target.split(' ')
+
+        if id in self.login.values():
+            for x in self.login:
+                if self.login[x] == id:
+                    del self.login[x]
+
+        self.login[nick] = id
+
+        self.con.query(
+            u'NOTICE',
+            nick,
+            u'로그인 되었습니다.'
+        )
+
+    def on_QUIT(self,line):
+        if line.nick in self.login:
+            del self.login[line.nick]
+
+    def on_NICK(self,line):
+        print line
+        temp = self.login.get(line.nick)
+
+        if temp:
+            del self.login[line.nick]
+            self.login[line.message]=temp
+
+    def on_396(self,line): #motd 끝
+        self.con.send(u'JOIN #item4')
+
+    def on_PRIVMSG(self,line):
+        if line.message == self.nick:
+            self.con.query(
+                u'PRIVMSG',
+                line.target,
+                u'멍멍! %s는 item4가 키우는 파이썬 봇입니다.' % self.nick
+            )
+        elif re.match(ur'멍+!*$',line.message):
+            self.con.query(
+                u'PRIVMSG',
+                line.target,
+                line.message,
+            )
+        elif line.message.startswith('/') or line.message.startswith('?'):
+            Thread(
+                target = self.cmd.run,
+                kwargs = {'line':line},
+            ).start()
 
 class DogBotLine:
-    __slots__ = "nick", "ident", "ip", "server", "type", "target", "message"
-    nick = ident = ip = server = type = target = message = None
+    __slots__ = "nick", "ident", "ip", "server", "type", "target", "message", "login"
+    nick = ident = ip = server = type = target = message = login = None
 
-    def __init__(self,msg):
+    def __init__(self, msg, login):
         if msg[1:].find(':') > 0:
             temp, message = msg[1:].split(':',1)
-        else:
-            return
 
-        self.message = message
-        temp = temp.rstrip()
-        temp = temp.split(' ', 2)
-        if temp[0].find('!') > 0:
-            try:
-                self.nick,t=temp[0].split('!',1)
-            except:
-                print temp[0]
-            self.ident, self.ip = t.split('@',1)
-        else:
-            self.server = temp[0]
-        self.type = temp[1]
+            self.message = message
+            temp = temp.rstrip()
+            temp = temp.split(' ', 2)
+            if temp[0].find('!') > 0:
+                try:
+                    self.nick,t=temp[0].split('!',1)
+                except:
+                    print temp[0]
+                self.ident, self.ip = t.split('@',1)
+            else:
+                self.server = temp[0]
+            self.type = temp[1]
 
-        if len(temp) == 3:
-            self.target = temp[2]
+            if len(temp) == 3:
+                self.target = temp[2]
+        else:
+            temp, self.type, self.message = msg[1:].split(' ',2)
+            if temp.find('!') > 0:
+                try:
+                    self.nick,t=temp.split('!',1)
+                except:
+                    print temp
+                self.ident, self.ip = t.split('@',1)
+            else:
+                self.server = temp
+
+        self.login = login.get(self.nick)
+
+    def __repr__(self):
+        temp = [self.nick,self.ident,self.ip,self.server,self.type,self.target,self.message,self.login]
+        for i in xrange(len(temp)):
+            if temp[i] is not None:
+                temp[i] = temp[i].encode('utf8')
+
+        format = "'nick':{!r},'ident':{!r},'ip':{!r},'server':{!r},"
+        format += "type:{!r},target:{!r},message:{!r},login:{!r}"
+        return '<DogBotLine>{' + format.format(*temp) + '}'
+
 
 class DogBotConnection:
     def __init__(self, host, port):
@@ -325,8 +404,8 @@ class DogBotConnection:
     def connect(self):
         self.running = True
         self.connect = socket.socket()
-        self.connect.connect((self.host, self.port))
         self.connect.settimeout(1)
+        self.connect.connect((self.host, self.port))
         Thread(target=self.run).start()
 
     def recv(self):
@@ -358,7 +437,10 @@ class DogBotConnection:
 
     def close(self):
         self.running = False
-        self.connect.close()
+        try:
+            self.connect.close()
+        except:
+            pass
         del self.connect
 
 class DogBotError(Exception):
