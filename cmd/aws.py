@@ -4,7 +4,7 @@ alias=[u'날씨']
 import urllib
 import re
 
-def cmd_aws(con,line,args):
+def cmd_aws(bot,line,args):
     if args is None:
         return
 
@@ -43,14 +43,14 @@ def cmd_aws(con,line,args):
         if pressure != '.':
             res += u' / 해면기압:%shPa' % pressure
 
-        con.query(
+        bot.con.query(
             'PRIVMSG',
             line.target,
             res
         )
 
     else:
-        con.query(
+        bot.con.query(
             'PRIVMSG',
             line.target,
             u'그런거 없다'

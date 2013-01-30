@@ -4,7 +4,7 @@ alias=[u'도쿄도','tokyotosho']
 import urllib
 import re
 
-def cmd_tokyo(con,line,args):
+def cmd_tokyo(bot,line,args):
     if args is None:
         url = 'http://www.tokyotosho.info/?cat=7'
     else:
@@ -13,7 +13,7 @@ def cmd_tokyo(con,line,args):
     try:
         data = urllib.urlopen(url).read()
     except IOError:
-        con.query(
+        bot.con.query(
             'PRIVMSG',
             line.target,
             u'timeout'
@@ -31,7 +31,7 @@ def cmd_tokyo(con,line,args):
             x.group(2).replace('<span class="s"> </span>',''),\
             x.group(3),x.group(4),x.group(5),x.group(6),\
             x.group(7),x.group(1).replace('&amp;','&'))
-        con.query(
+        bot.con.query(
             'PRIVMSG',
             line.target,
             res
@@ -40,7 +40,7 @@ def cmd_tokyo(con,line,args):
         if i > 3:
             break
     else:
-        con.query(
+        bot.con.query(
             'PRIVMSG',
             line.target,
             u'그런거 없다'

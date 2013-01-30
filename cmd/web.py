@@ -5,12 +5,19 @@ import urllib
 import re
 import HTMLParser
 
-def cmd_web(con,line,args):
+def cmd_web(bot,line,args):
     if args==None:
         return
     if not args.startswith('http://') and not args.startswith('https://'):
         args='http://'+args
-    data=urllib.urlopen(args).read()
+    try:
+        data=urllib.urlopen(args).read()
+    except:
+        bot.con.query(
+            'PRIVMSG',
+            line.target,
+            u'접속 실패'
+        )
 
     try:
         data=data.decode('cp949')
@@ -25,7 +32,11 @@ def cmd_web(con,line,args):
 
     if len(data)>150:
         data=data[:150]
-    con.query('PRIVMSG',line.target,'[%s]  %s'%(args,data))
+    bot.con.query(
+        'PRIVMSG',
+        line.target,
+        '[%s]  %s'%(args,data)
+    )
 
 def main():
     pass

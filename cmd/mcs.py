@@ -4,7 +4,7 @@ alias=[u'마크서버']
 import socket
 import re
 
-def cmd_mcs(con,line,args):
+def cmd_mcs(bot,line,args):
     if args == None:
         args='mc.sjkoon.com'
 
@@ -18,7 +18,7 @@ def cmd_mcs(con,line,args):
         s = socket.socket()
         s.connect((server,port))
     except:
-        con.query(
+        bot.con.query(
             'PRIVMSG',
             line.target,
             '[%s] Offline' % args
@@ -30,7 +30,7 @@ def cmd_mcs(con,line,args):
         data = s.recv(256)
 
         if data[0] != '\xff':
-            con.query(
+            bot.con.query(
                 'PRIVMSG',
                 line.target,
                 '[%s] Offline' % args
@@ -43,7 +43,7 @@ def cmd_mcs(con,line,args):
             res='[%s/%s] Online - %s' % (args,data[2],data[3])
             if len(data) == 6:
                 res += ' (%s/%s)' % (data[4],data[5])
-            con.query(
+            bot.con.query(
                 'PRIVMSG',
                 line.target,
                 res

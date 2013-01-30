@@ -3,10 +3,14 @@ alias=[]
 
 import hashlib
 
-def cmd_sha384(con,line,args):
+def cmd_sha384(bot,line,args):
     if args==None:
         return
-    con.query('PRIVMSG',line.target,'[SHA384] %s = %s'%(args,hashlib.sha384(args).hexdigest()))
+    bot.con.query(
+        'PRIVMSG',
+        line.target,
+        '[SHA384] %s = %s' % (args,hashlib.sha384(args).hexdigest())
+    )
 
 def main():
     pass

@@ -30,10 +30,9 @@ class DogBot:
             th.start()
 
 class DogBotCommand:
-    def __init__(self, con):
-        self.con = con
+    def __init__(self):
         self.cmdlist = {}
-        self.syscmd = ['load','reload','list','login']
+        self.syscmd = ['load','reload','list']
         self.reload()
 
     def reload(self, cmdname=None):
@@ -99,7 +98,7 @@ class DogBotCommand:
                 self.cmdlist[aliasname] = func
             return 1
 
-    def run(self, line):
+    def run(self, bot, line):
         temp = line.message.split(' ', 1)
         cmd = temp[0][1:]
         args = None
@@ -108,114 +107,112 @@ class DogBotCommand:
 
         if cmd in self.cmdlist:
             try:
-                self.cmdlist[cmd](self.con, line, args)
+                self.cmdlist[cmd](bot, line, args)
             except Exception as e:
                 try:
-                    self.con.query(
+                    bot.con.query(
                         'PRIVMSG',
                         line.target,
                         u'%s: %s' % (e.__class__.__name__,e)
                     )
                 except:
-                    self.con.query(
+                    bot.con.query(
                         'PRIVMSG',
                         line.target,
                         u'%s: %s' % (e.__class__.__name__,e.decode('utf8'))
                     )
         elif cmd in self.syscmd:
-            func = getattr(self,'cmd_%s'%cmd)
-            func(line,args)
+            func = getattr(self,'cmd_%s' % cmd)
+            func(bot,line,args)
 
-    def cmd_load(self,line,args):
+    def cmd_load(self, bot, line, args):
         if line.login != 'item4':
             return
         if not args:
-            self.con.query(
+            bot.con.query(
                 'PRIVMSG',
                 line.target,
                 u'뭘?'
             )
         else:
             try:
-                self.con.query(
+                bot.con.query(
                     'PRIVMSG',
                     line.target,
                     u'%s 명령어 로드 시작' % args
                 )
                 self.load(args)
             except Exception as e:
-                self.con.query(
+                bot.con.query(
                     'PRIVMSG',
                     line.target,
                     u'%s 명령어 로드 실패 - %s: %s' % (args,e.__class__.__name__,e)
                 )
             else:
-                self.con.query(
+                bot.con.query(
                     'PRIVMSG',
                     line.target,
                     u'%s 명령어 로드 성공' % args
                 )
-    def cmd_reload(self,line,args):
+    def cmd_reload(self, bot, line, args):
         if line.login != 'item4':
             return
         if args:
             try:
-                self.con.query(
+                bot.con.query(
                     'PRIVMSG',
                     line.target,
                     u'%s 명령어 리로드 시작' % args
                 )
                 self.reload(args)
             except Exception as e:
-                self.con.query(
+                bot.con.query(
                     'PRIVMSG',
                     line.target,
                     u'%s 명령어 리로드 실패 - %s: %s' % (args,e.__class__.__name__,e)
                 )
             else:
-                self.con.query(
+                bot.con.query(
                     'PRIVMSG',
                     line.target,
                     u'%s 명령어 리로드 성공' % args
                 )
         else:
             try:
-                self.con.query(
+                bot.con.query(
                     'PRIVMSG',
                     line.target,
                     u'모든 명령어 리로드 시작'
                 )
                 success,total = self.reload()
             except Exception as e:
-                self.con.query(
+                bot.con.query(
                     'PRIVMSG',
                     line.target,
                     u'모든 명령어 리로드 실패 - %s: %s' % (e.__class__.__name__,e)
                 )
             else:
-                self.con.query(
+                bot.con.query(
                     'PRIVMSG',
                     line.target,
                     u'총 %d개의 모듈중 %d개 모듈 로딩 성공, 총합 %d개의 명령어 리로드됨' % (total,success,len(self.cmdlist))
                 )
 
-    def cmd_list(self,line,args):
-        self.con.query(
+    def cmd_list(self, bot, line, args):
+        bot.con.query(
             'PRIVMSG',
             line.target,
             u'총 %d개의 명령어와 %d개의 시스템 명령어가 있습니다' % (len(self.cmdlist),len(self.syscmd))
         )
-        self.con.query(
+        bot.con.query(
             'PRIVMSG',
             line.target,
             ', '.join(sorted(self.cmdlist.keys()+self.syscmd))
         )
 
-    def cmd_login(self,line,args):
-        self.con.query(
-            'WHOIS',
-            line.nick
-        )
+
+
+
 
 
 
@@ -225,8 +222,9 @@ class DogBotObject:
         self.con = connect
         self.nick = u'멍멍이'
         self.login = {}
+        self.start = 0.
 
-        self.cmd = DogBotCommand(connect)
+        self.cmd = DogBotCommand()
         while True:
             self._start()
             try:
@@ -238,6 +236,7 @@ class DogBotObject:
         self.con.connect()
         self.restart = False
         self.login.clear()
+        self.start = time.time()
 
     def _run(self):
         self.con.send(u'NICK %s' % self.nick)
@@ -345,7 +344,7 @@ class DogBotObject:
         elif line.message.startswith('/') or line.message.startswith('?'):
             Thread(
                 target = self.cmd.run,
-                kwargs = {'line':line},
+                kwargs = {'bot':self,'line':line},
             ).start()
 
 class DogBotLine:
@@ -409,7 +408,7 @@ class DogBotConnection:
         Thread(target=self.run).start()
 
     def recv(self):
-        recv = self.connect.recv(4096).decode('utf8', 'replace')
+        recv = self.connect.recv(32768).decode('utf8', 'replace')
         return recv
 
     def send(self, msg):

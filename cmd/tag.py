@@ -4,7 +4,7 @@ alias=[u'html']
 import urllib
 import re
 
-def cmd_tag(con,line,args):
+def cmd_tag(bot,line,args):
     if args is None:
         return
 
@@ -27,7 +27,7 @@ def cmd_tag(con,line,args):
 
     """
     if not data:
-        con.query(
+        bot.con.query(
             'PRIVMSG',
             line.target,
             u'그런거 없다'
@@ -37,7 +37,7 @@ def cmd_tag(con,line,args):
         description = data.group(3).replace('<span class="deprecated">','').replace('</span>','')
         if data.group(2):
             description = '[NEW tag in HTML5]' + description
-        con.query(
+        bot.con.query(
             'PRIVMSG',
             line.target,
             u'%s %s - http://w3schools.com/tags/%s' % (tag,description,data.group(1))

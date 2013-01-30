@@ -6,7 +6,7 @@ import urllib2
 import re
 import HTMLParser
 
-def cmd_gg(con,line,args):
+def cmd_gg(bot,line,args):
     if args==None:
         return
     opener = urllib2.build_opener()
@@ -33,12 +33,16 @@ def cmd_gg(con,line,args):
             res=res.replace('<span class="f">','').replace('</span>','')
 
             res=HTMLParser.HTMLParser().unescape(res)
-            con.query('PRIVMSG',line.target,res)
+            bot.con.query(
+                'PRIVMSG',
+                line.target,
+                res
+            )
             c+=1
             if c>3:
                 break
         else:
-            con.query('PRIVMSG',line.target,u'파싱 실패')
+            bot.con.query('PRIVMSG',line.target,u'파싱 실패')
 
 
     return

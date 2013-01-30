@@ -4,7 +4,7 @@ alias=[u'pf']
 import urllib
 import re
 
-def cmd_phpf(con,line,args):
+def cmd_phpf(bot,line,args):
     if args is None:
         return
 
@@ -32,26 +32,26 @@ def cmd_phpf(con,line,args):
         description = data.group(4)
         description = re.sub(r'</?[^>]+>','',description)
 
-        con.query(
+        bot.con.query(
             'PRIVMSG',
             line.target,
             u'\x02%s\x02: %s (%s)' % (data.group(2).replace('&gt;','>'),
                                     data.group(3).replace('&#039;',"'"),
                                     data.group(1).replace('&gt;','>'))
         )
-        con.query(
+        bot.con.query(
             'PRIVMSG',
             line.target,
             description
         )
-        con.query(
+        bot.con.query(
             'PRIVMSG',
             line.target,
             url
         )
 
     else:
-        con.query(
+        bot.con.query(
             'PRIVMSG',
             line.target,
             u'그런거 없다'

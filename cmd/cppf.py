@@ -4,7 +4,7 @@ alias=[]
 import urllib
 import re
 
-def cmd_cppf(con,line,args):
+def cmd_cppf(bot,line,args):
     if args is None:
         return
 
@@ -24,7 +24,7 @@ def cmd_cppf(con,line,args):
         else:
             description = []
 
-        con.query(
+        bot.con.query(
             'PRIVMSG',
             line.target,
             u'\x02%s\x02: %s (%s, #include <%s>)' % (data.group(2),\
@@ -33,19 +33,19 @@ def cmd_cppf(con,line,args):
                                                     data.group(3))
         )
         for x in description:
-            con.query(
+            bot.con.query(
                 'PRIVMSG',
                 line.target,
                 x.strip().replace('      ','')
             )
-        con.query(
+        bot.con.query(
             'PRIVMSG',
             line.target,
             url
         )
 
     else:
-        con.query(
+        bot.con.query(
             'PRIVMSG',
             line.target,
             u'그런거 없다'

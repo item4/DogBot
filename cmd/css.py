@@ -4,7 +4,7 @@ alias=[]
 import urllib
 import re
 
-def cmd_css(con,line,args):
+def cmd_css(bot,line,args):
     if args is None:
         return
 
@@ -18,7 +18,7 @@ def cmd_css(con,line,args):
 
     """
     if not data:
-        con.query(
+        bot.con.query(
             'PRIVMSG',
             line.target,
             u'그런거 없다'
@@ -27,7 +27,7 @@ def cmd_css(con,line,args):
         res = u'[%s/CSS%s] %s' % (args,data.group(3),data.group(2))
         if data.group(1):
             res += u' - http://w3schools.com/cssref/%s' % data.group(1)
-        con.query(
+        bot.con.query(
             'PRIVMSG',
             line.target,
             res
