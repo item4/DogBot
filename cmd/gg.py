@@ -17,7 +17,7 @@ def cmd_gg(bot,line,args):
     data=data.replace('\n',' ').replace('\r','')
     f=data.find('<li class="g">')
     if f==-1:
-        con.query('PRIVMSG',line.target,u'검색 실패')
+        bot.con.query('PRIVMSG',line.target,u'검색 실패')
     else:
         data=data[f:]
         pattern=re.compile(r'<li class="g"><div[^>]*>\s*<div[^>]*>\s*<div[^>]*>\s*</div>\s*</div>\s*<h3 class="r"><a href="([^"]+)"[^>]+>(.+?)</a></h3><div class="s"><div class="f kv"><cite>.*?</cite>.*?</div>.*?<span class="st">(.*?)</span>(<div class=osl>.+?</div>)?</div></div><!--n-->(<table class="nrgt" cellpadding="0" cellspacing="0">.+?</table>)?</li>')

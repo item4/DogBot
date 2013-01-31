@@ -12,7 +12,7 @@ def cmd_css(bot,line,args):
 
     data = urllib.urlopen('http://w3schools.com/cssref/default.asp').read()
     data = data.decode('utf8').replace('\r','').replace('\n','')
-    data = re.search(r'<tr>\s*<td>(?:<a href="([^"]+)">)?%s(?:</a>)?</td>\s*<td>([^<]+)</td>\s*<td>(\d+)</td>\s*</tr>' % args,data)
+    data = re.search(r'<tr>\s*<td>(?:<a href="([^"]+)">)?%s(?:</a>)?(?:<br>\s*)?</td>\s*<td>([^<]+)</td>\s*<td>(\d+)</td>\s*</tr>' % args,data)
     """
 
 

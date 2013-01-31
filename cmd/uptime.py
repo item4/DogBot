@@ -10,13 +10,13 @@ def cmd_uptime(bot, line, args):
     minute, second = divmod(uptime,60)
     temp = []
     if day:
-        temp.append(str(day)+u'일')
+        temp.append(str(int(day))+u'일')
     if hour:
-        temp.append(str(hour)+u'시간')
+        temp.append(str(int(hour))+u'시간')
     if minute:
-        temp.append(str(minute)+u'분')
+        temp.append(str(int(minute))+u'분')
     if second or (not day and not hour and not minute):
-        temp.append(str(second)+u'초')
+        temp.append(str(int(second))+u'초')
     bot.con.query(
         'PRIVMSG',
         line.target,

@@ -7,6 +7,7 @@ import time
 import re
 import string
 import random
+import select
 from Queue import Queue
 from threading import Thread
 
@@ -249,14 +250,18 @@ class DogBotObject:
             recv = ''
             while not recv:
                 try:
-                    recv = self.con.recv()
+                    ready = select.select([self.con.connect], [], [], 1) # http://stackoverflow.com/questions/2719017/how-to-set-timeout-on-pythons-socket-recv-method
+                    if ready[0]:
+                        recv = self.con.recv()
                 except socket.timeout:
+                    pass
+                except select.error:
                     pass
                 except socket.error:
                     return
-                else:
+                """else:
                     if not recv:
-                        return
+                        pass"""
 
             recv = temp + recv
             #lines = recv.splitlines()
@@ -300,10 +305,10 @@ class DogBotObject:
     def on_330(self,line):
         _, nick, id = line.target.split(' ')
 
-        if id in self.login.values():
-            for x in self.login:
-                if self.login[x] == id:
-                    del self.login[x]
+        """if id in self.login.values():
+            for k,v in self.login.items():
+                if v == id:
+                    del self.login[k]"""
 
         self.login[nick] = id
 
@@ -403,12 +408,14 @@ class DogBotConnection:
     def connect(self):
         self.running = True
         self.connect = socket.socket()
-        self.connect.settimeout(1)
+        #self.connect.settimeout(1)
+
         self.connect.connect((self.host, self.port))
+        #self.connect.setblocking(0)
         Thread(target=self.run).start()
 
     def recv(self):
-        recv = self.connect.recv(32768).decode('utf8', 'replace')
+        recv = self.connect.recv(4096).decode('utf8', 'replace')
         return recv
 
     def send(self, msg):
