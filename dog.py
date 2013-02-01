@@ -255,7 +255,7 @@ class DogBotObject:
                         recv = self.con.recv()
                 except socket.timeout:
                     pass
-                except select.error:
+                except select.error as e:
                     pass
                 except socket.error:
                     return
@@ -279,10 +279,14 @@ class DogBotObject:
         self.con.close()
 
     def parse(self,msg):
-        print '[%s]<< %s' % (time.strftime('%H:%M:%S'),msg)
+        temp = u'[%s]<< %s' % (time.strftime('%H:%M:%S'),msg)
+        print temp.encode('cp949','replace')
 
         if msg.startswith(u'PING'):
-            self.con.send(u'PONG %s' % msg[6:])
+            if msg[5] == ':':
+                self.con.send(u'PONG %s' % msg[6:])
+            else:
+                self.con.send(u'PONG %s' % msg[5:])
         elif msg.startswith(u'ERROR'):
             self.restart = True
         else:
@@ -403,10 +407,11 @@ class DogBotConnection:
     def __init__(self, host, port):
         self.host = host
         self.port = port
-        self.queue = Queue()
+        self.queue = None
 
     def connect(self):
         self.running = True
+        self.queue = Queue()
         self.connect = socket.socket()
         #self.connect.settimeout(1)
 
@@ -419,8 +424,9 @@ class DogBotConnection:
         return recv
 
     def send(self, msg):
-        print '[%s]>> %s' % (time.strftime('%H:%M:%S'), msg)
-        msg+='\r\n'
+        temp = u'[%s]>> %s' % (time.strftime('%H:%M:%S'), msg)
+        print temp.encode('cp949','replace')
+        msg += u"\r\n"
         self.connect.send(msg.encode('utf8', 'replace'))
 
     def append(self,msg):
@@ -448,6 +454,7 @@ class DogBotConnection:
         except:
             pass
         del self.connect
+        del self.queue
 
 class DogBotError(Exception):
     pass
