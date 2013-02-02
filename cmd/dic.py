@@ -11,12 +11,16 @@ def cmd_dic(bot, line, args):
         return
 
     if ' ' in args:
-        keyword, num = args.split(' ',1)
+        temp = args.split(' ')
+        keyword = ' '.join(temp[:-1])
+        num = [-1]
         try:
             num = int(num) - 1
         except ValueError:
+            keyword = args
             num = 0
         if num < 0:
+            keyword = args
             num = 0
     else:
         keyword = args

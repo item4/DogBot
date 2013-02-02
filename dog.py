@@ -14,14 +14,15 @@ from threading import Thread
 class DogBot:
     def __init__(self):
         self.thread = []
+        self.running = True
 
     def add_connect(self, server, port):
-        connect = DogBotConnection(server, port)
+        connect = DogBotConnection(self, server, port)
 
         th = Thread(
             target = DogBotObject,
             name = 'DogObj#%s'%server,
-            kwargs = {'connect':connect},
+            kwargs = {'system':self ,'connect':connect},
         )
 
         self.thread.append(th)
@@ -218,24 +219,27 @@ class DogBotCommand:
 
 
 class DogBotObject:
-    def __init__(self, connect):
-        self.running = True
+    def __init__(self, system, connect):
+        self.system = system
         self.con = connect
-        self.nick = u'멍멍이'
+
+        self.running = True
         self.login = {}
         self.start = 0.
 
+        self.nick = u'멍멍이'
+
         self.cmd = DogBotCommand()
-        while True:
-            self._start()
+
+        while self.system.running and self.running:
             try:
+                self._start()
                 self._run()
             finally:
                 self._stop()
 
     def _start(self):
         self.con.connect()
-        self.restart = False
         self.login.clear()
         self.start = time.time()
 
@@ -246,7 +250,7 @@ class DogBotObject:
         temp = ''
         lines = []
 
-        while self.running and not self.restart:
+        while self.system.running and self.running:
             recv = ''
             while not recv:
                 try:
@@ -404,7 +408,8 @@ class DogBotLine:
 
 
 class DogBotConnection:
-    def __init__(self, host, port):
+    def __init__(self, system, host, port):
+        self.system = system
         self.host = host
         self.port = port
         self.queue = None
@@ -433,11 +438,14 @@ class DogBotConnection:
         self.queue.put((msg, self.queue.qsize() / 10))
 
     def run(self):
-        while self.running:
-            while not self.queue.empty():
-                msg,sleep=self.queue.get()
-                self.send(msg)
-                time.sleep(.1+sleep)
+        while self.system.running and self.running:
+            try:
+                while not self.queue.empty():
+                    msg,sleep = self.queue.get()
+                    self.send(msg)
+                    time.sleep(.1+sleep)
+            except AttributeError:
+                break
 
     def query(self, type, target=None, message=None):
         msg = type
