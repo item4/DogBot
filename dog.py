@@ -23,8 +23,8 @@ class DogBot:
 
         th = Thread(
             target = DogBotObject,
-            name = 'DogObj#%s'%server,
-            kwargs = {'system':self ,'connect':connect},
+            name = 'DogObj#%s' % server,
+            kwargs = {'system':self, 'connect':connect},
         )
 
         self.thread.append(th)
@@ -123,7 +123,7 @@ class DogBotCommand:
                     bot.con.query(
                         'PRIVMSG',
                         line.target,
-                        u'%s: %s' % (e.__class__.__name__,e.decode('utf8'))
+                        u'%s: ???' % (e.__class__.__name__)
                     )
         elif cmd in self.syscmd:
             func = getattr(self,'cmd_%s' % cmd)
@@ -226,6 +226,7 @@ class DogBotObject:
         self.con = connect
 
         self.running = True
+        self.restart = False
         self.login = {}
         self.start_time = 0.
 
@@ -233,14 +234,19 @@ class DogBotObject:
 
         self.cmd = DogBotCommand()
 
-        while self.system.running and self.running:
+        while self.system.running and (self.running or self.restart):
             try:
                 self._start()
                 self._run()
+            except DogBotError as e:
+                if e == 'QUIT':
+                    break
             finally:
                 self._stop()
 
     def _start(self):
+        self.running = True
+        self.restart = False
         self.con.connect()
         self.login.clear()
         self.start_time = time.time()
@@ -438,12 +444,15 @@ class DogBotConnection:
         self.connect.send(msg.encode('utf8', 'replace'))
 
     def append(self,msg):
-        self.queue.put((msg, self.queue.qsize() / 10))
+        try:
+            self.queue.put((msg, self.queue.qsize() / 10))
+        except AttributeError:
+            pass
 
     def run(self):
         while self.running:
             if not self.system.running:
-                self.com.send(u'QUIT :%s' % self.system.exit_reason)
+                self.com.send(u'QUIT %s' % self.system.exit_reason)
                 break
             try:
                 while not self.queue.empty():

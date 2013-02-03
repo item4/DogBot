@@ -3,7 +3,7 @@ alias=[]
 
 import time
 
-def time_read(_time):
+def read_time(_time):
     _time = _time
     day, _time = divmod(_time,86400)
     hour, _time = divmod(_time,3600)

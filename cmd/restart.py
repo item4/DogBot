@@ -2,17 +2,17 @@
 
 alias = []
 
-def cmd_quit(bot, line, args):
+def cmd_restart(bot, line, args):
     if line.login != 'item4':
         return
     if args is None:
-        args = 'QUIT'
+        args = 'RESTART'
 
     bot.con.send(
         'QUIT ' + args
     )
 
     bot.running = False
+    bot.restart = True
     bot.con.running = False
 
-    raise DogBotError('QUIT')
