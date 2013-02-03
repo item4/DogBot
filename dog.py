@@ -301,7 +301,8 @@ class DogBotObject:
             else:
                 self.con.send(u'PONG %s' % msg[5:])
         elif msg.startswith(u'ERROR'):
-            self.restart = True
+            if self.running:
+                self.restart = True
         else:
             line = DogBotLine(msg,self.login)
             #print(repr(line.message))
