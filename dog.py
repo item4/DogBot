@@ -14,7 +14,9 @@ from threading import Thread
 class DogBot:
     def __init__(self):
         self.thread = []
+        self.start_time = time.time()
         self.running = True
+        self.exit_reason = ''
 
     def add_connect(self, server, port):
         connect = DogBotConnection(self, server, port)
@@ -225,7 +227,7 @@ class DogBotObject:
 
         self.running = True
         self.login = {}
-        self.start = 0.
+        self.start_time = 0.
 
         self.nick = u'멍멍이'
 
@@ -241,7 +243,7 @@ class DogBotObject:
     def _start(self):
         self.con.connect()
         self.login.clear()
-        self.start = time.time()
+        self.start_time = time.time()
 
     def _run(self):
         self.con.send(u'NICK %s' % self.nick)
@@ -276,6 +278,7 @@ class DogBotObject:
                 self.parse(line)
 
             temp = lines[-1]
+
 
         return
 
@@ -438,7 +441,10 @@ class DogBotConnection:
         self.queue.put((msg, self.queue.qsize() / 10))
 
     def run(self):
-        while self.system.running and self.running:
+        while self.running:
+            if not self.system.running:
+                self.com.send(u'QUIT :%s' % self.system.exit_reason)
+                break
             try:
                 while not self.queue.empty():
                     msg,sleep = self.queue.get()
