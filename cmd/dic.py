@@ -13,7 +13,7 @@ def cmd_dic(bot, line, args):
     if ' ' in args:
         temp = args.split(' ')
         keyword = ' '.join(temp[:-1])
-        num = [-1]
+        num = temp[-1]
         try:
             num = int(num) - 1
         except ValueError:
@@ -44,6 +44,8 @@ def cmd_dic(bot, line, args):
 
     try:
         url = 'http://dic.daum.net' + data[num]
+        if url.find('view_example.do') > 0:
+            url = url.replace('view_example.do','view.do')
     except IndexError:
         bot.con.query(
             'PRIVMSG',
@@ -56,15 +58,16 @@ def cmd_dic(bot, line, args):
 
     data = data.decode('utf8','ignore').replace('\r','').replace('\n','')
 
-    data = re.findall('(?:<span[^>]+>(.+?)</span>\s*)?<p class="txt_sense( no_num)?">(.+?)</p>', data)
-
-    print num, len(data)
+    data = re.findall('(?:<h4[^>]+>([^<]+)</h4>\s*<div[^>]+>\s*<div[^>]+>\s*)?(?:<span[^>]+>([^<]+)</span>\s*)?<p class="txt_sense( no_num)?">(.+?)</p>', data)
 
     if data:
         res = ''
         i = 1
-        for n, nonum, desc in data:
+        for wordtype, n, nonum, desc in data:
             desc = re.sub('</?[^>]+>', '', desc)
+            if wordtype:
+                res += wordtype + ' '
+                i = 1
             if n or nonum:
                 res += '%d. ' % i
                 i += 1
