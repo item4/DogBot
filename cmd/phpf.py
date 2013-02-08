@@ -6,6 +6,11 @@ import re
 
 def cmd_phpf(bot,line,args):
     if args is None:
+        bot.con.query(
+            'PRIVMSG',
+            line.target,
+            u'PHP 함수의 정보를 보여줍니다. | usgae: ?phpf function_name'
+        )
         return
 
     args = args.lower()

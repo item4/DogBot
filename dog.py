@@ -356,7 +356,7 @@ class DogBotObject:
             self.con.query(
                 u'PRIVMSG',
                 line.target,
-                u'멍멍! %s는 item4가 키우는 파이썬 봇입니다.' % self.nick
+                u'멍멍! %s는 item4가 키우는 파이썬 봇입니다. 명령어 : ?list' % self.nick
             )
         elif re.match(ur'멍+!*$',line.message):
             self.con.query(

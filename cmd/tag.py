@@ -6,6 +6,11 @@ import re
 
 def cmd_tag(bot,line,args):
     if args is None:
+        bot.con.query(
+            'PRIVMSG',
+            line.target,
+            u'HTML Tag의 정보를 보여줍니다. | usgae: ?html tag_name | ex) ?html strong'
+        )
         return
 
     args = args.lower()

@@ -8,6 +8,11 @@ import time
 
 def cmd_dic(bot, line, args):
     if not args:
+        bot.con.query(
+            'PRIVMSG',
+            line.target,
+            u'다음 사전에서 검색하여 결과를 보여줍니다 | usage: ?dic 단어'
+        )
         return
 
     if ' ' in args:

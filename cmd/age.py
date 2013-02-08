@@ -6,6 +6,11 @@ import time
 
 def cmd_age(bot, line, args):
     if not args:
+        bot.con.query(
+            'PRIVMSG',
+            line.target,
+            u'입력받은 날짜를 기준으로 나이와 생일 정보를 출력해줍니다. 날짜는 YYYYMMDD 형식입니다. | usage: ?age YYYYMMDD | ?age YYYYMMDD YYYYMMDD (기준일 추가)'
+        )
         return
 
     if ' ' in args:

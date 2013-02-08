@@ -1,13 +1,19 @@
 # -*- coding:utf-8 -*-
 
-alias = [r'롤']
+alias = [u'롤']
 
 import re
 import urllib
 
 def cmd_lol(bot, line, args):
     if not args:
+        bot.con.query(
+            'PRIVMSG',
+            line.target,
+            u'리그 오브 레전드 소환사 검색기입니다. | usage: ?lol 소환사ID'
+        )
         return
+
     url = 'http://op.gg/summoner/%s' % urllib.urlencode({'userName':args.encode('utf8')})
 
     data = urllib.urlopen(url).read()

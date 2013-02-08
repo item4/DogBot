@@ -6,6 +6,11 @@ import re
 
 def cmd_css(bot,line,args):
     if args is None:
+        bot.con.query(
+            'PRIVMSG',
+            line.target,
+            u'CSS 속성의 정보를 보여줍니다. | usgae: ?css attribute_name'
+        )
         return
 
     args = args.lower()

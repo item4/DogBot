@@ -6,6 +6,11 @@ import re
 
 def cmd_aws(bot,line,args):
     if args is None:
+        bot.con.query(
+            'PRIVMSG',
+            line.target,
+            u'기상청 AWS 관측대의 정보를 보여줍니다. | usgae: ?aws 지역명 | ex) ?aws 서울'
+        )
         return
 
 

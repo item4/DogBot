@@ -8,7 +8,13 @@ import HTMLParser
 
 def cmd_gg(bot,line,args):
     if args==None:
+        bot.con.query(
+            'PRIVMSG',
+            line.target,
+            u'구글 검색 명령어입니다. | usgae: ?gg 검색어'
+        )
         return
+
     opener = urllib2.build_opener()
     opener.addheaders = [('User-agent', 'Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.52 Safari/537.17')]
     data = opener.open('http://www.google.co.kr/search?%s' % urllib.urlencode({'q':args.encode('utf8')})).read()

@@ -6,6 +6,11 @@ import re
 
 def cmd_cppf(bot,line,args):
     if args is None:
+        bot.con.query(
+            'PRIVMSG',
+            line.target,
+            u'C++ 함수와 상수등의 정보를 보여줍니다. | usgae: ?cppf name'
+        )
         return
 
     args = args.lower()

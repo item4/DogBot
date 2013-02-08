@@ -7,6 +7,11 @@ import HTMLParser
 
 def cmd_web(bot,line,args):
     if args==None:
+        bot.con.query(
+            'PRIVMSG',
+            line.target,
+            u'웹페이지의 내용을 간략히 보여줍니다. | usgae: ?web url'
+        )
         return
     if not args.startswith('http://') and not args.startswith('https://'):
         args='http://'+args
