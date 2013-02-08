@@ -131,12 +131,17 @@ class DogBotCommand:
 
     def cmd_load(self, bot, line, args):
         if line.login != 'item4':
+            bot.con.query(
+                'PRIVMSG',
+                line.target,
+                u'멍멍! 관리자만 사용가능한 명령어입니다.'
+            )
             return
         if not args:
             bot.con.query(
                 'PRIVMSG',
                 line.target,
-                u'뭘?'
+                u'멍멍?'
             )
         else:
             try:
@@ -160,6 +165,11 @@ class DogBotCommand:
                 )
     def cmd_reload(self, bot, line, args):
         if line.login != 'item4':
+            bot.con.query(
+                'PRIVMSG',
+                line.target,
+                u'멍멍! 관리자만 사용가능한 명령어입니다.'
+            )
             return
         if args:
             try:
@@ -358,7 +368,7 @@ class DogBotObject:
                 line.target,
                 u'멍멍! %s는 item4가 키우는 파이썬 봇입니다. 명령어 : ?list' % self.nick
             )
-        elif re.match(ur'멍+!*$',line.message):
+        elif re.match(ur'(멍+!*\s*)+$',line.message):
             self.con.query(
                 u'PRIVMSG',
                 line.target,
@@ -468,7 +478,7 @@ class DogBotConnection:
         if target:
             msg += ' ' + target
         if message:
-            msg += ' ' + message
+            msg += ' :' + message
         self.append(msg)
 
     def close(self):
