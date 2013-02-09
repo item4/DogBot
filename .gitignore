@@ -1,7 +1,10 @@
 *.py[cod]
 
-#launcher
+# Launcher
 run.bat
+
+# Database
+DogBot.db
 
 # C extensions
 *.so

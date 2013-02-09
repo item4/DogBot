@@ -8,6 +8,7 @@ import re
 import string
 import random
 import select
+import sqlite3
 from Queue import Queue
 from threading import Thread
 
@@ -241,8 +242,10 @@ class DogBotObject:
         self.start_time = 0.
 
         self.nick = u'멍멍이'
+        self.db = 'DogBot.db'
 
         self.cmd = DogBotCommand()
+
 
         while self.system.running and (self.running or self.restart):
             try:
@@ -362,11 +365,11 @@ class DogBotObject:
         self.con.send(u'JOIN #item4')
 
     def on_PRIVMSG(self,line):
-        if line.message == self.nick:
+        if line.message.startswith(self.nick):
             self.con.query(
                 u'PRIVMSG',
                 line.target,
-                u'멍멍! %s는 item4가 키우는 파이썬 봇입니다. 명령어 : ?list' % self.nick
+                u'멍멍! %s는 item4가 키우는 파이썬 봇입니다. 명령어 : ?list | https://github.com/item4/DogBot' % self.nick
             )
         elif re.match(ur'(멍+!*\s*)+$',line.message):
             self.con.query(
