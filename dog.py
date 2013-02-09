@@ -12,6 +12,23 @@ import sqlite3
 from Queue import Queue
 from threading import Thread
 
+def read_time(_time):
+    _time = _time
+    day, _time = divmod(_time,86400)
+    hour, _time = divmod(_time,3600)
+    minute, second = divmod(_time,60)
+    temp = []
+    if day:
+        temp.append(str(int(day))+u'일')
+    if hour:
+        temp.append(str(int(hour))+u'시간')
+    if minute:
+        temp.append(str(int(minute))+u'분')
+    if second or (not day and not hour and not minute):
+        temp.append(str(int(second))+u'초')
+
+    return ' '.join(temp)
+
 class DogBot:
     def __init__(self):
         self.thread = []
@@ -239,10 +256,11 @@ class DogBotObject:
         self.running = True
         self.restart = False
         self.login = {}
+        self.db = {}
         self.start_time = 0.
 
         self.nick = u'멍멍이'
-        self.db = 'DogBot.db'
+        self.dbname = 'DogBot.db'
 
         self.cmd = DogBotCommand()
 
@@ -260,9 +278,16 @@ class DogBotObject:
     def _start(self):
         self.running = True
         self.restart = False
+        self.start_time = time.time()
+
         self.con.connect()
         self.login.clear()
-        self.start_time = time.time()
+        self.db.clear()
+
+        self.db['server']={}
+        self.db['channel']={}
+        self.db['busy']={}
+
 
     def _run(self):
         self.con.send(u'NICK %s' % self.nick)
@@ -280,7 +305,7 @@ class DogBotObject:
                         recv = self.con.recv()
                 except socket.timeout:
                     pass
-                except select.error as e:
+                except select.error:
                     pass
                 except socket.error:
                     return
@@ -304,7 +329,7 @@ class DogBotObject:
     def _stop(self):
         self.con.close()
 
-    def parse(self,msg):
+    def parse(self, msg):
         temp = u'[%s]<< %s' % (time.strftime('%H:%M:%S'),msg)
         print temp.encode('cp949','replace')
 
@@ -326,14 +351,14 @@ class DogBotObject:
             else:
                 func(line)
 
-    def on_001(self,line): # 서버 접속
+    def on_001(self, line): # 서버 접속
         self.con.send(u'MODE %s +x' % self.nick)
 
-    def on_433(self,line): # nick 중복
+    def on_433(self, line): # nick 중복
         self.nick = u'멍멍이%d호' % random.randint(1,9999)
         self.con.send(u'NICK %s' % self.nick)
 
-    def on_330(self,line):
+    def on_330(self, line):
         _, nick, id = line.target.split(' ')
 
         """if id in self.login.values():
@@ -349,20 +374,108 @@ class DogBotObject:
             u'로그인 되었습니다.'
         )
 
-    def on_QUIT(self,line):
+    def on_QUIT(self, line):
         if line.nick in self.login:
             del self.login[line.nick]
 
-    def on_NICK(self,line):
-        print line
+        if line.nick in self.db['busy']:
+            del self.db['busy'][line.nick]
+
+        for chan in self.db['channel']:
+            if line.nick in self.db['channel'][chan]['member']:
+                del self.db['channel'][chan]['member'][line.nick]
+
+    def on_PART(self, line):
+        del self.db['channel'][line.target]['member'][line.nick]
+
+    def on_JOIN(self, line):
+        if line.message in self.db['channel']:
+            self.db['channel'][line.message]['member'][line.nick] = ''
+
+    def on_NICK(self, line):
         temp = self.login.get(line.nick)
 
         if temp:
             del self.login[line.nick]
-            self.login[line.message]=temp
+            self.login[line.message] = temp
+
+
+        temp = self.db['busy'].get(line.nick)
+
+        if temp:
+            del self.db['busy'][line.nick]
+            self.db['busy'][line.message] = temp
+
+
+        for chan in self.db['channel']:
+            temp = self.db['channel'][chan]['member'].get(line.nick)
+
+            if temp:
+                del self.db['channel'][chan]['member'][line.nick]
+                self.db['channel'][chan]['member'][line.message] = temp
+
+
 
     def on_396(self,line): #motd 끝
         self.con.send(u'JOIN #item4')
+
+    def on_005(self,line): #server options
+        option = line.target.split(' ')[1:]
+        for x in option:
+            if '=' in x:
+                key, value = x.split('=',1)
+            else:
+                key = x
+                value = 1
+            self.db['server'][key] = value
+            print key
+
+    def on_332(self, line): # channel topic
+        _, channel = line.target.split(' ',1)
+
+        if channel not in self.db['channel']:
+            self.db['channel'][channel] = {}
+
+        self.db['channel'][channel]['topic'] = line.message
+
+    def on_333(self, line): # channel topic setter and time
+        _, channel, setter, settime  = line.message.split(' ',3)
+
+        if channel not in self.db['channel']:
+            self.db['channel'][channel] = {}
+
+        self.db['channel'][channel]['topic_setter'] = setter
+        self.db['channel'][channel]['topic_time'] = settime
+
+    def on_353(self, line): # channel member
+        _, _, channel = line.target.split(' ',2)
+        print self.db['server']
+        prefix = list(self.db['server']['STATUSMSG'])
+
+        if channel not in self.db['channel']:
+            self.db['channel'][channel] = {}
+
+        if self.db['channel'][channel].get('member'):
+            self.db['channel'][channel].clear()
+        else:
+            self.db['channel'][channel]['member'] = {}
+
+        member = line.message.split(' ')
+
+        for x in member:
+            if not x:
+                continue
+            if x[0] in prefix:
+                pre = x[0]
+                nick = x[1:]
+            else:
+                pre = ''
+                nick = x
+
+            self.db['channel'][channel]['member'][nick] = pre
+
+
+
 
     def on_PRIVMSG(self,line):
         if line.message.startswith(self.nick):
@@ -382,6 +495,26 @@ class DogBotObject:
                 target = self.cmd.run,
                 kwargs = {'bot':self,'line':line},
             ).start()
+        else:
+            for x in self.db['busy'].keys():
+                reason, busytime = self.db['busy'].get(x)
+                busytime = time.time() - busytime
+
+                if line.nick == x:
+                    self.con.query(
+                        u'PRIVMSG',
+                        line.target,
+                        u'%s, 부재를 해지합니다. (%s 동안 부재였음.)' % (x,read_time(busytime))
+                    )
+                    del self.db['busy'][x]
+
+                elif line.message.startswith(x) and x in self.db['channel'][line.target]['member']:
+
+                    self.con.query(
+                        u'PRIVMSG',
+                        line.target,
+                        u'%s, %s님은 %s 전부터 부재중입니다. (이유: %s)' % (line.nick,x,read_time(busytime),reason)
+                    )
 
 class DogBotLine:
     __slots__ = "nick", "ident", "ip", "server", "type", "target", "message", "login"
@@ -389,7 +522,7 @@ class DogBotLine:
 
     def __init__(self, msg, login):
         if msg[1:].find(':') > 0:
-            temp, message = msg[1:].split(':',1)
+            temp, message = msg[1:].split(' :',1)
 
             self.message = message
             temp = temp.rstrip()
