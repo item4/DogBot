@@ -358,7 +358,7 @@ class DogBotObject:
         self.nick = u'멍멍이%d호' % random.randint(1,9999)
         self.con.send(u'NICK %s' % self.nick)
 
-    def on_330(self, line):
+    def on_330(self, line): # whois login
         _, nick, id = line.target.split(' ')
 
         """if id in self.login.values():
@@ -392,7 +392,7 @@ class DogBotObject:
         if line.message in self.db['channel']:
             self.db['channel'][line.message]['member'][line.nick] = ''
 
-    def on_NICK(self, line):
+    def on_NICK(self, line): # change nick
         temp = self.login.get(line.nick)
 
         if temp:
@@ -416,10 +416,10 @@ class DogBotObject:
 
 
 
-    def on_396(self,line): #motd 끝
+    def on_396(self,line): # motd 끝
         self.con.send(u'JOIN #item4')
 
-    def on_005(self,line): #server options
+    def on_005(self,line): # server options
         option = line.target.split(' ')[1:]
         for x in option:
             if '=' in x:
@@ -428,7 +428,6 @@ class DogBotObject:
                 key = x
                 value = 1
             self.db['server'][key] = value
-            print key
 
     def on_332(self, line): # channel topic
         _, channel = line.target.split(' ',1)
@@ -449,7 +448,6 @@ class DogBotObject:
 
     def on_353(self, line): # channel member
         _, _, channel = line.target.split(' ',2)
-        print self.db['server']
         prefix = list(self.db['server']['STATUSMSG'])
 
         if channel not in self.db['channel']:
@@ -474,10 +472,11 @@ class DogBotObject:
 
             self.db['channel'][channel]['member'][nick] = pre
 
+    def on_TOPIC(self, line): # set topic
+        self.db['channel'][line.target]['topic'] = line.message
+        self.db['channel'][line.target]['topic_setter'] = line.mask
 
-
-
-    def on_PRIVMSG(self,line):
+    def on_PRIVMSG(self, line):
         if line.message.startswith(self.nick):
             self.con.query(
                 u'PRIVMSG',
@@ -517,21 +516,22 @@ class DogBotObject:
                     )
 
 class DogBotLine:
-    __slots__ = "nick", "ident", "ip", "server", "type", "target", "message", "login"
-    nick = ident = ip = server = type = target = message = login = None
+    __slots__ = "nick", "ident", "ip", "mask", "server", "type", "target", "message", "login"
+    nick = ident = ip = mask = server = type = target = message = login = None
 
     def __init__(self, msg, login):
-        if msg[1:].find(':') > 0:
+        if ':' in msg[1:]:
             temp, message = msg[1:].split(' :',1)
 
             self.message = message
             temp = temp.rstrip()
             temp = temp.split(' ', 2)
-            if temp[0].find('!') > 0:
+            if '!' in temp[0]:
+                self.mask = temp[0]
                 try:
-                    self.nick,t=temp[0].split('!',1)
+                    self.nick, t = self.mask.split('!',1)
                 except:
-                    print temp[0]
+                    print self.mask
                 self.ident, self.ip = t.split('@',1)
             else:
                 self.server = temp[0]
@@ -540,15 +540,16 @@ class DogBotLine:
             if len(temp) == 3:
                 self.target = temp[2]
         else:
-            temp, self.type, self.message = msg[1:].split(' ',2)
-            if temp.find('!') > 0:
+            self.mask, self.type, self.message = msg[1:].split(' ',2)
+            if '!' in self.mask:
                 try:
-                    self.nick,t=temp.split('!',1)
+                    self.nick, t = self.mask.split('!',1)
                 except:
-                    print temp
+                    print mask
                 self.ident, self.ip = t.split('@',1)
             else:
-                self.server = temp
+                self.server = self.mask
+                self.mask = None
 
         self.login = login.get(self.nick)
 
@@ -614,8 +615,13 @@ class DogBotConnection:
         if target:
             msg += ' ' + target
         if message:
-            msg += ' :' + message
-        self.append(msg)
+            while len(message) > 400:
+                self.append(msg + ' :' + message[:400])
+                message = message[400:]
+            else:
+                self.append(msg + ' :' + message)
+        else:
+            self.append(msg)
 
     def close(self):
         self.running = False

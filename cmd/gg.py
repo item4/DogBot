@@ -21,18 +21,29 @@ def cmd_gg(bot,line,args):
 
     data=data.decode('utf8','replace')
     data=data.replace('\n',' ').replace('\r','')
-    f=data.find('<li class="g')
-    if f==-1:
+    f = data.find('<li class="g')
+    if f == -1:
         bot.con.query('PRIVMSG',line.target,u'검색 실패')
     else:
-        website = r'<li class="g"><div[^>]*>\s*<div[^>]*>\s*<div[^>]*>\s*</div>\s*</div>\s*<h3 class="r"><a href="([^"]+)"[^>]+>(.+?)</a></h3>'+\
+        website = r'<li class="g"><div[^>]*>\s*<div[^>]*>\s*<div[^>]*>\s*</div>\s*</div>\s*'+\
+        r'<h3 class="r"><a href="([^"]+)"[^>]+>(.+?)</a></h3>'+\
         r'<div class="s"><div class="f kv"><cite>.*?</cite>(?:.*?</div>)?'+\
         r'(?:<span class="gl">.+?</span>)?(?:<span class="vshid">.+?</span>)?(?:<span class="std">.+?</span>)?(?:<a[^>]+><span class="pplsrsl">.+?</span></a>)?'+\
         r'(?:<div data-ved[^>]+>.+?</div>)?'+\
         r'</div>(?:<div class="esc slp"[^>]+>.+?</div>)?(?:<span class="f">.+?</span>)?'+\
         r'<span class="st">(.+?)</span>'+\
-        r'(?:<div class=osl>.+?</div>)?(?:<table[^>]*>.+?</table>)?</div></div><!--n-->(?:<table class="nrgt" cellpadding="0" cellspacing="0">.+?</table>)?</li>'
+        r'(?:<div class=osl>.+?</div>)?(?:<table[^>]*>.+?</table>)?</div></div>(?:<h3[^>]+>.+?</h3>)?<!--n-->(?:<table class="nrgt" cellpadding="0" cellspacing="0">.+?</table>)?</li>'
         """
+<li class="g"><div class="vsc" sig="18q">  <div data-ved="0CDUQkgowAA">  <div data-ved="0CDYQkQowAA"> </div>   </div>   <h3 class="r">
+<a href="http://isohunt.com/torrent_details/434772113/Shows.torrent"><em>무한도전</em>.E306.121201.HDTV.H264.720p-WITH.mp4 › Shows <b>...</b></a></h3>
+<div class="s"><div class="f kv"><cite>isohunt.com/.../Shows.torre...</cite>
+<span class="gl"> - <a  target="_blank" target="_blank">저장된&nbsp;페이지</a></span>
+<span class="std">&nbsp;<span class=gl>-</span> <a target=_blank>이 페이지 번역하기</a></span>
+<a ><span class="pplsrsl">공유</span></a>
+<div data-ved">+페이지에서 확인하세요.</a></div>
+</div><div class="esc slp" id="poS0" style="display:none">공개적으로 +1했습니다.&nbsp;<a href="#" class="fl">실행취소</a></div>
+<span class="st">bttrack.9you.com:80/:8080/announce: 1 seeds. Uploader&#39;s Comments: Category: TV shows. Seeds: 232Leechers: 4Size: 1.33 GBMore @ Limetorrents.com <b>...</b><br></span>
+</div></div><!--n--></li>
 
 <li class="g"><div class="vsc" sig="3u9">  <div data-ved="0CEAQkgowAg">  <div data-ved="0CEEQkQowAg"> </div>   </div>   <h3 class="r">
 <a href="http://westhooksandandgravel.com/BlueClayPondSiltCrushedItem4.html">Westhook Sand&amp;Gravel: Blue Clay, Pond Silt Crushed <em>Item4</em></a></h3>
@@ -108,53 +119,53 @@ li class="g"><div class="vsc" sig="t9t">  <div data-ved="0CG4QkgowDA">  <div dat
 <div class=s><cite><span class=a>coolpunch.tistory.com/&nbsp;-&nbsp;쿨펀치의 세상리뷰</span></cite><br>장점 1. <em>CMD</em> 창에서 사용한 명령어 드래그 <em>복사</em>가 가능하다. 2. 마우스 드래그 <em>복사</em> 명령어 메모장이나 기타 텍스트 편집 유틸에 <em>복사</em>가 가능 단점 1.</div></div><!--n--><!--m-->"""
 
 
-        data=data[f:]
-        if data.find('<li class="g ">') < data.find('<li class="g">'):
+        data = data[f:]
+        blog_pos = data.find('<li class="g ">')
+        web_pos = data.find('<li class="g">')
+        if blog_pos == -1 and web_pos == -1:
+            bot.con.query(
+                'PRIVMSG',
+                line.target,
+                u'알 수 없는 에러'
+            )
+            return
+        elif blog_pos == -1:
+            pattern = website
+        elif web_pos == -1:
+            pattern = blog
+        elif blog_pos < web_pos:
             pattern = blog
         else:
             pattern = website
-        pattern=re.compile(pattern)
+        pattern = re.compile(pattern)
 
-        print repr(data.encode('cp949','ignore'))
-
-        iter=pattern.finditer(data)
+        iter = pattern.finditer(data)
 
         c=1
         for x in iter:
-            res=u'[ %s - %s ] %s' % (x.group(2),x.group(1),x.group(3))
-            res=res.replace('<br>','').replace('<wbr>','')
-            res=res.replace('<b>','').replace('</b>','')
-            res=res.replace('<em>','\x02').replace('</em>','\x02')
-            res=res.replace('<span class="f">','').replace('</span>','')
+            res = u'[ %s - %s ] %s' % (x.group(2),x.group(1),x.group(3))
+            res = res.replace('<br>','').replace('<wbr>','')
+            res = res.replace('<b>','').replace('</b>','')
+            res = res.replace('<em>','\x02').replace('</em>','\x02')
+            res = res.replace('<span class="f">','').replace('</span>','')
 
-            res=HTMLParser.HTMLParser().unescape(res)
+            res = HTMLParser.HTMLParser().unescape(res)
             bot.con.query(
                 'PRIVMSG',
                 line.target,
                 res
             )
-            c+=1
-            if c>3:
+            c += 1
+            if c > 3:
                 break
-        else:
-            bot.con.query('PRIVMSG',line.target,u'파싱 실패')
 
+        if c == 1:
+            bot.con.query(
+                'PRIVMSG',
+                line.target,
+                u'파싱 실패' + str(data.find('<li class="g">'))
+            )
 
-    return
-
-
-
-    if data:
-        data=data[0]
-        #if len(data)>150:
-        #    data=data[:150]
-        con.query(
-            'PRIVMSG',
-            line.target,
-            u'[%s]  %s'%(args,data.group[0])
-        )
-    else:
-        con.query('PRIVMSG',line.target,u'그런거 없다.')
 
 def main():
     pass

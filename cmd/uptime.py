@@ -18,8 +18,6 @@ def read_time(_time):
     if second or (not day and not hour and not minute):
         temp.append(str(int(second))+u'초')
 
-    return ' '.join(temp)
-
 def cmd_uptime(bot, line, args):
     temp = time.time()
     bot.con.query(
