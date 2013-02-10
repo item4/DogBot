@@ -27,7 +27,7 @@ def cmd_tag(bot,line,args):
 
     data = urllib.urlopen('http://w3schools.com/tags/default.asp').read()
     data = data.decode('utf8').replace('\r','').replace('\n','')
-    data = re.search(r'<tr><td><a href="([^"]+)"(?: class="notsupported")?>%s</a>(<span class="new">New</span>)?</td><td>(.+?)</td></tr>' % tag,data)
+    data = re.search(r'<tr><td><a href="([^"]+)"(?: class="notsupported")?>%s</a>(?:&nbsp;)?(<span class="new">New</span>)?</td><td>(.+?)</td></tr>' % tag,data)
     """
 
     """
