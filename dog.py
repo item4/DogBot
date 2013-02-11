@@ -615,9 +615,9 @@ class DogBotConnection:
         if target:
             msg += ' ' + target
         if message:
-            while len(message) > 400:
-                self.append(msg + ' :' + message[:400])
-                message = message[400:]
+            while len(message) > 200:
+                self.append(msg + ' :' + message[:200])
+                message = message[200:]
             else:
                 self.append(msg + ' :' + message)
         else:
