@@ -68,6 +68,7 @@ def cmd_dic(bot, line, args):
     if data:
         res = ''
         i = 1
+        lines = 0
         for wordtype, n, nonum, desc in data:
             desc = re.sub('</?[^>]+>', '', desc)
             if wordtype:
@@ -88,6 +89,14 @@ def cmd_dic(bot, line, args):
                     res[:cut]
                 )
                 res = ''
+                lines += 1
+                if lines > 4:
+                    bot.con.query(
+                        'PRIVMSG',
+                        line.target,
+                        u'멍멍! 너무 길어요. 직접 가서 보세요 - ' + url
+                    )
+                    return
         if res:
             cut = -3 if res.endswith(' / ') else -1
             bot.con.query(

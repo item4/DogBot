@@ -35,20 +35,16 @@ def cmd_anitime(bot, line, args):
         bot.con.query(
             'PRIVMSG',
             line.target,
-            u'멍멍! 정상적인 요일을 입력해주세요!'
+            u'멍멍?'
         )
         return
-
     data = urllib.urlopen('http://gs.saro.me/api/ab' + str(wday)).read()
     #data = data.decode('utf8')
-
-
-    print data
 
     tree = xml.etree.ElementTree.fromstring(data)
 
     res = ''
-
+    i = 0
     for x in tree.findall('n'):
         time = x.get('t')
         time = time[:2] + ':' + time[2:] if wday not in [7,8] else '20' + time[:2] + '-' + time[2:]
@@ -65,6 +61,14 @@ def cmd_anitime(bot, line, args):
                 res
             )
             res = ''
+            i += 1
+            if i > 4:
+                bot.con.query(
+                    'PRIVMSG',
+                    line.target,
+                    u'멍멍! 너무 길어요. 직접 가서 보세요 - http://gs.saro.me/ani/530'
+                )
+                return
         else:
             res += ' | '
 
