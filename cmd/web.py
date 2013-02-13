@@ -2,45 +2,85 @@
 alias=[]
 
 import urllib
+import urllib2
 import re
 import HTMLParser
 
 def cmd_web(bot,line,args):
-    if args==None:
+    if not args:
         bot.con.query(
             'PRIVMSG',
             line.target,
             u'웹페이지의 내용을 간략히 보여줍니다. | usgae: ?web url'
         )
         return
+
     if not args.startswith('http://') and not args.startswith('https://'):
-        args='http://'+args
+        args = 'http://' + args
     try:
-        data=urllib.urlopen(args).read()
+        obj = urllib2.urlopen(args)
+        data = obj.read()
+
     except:
         bot.con.query(
             'PRIVMSG',
             line.target,
-            u'접속 실패'
+            u'멍멍! 접속에 실패하였습니다.'
         )
 
+    test = re.search('charset=(.+)', str(obj.info()))
+    if not test:
+        test = re.search('charset=["\']?([^"\']+)[^"\']?', data)
+
+    if test:
+        charset = test.group(1)
+    else:
+        charset = 'utf8'
+
+    charset = charset.lower()
+
+    if charset == 'euc-kr':
+        charset = 'cp949'
+    elif charset == 'utf-8':
+        charset = 'utf8'
+
     try:
-        data=data.decode('cp949')
+        data = data.decode(charset,'replace') # 'cp949')
     except:
-        data=data.decode('utf8','replace')
+        try:
+            data = data.decode('utf8','replace')
+        except:
+            bot.con.query(
+                'PRIVMSG',
+                line.target,
+                u'멍멍! charset 감지에 실패하였습니다.'
+            )
+            return
 
-    data=HTMLParser.HTMLParser().unescape(data)
-    data=data.replace('\n',' ').replace('\r','')
-    data=re.sub(r'\s{2,}',' ',data)
-    data=re.sub(r'<(style|script|title)[^>]*>.*?</\1>','',data,re.I|re.S)
-    data=re.sub(r'</?[^>]+>','',data)
 
-    if len(data)>150:
-        data=data[:150]
+    data = HTMLParser.HTMLParser().unescape(data)
+    data = data.replace('\n',' ').replace('\r','')
+    data = re.sub(r'\s{2,}',' ',data)
+    data = re.sub(r'<(style|script|title)[^>]*>.*?</\1>','',data,re.I|re.S)
+    data = re.sub(r'</?[^>]+>','',data)
+    data = re.sub(r'\s{2,}',' ',data)
+
+    data = data.strip()
+
+    if len(data) > 150:
+        data = data[:150]
+    elif not data:
+        bot.con.query(
+            'PRIVMSG',
+            line.target,
+            u'멍멍! frameset 페이지거나 페이지 내용이 없습니다.'
+        )
+        return
+
     bot.con.query(
         'PRIVMSG',
         line.target,
-        '[%s]  %s'%(args,data)
+        '[%s] %s' % (args, data)
     )
 
 def main():
