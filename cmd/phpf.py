@@ -36,6 +36,7 @@ def cmd_phpf(bot,line,args):
     if data:
         description = data.group(4)
         description = re.sub(r'</?[^>]+>','',description)
+        description = re.sub('\s{2,}',' ',description).strip()
 
         bot.con.query(
             'PRIVMSG',
