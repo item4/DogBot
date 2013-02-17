@@ -82,7 +82,7 @@ def cmd_memo(bot, line, args):
 
 
 
-    con = sqlite3.connect(bot.dbname)
+    con = sqlite3.connect(bot.system.dbname)
     c = con.cursor()
 
     with con:

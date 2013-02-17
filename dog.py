@@ -29,20 +29,23 @@ def read_time(_time):
 
     return ' '.join(temp)
 
+
 class DogBot:
     def __init__(self):
         self.thread = []
         self.start_time = time.time()
         self.running = True
         self.exit_reason = ''
+        self.encoding = 'cp949' #system encoding
+        self.dbname = 'DogBot.db'
 
-    def add_connect(self, server, port):
-        connect = DogBotConnection(self, server, port)
+    def add_connect(self, server, port, encoding, channels):
+        connect = DogBotConnection(self, server, port, encoding)
 
         th = Thread(
             target = DogBotObject,
             name = 'DogObj#%s' % server,
-            kwargs = {'system':self, 'connect':connect},
+            kwargs = {'system':self, 'connect':connect, 'encoding':encoding, 'channels':channels},
         )
 
         self.thread.append(th)
@@ -50,6 +53,7 @@ class DogBot:
     def start(self):
         for th in self.thread:
             th.start()
+
 
 class DogBotCommand:
     def __init__(self):
@@ -141,7 +145,7 @@ class DogBotCommand:
                     bot.con.query(
                         'PRIVMSG',
                         line.target,
-                        u'%s: ???' % (e.__class__.__name__)
+                        u'%s: %s' % (e.__class__.__name__,e.decode('cp949'))
                     )
         elif cmd in self.syscmd:
             func = getattr(self,'cmd_%s' % cmd)
@@ -249,9 +253,11 @@ class DogBotCommand:
 
 
 class DogBotObject:
-    def __init__(self, system, connect):
+    def __init__(self, system, connect, encoding, channels):
         self.system = system
         self.con = connect
+        self.encoding = encoding
+        self.channels = channels
 
         self.running = True
         self.restart = False
@@ -260,10 +266,8 @@ class DogBotObject:
         self.start_time = 0.
 
         self.nick = u'멍멍이'
-        self.dbname = 'DogBot.db'
 
         self.cmd = DogBotCommand()
-
 
         while self.system.running and (self.running or self.restart):
             try:
@@ -416,10 +420,14 @@ class DogBotObject:
 
 
 
-    def on_396(self,line): # motd 끝
-        self.con.send(u'JOIN #item4')
+    def on_396(self, line): # motd 끝
+        for x in self.channels:
+            self.con.query(
+                'JOIN',
+                x
+            )
 
-    def on_005(self,line): # server options
+    def on_005(self, line): # server options
         option = line.target.split(' ')[1:]
         for x in option:
             if '=' in x:
@@ -565,10 +573,11 @@ class DogBotLine:
 
 
 class DogBotConnection:
-    def __init__(self, system, host, port):
+    def __init__(self, system, host, port, encoding):
         self.system = system
         self.host = host
         self.port = port
+        self.encoding = encoding
         self.queue = None
 
     def connect(self):
@@ -582,14 +591,14 @@ class DogBotConnection:
         Thread(target=self.run).start()
 
     def recv(self):
-        recv = self.connect.recv(4096).decode('utf8', 'replace')
+        recv = self.connect.recv(4096).decode(self.encoding, 'replace')
         return recv
 
     def send(self, msg):
         temp = u'[%s]>> %s' % (time.strftime('%H:%M:%S'), msg)
-        print temp.encode('cp949','replace')
+        print temp.encode(self.system.encoding,'replace')
         msg += u"\r\n"
-        self.connect.send(msg.encode('utf8', 'replace'))
+        self.connect.send(msg.encode(self.encoding, 'replace'))
 
     def append(self,msg):
         try:
@@ -613,7 +622,11 @@ class DogBotConnection:
     def query(self, type, target=None, message=None):
         msg = type
         if target:
-            msg += ' ' + target
+            if message:
+                msg += ' ' + target
+            else:
+                msg += ' :' + target
+
         if message:
             while len(message) > 200:
                 self.append(msg + ' :' + message[:200])
@@ -637,7 +650,7 @@ class DogBotError(Exception):
 
 def main():
     dog = DogBot()
-    dog.add_connect(u'kanade.irc.ozinger.org', 6667)
+    dog.add_connect(u'irc.ozinger.org', 6667, 'utf8', ['#item4','#snoin-dev'])
     dog.start()
 
 if __name__ == '__main__':

@@ -20,7 +20,7 @@ def cmd_db(bot, line, args):
         )
         return
 
-    conn = sqlite3.connect(bot.dbname)
+    conn = sqlite3.connect(bot.system.dbname)
     with conn:
         c = conn.cursor()
 
