@@ -2,7 +2,8 @@
 
 alias = [u'애니시간표']
 
-import xml.etree.ElementTree
+#import xml.etree.ElementTree
+import re
 import urllib
 
 def cmd_anitime(bot, line, args):
@@ -39,17 +40,22 @@ def cmd_anitime(bot, line, args):
         )
         return
     data = urllib.urlopen('http://gs.saro.me/api/ab' + str(wday)).read()
-    #data = data.decode('utf8')
+    data = data.decode('utf8')
 
-    tree = xml.etree.ElementTree.fromstring(data)
+    #tree = xml.etree.ElementTree.fromstring(data)
+
+    data = re.findall('<n t="([^"]+)" s="([^"]+)" g="([^"]+)"/>',data)
 
     res = ''
     i = 0
-    for x in tree.findall('n'):
-        time = x.get('t')
+    #for x in tree.findall('n'):
+    for x in data:
+        time, title, genre = x
+        #time = x.get('t')
         time = time[:2] + ':' + time[2:] if wday not in [7,8] else '20' + time[:2] + '-' + time[2:]
-        title = x.get('s')
-        genre = x.get('g')
+        #title = x.get('s')
+        #genre = x.get('g')
+
 
         res += '[%s] %s' % (time,title)
         if genre != '/':
