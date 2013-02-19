@@ -32,9 +32,9 @@ def cmd_exchange(bot, line, args):
     money = float(data[0])
 
     if size == 2:
-        ex_from = 'WON'
         temp = shortcut.get(data[1])
-        ex_to = temp if temp else data[1]
+        ex_from = temp if temp else data[1]
+        ex_to = 'WON'
     elif size == 3:
         temp = shortcut.get(data[1])
         ex_from = temp if temp else data[1]
@@ -49,9 +49,6 @@ def cmd_exchange(bot, line, args):
         return
 
     data = urllib.urlopen('http://finance.daum.net/exchange/exchangeMain.daum').read().decode('utf8')
-
-    print data[data.find('ex['):data.find('ex[')+100]
-    print ex_from,ex_to
 
     from_data = re.search(r"""ex\[\d+\] = '%s';ex_rate\[\d+\] = "(.+?)";country\[\d+\] = '(.+?)'; k_ex\[\d+\] = '(.+?)';full_k_ex\[\d+\] = '.+?';""" % ex_from,data)
     to_data = re.search(r"""ex\[\d+\] = '%s';ex_rate\[\d+\] = "(.+?)";country\[\d+\] = '(.+?)'; k_ex\[\d+\] = '(.+?)';full_k_ex\[\d+\] = '.+?';""" % ex_to,data)
