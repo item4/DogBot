@@ -64,7 +64,7 @@ class DogBotCommand:
     def reload(self, cmdname=None):
         if cmdname is None:
             self.cmdlist.clear()
-            os.chdir('c:/py/DogBot/')
+            os.chdir('/py/DogBot/')
             cmdlist = os.listdir('./cmd/')
             res = 0
             total = 0
