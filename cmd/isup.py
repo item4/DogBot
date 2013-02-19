@@ -10,7 +10,7 @@ def cmd_isup(bot, line, args):
         bot.con.query(
             'PRIVMSG',
             line.target,
-            u'입력된 사이트가 접속 가능한지 검사합니다. | usage: ?isup item4.net'
+            u'http://isup.me 사이트를 통해 입력된 사이트가 접속 가능한지 검사합니다. | usage: ?isup item4.net'
         )
         return
 
