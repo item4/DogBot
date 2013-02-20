@@ -390,7 +390,10 @@ class DogBotObject:
                 del self.db['channel'][chan]['member'][line.nick]
 
     def on_PART(self, line):
-        del self.db['channel'][line.target]['member'][line.nick]
+        if line.nick == self.nick:
+            self.db['channel'][line.target].clear()
+        else:
+            del self.db['channel'][line.target]['member'][line.nick]
 
     def on_JOIN(self, line):
         if line.message in self.db['channel']:
