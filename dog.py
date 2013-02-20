@@ -396,6 +396,27 @@ class DogBotObject:
         if line.message in self.db['channel']:
             self.db['channel'][line.message]['member'][line.nick] = ''
 
+    def on_KICK(self, line):
+        chan, nick = line.target.split(' ')
+
+        if nick == self.nick:
+            self.db['channel'][chan]['member'].clear()
+
+            if chan in self.channels:
+                self.con.query(
+                    'JOIN',
+                    chan
+                )
+                time.sleep(.1)
+                self.con.query(
+                    'PRIVMSG',
+                    chan,
+                    u'깨갱'
+                )
+        else:
+            del self.db['channel'][chan]['member'][nick]
+
+
     def on_NICK(self, line): # change nick
         temp = self.login.get(line.nick)
 
@@ -461,9 +482,7 @@ class DogBotObject:
         if channel not in self.db['channel']:
             self.db['channel'][channel] = {}
 
-        if self.db['channel'][channel].get('member'):
-            self.db['channel'][channel].clear()
-        else:
+        if 'member' not in self.db['channel'][channel]:
             self.db['channel'][channel]['member'] = {}
 
         member = line.message.split(' ')

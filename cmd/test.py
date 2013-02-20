@@ -13,6 +13,6 @@ def cmd_test(bot, line, args):
     bot.con.query(
         'PRIVMSG',
         line.target,
-        str(len(bot.db['channel'][line.target]['member']))
-        )
+        'TEST'
+    )
     print ', '.join(bot.db['channel'][line.target]['member'].keys())
