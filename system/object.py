@@ -3,6 +3,7 @@
 __all__ = ['DogBotObject']
 
 import os
+import random
 import re
 import select
 import time
