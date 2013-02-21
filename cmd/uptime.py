@@ -1,7 +1,10 @@
 # -*- coding:utf-8 -*-
+
 alias=[]
 
 import time
+
+from utility.time import read_time
 
 def read_time(_time):
     day, _time = divmod(_time,86400)
