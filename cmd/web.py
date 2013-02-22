@@ -18,15 +18,15 @@ def cmd_web(bot,line,args):
     if not args.startswith('http://') and not args.startswith('https://'):
         args = 'http://' + args
     try:
-        obj = urllib2.urlopen(args)
+        obj = urllib2.urlopen(args,None,3)
         data = obj.read()
-
     except:
         bot.con.query(
             'PRIVMSG',
             line.target,
             u'멍멍! 접속에 실패하였습니다.'
         )
+        return
 
     test = re.search('charset=(.+)', str(obj.info()))
     if not test:
