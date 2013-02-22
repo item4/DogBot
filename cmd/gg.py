@@ -31,9 +31,20 @@ def cmd_gg(bot,line,args):
         r'(?:<span class="gl">.+?</span>)?(?:<span class="vshid">.+?</span>)?(?:<span class="std">.+?</span>)?(?:<a[^>]+><span class="pplsrsl">.+?</span></a>)?'+\
         r'(?:<div data-ved[^>]+>.+?</div>)?'+\
         r'</div>(?:<div class="esc slp"[^>]+>.+?</div>)?(?:<span class="f">.+?</span>)?'+\
+        r'(?:<table class="ts">(?<!<span class="st">))?'+\
         r'<span class="st">(.+?)</span>'+\
-        r'(?:<div class=osl>.+?</div>)?(?:<table[^>]*>.+?</table>)?</div></div>(?:<h3[^>]+>.+?</h3>)?<!--n-->(?:<table class="nrgt" cellpadding="0" cellspacing="0">.+?</table>)?</li>'
+        r'(?:<div class=osl>.+?</div>)?(?:<table[^>]*>.+?</table>)?'+\
+        r'(?:</td></tr></table>)?'+\
+        r'</div></div>(?:<h3[^>]+>.+?</h3>)?<!--n-->(?:<table class="nrgt" cellpadding="0" cellspacing="0">.+?</table>)?</li>'
         """
+<li class="g"><div class="vsc" sig="Wth">  <div data-ved="0CDkQkgowAA">  <div data-ved="0CDoQkQowAA"> </div>   </div>   <h3 class="r">
+<a href="http://flask.pocoo.org/">Welcome | <em>Flask</em> (A <em>Python</em> Microframework)</a></h3>
+<div class="s"><div class="f kv"><cite><b>flask</b>.pocoo.org/</cite>
+<span class="gl"> - <a >저장된&nbsp;페이지</a></span><span class="vshid"><a>유사한 페이지</a></span><span class="std">&nbsp;<span class=gl>-</span> <a>이 페이지 번역하기</a></span></div>
+<div class="esc slp" id="poS0" style="display:none">공개적으로 +1했습니다.&nbsp;<a href="#" class="fl">실행취소</a></div>
+<table class="ts"><span class="st">A lightweight <em>Python</em> web framework based on Werkzeug and Jinja 2. Code, documentation, and community links are provided.<br></span>
+<div class=osl></div></td></tr></table></div></div><!--n--></li><!--m--><li class="g"><div class="vsc" sig="6Fx">  <div data-ved="0CEoQkgowAQ">  <div data-ved="0CEsQkQowAQ"> </div>   </div>   <h3 class="r"><a href="http://flask-script.readthedocs.org/" target=_blank class=l onmousedown="return rwt(this,'','','','2','AFQjCNGcqGuT-SoP1Vlm-SRGrZ7uHw2GGg','','0CEwQFjAB','','',event)"><em>Flask</em>-Script — <em>Flask</em>-Script 0.4.0 documentation</a></h3><div class="s"><div class="f kv"><cite><b>flask</b>-script.readthedocs.org/</cite><span class="gl"> - <a href="http://webcache.googleusercontent.com/search?q=cache:k6qEErq9OqAJ:flask-script.readthedocs.org/+&amp;cd=2&amp;hl=ko&amp;ct=clnk&amp;gl=kr&amp;client=firefox-a" onmousedown="return rwt(this,'','','','2','AFQjCNGEN52splsnYtonRiW0uJ1PSi2Xog','','0CE0QIDAB','','',event)" target="_blank" target="_blank">저장된&nbsp;페이지</a></span><span class="std">&nbsp;<span class=gl>-</span> <a href="http://translate.google.co.kr/translate?hl=ko&amp;sl=en&amp;u=http://flask-script.readthedocs.org/&amp;prev=/search%3Fq%3Dpython%2Bflask%26hl%3Dko%26newwindow%3D1%26client%3Dfirefox-a%26hs%3DHus%26rls%3Dorg.mozilla:ko:official%26channel%3Dfflb&amp;sa=X&amp;ei=KGEnUcfLGtCViQeRyYCQAg&amp;ved=0CE4Q7gEwAQ" class=fl target=_blank>이 페이지 번역하기</a></span></div><div class="esc slp" id="poS1" style="display:none">공개적으로 +1했습니다.&nbsp;<a href="#" class="fl">실행취소</a></div><span class="st">The <em>Flask</em>-Script extension provides support for writing external scripts in <em>Flask</em>. This includes running a development server, a customised <em>Python</em> shell, scripts <b>...</b><br></span></div></div><!--n--></li>
+
 <li class="g"><div class="vsc" sig="18q">  <div data-ved="0CDUQkgowAA">  <div data-ved="0CDYQkQowAA"> </div>   </div>   <h3 class="r">
 <a href="http://isohunt.com/torrent_details/434772113/Shows.torrent"><em>무한도전</em>.E306.121201.HDTV.H264.720p-WITH.mp4 › Shows <b>...</b></a></h3>
 <div class="s"><div class="f kv"><cite>isohunt.com/.../Shows.torre...</cite>
