@@ -61,7 +61,7 @@ def cmd_web(bot,line,args):
     data = HTMLParser.HTMLParser().unescape(data)
     data = data.replace('\n',' ').replace('\r','')
     data = re.sub(r'\s{2,}',' ',data)
-    data = re.sub(r'<(style|script|title)[^>]*>.*?</\1>','',data,re.I|re.S)
+    data = re.sub(r'<(style|script|title)[^>]*>.*?</\1>','',data,flags=re.I|re.S)
     data = re.sub(r'</?[^>]+>','',data)
     data = re.sub(r'\s{2,}',' ',data)
 
