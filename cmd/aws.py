@@ -1,8 +1,8 @@
 # -*- coding:utf-8 -*-
 alias=[u'날씨']
 
-import urllib
 import re
+import urllib2
 
 def cmd_aws(bot,line,args):
     if args is None:
@@ -13,15 +13,20 @@ def cmd_aws(bot,line,args):
         )
         return
 
-
-    data = urllib.urlopen('http://203.247.66.10/cgi-bin/aws/nph-aws_txt_min').read()
-    data = data.decode('cp949').replace('\r','').replace('\n','')
-
-    if '>' + args + '<' not in data:
-        data = urllib.urlopen('http://203.247.66.10/cgi-bin/aws/nph-aws_txt_min?&0&MINDB_60M&0&a').read()
+    try:
+        data = urllib2.urlopen('http://203.247.66.10/cgi-bin/aws/nph-aws_txt_min',None,3).read()
         data = data.decode('cp949').replace('\r','').replace('\n','')
 
-    print args in data
+        if '>' + args + '<' not in data:
+            data = urllib2.urlopen('http://203.247.66.10/cgi-bin/aws/nph-aws_txt_min?&0&MINDB_60M&0&a',None,3).read()
+            data = data.decode('cp949').replace('\r','').replace('\n','')
+    except:
+        bot.con.query(
+            'PRIVMSG',
+            line.target,
+            u'멍멍! 기상청 AWS에 접속할 수 없습니다.'
+        )
+        return
 
     time = re.search(u'\[ 매분관측자료 \] \d+\.\d+\.\d+\.(\d+:\d+)',data)
     data = re.search(ur'<tr[^>]+><td[^>]+><a[^>]+>\d+</a></td><td[^>]+><a[^>]+>%s</a></td><td[^>]+>\d+m</td><td>(<font color=red>○</font>|<font color=blue>●</font>|-)</td><td[^>]*>([^<]*)</td><td[^>]*>[^<]*</td><td[^>]*>[^<]*</td><td[^>]*>[^<]*</td><td[^>]*>([^<]*)</td><td>([^<]*)</td><td class=textg>[^<]*</td><td class=textg>([^<]*)</td><td class=textg>([^<]*)</td><td[^>]*>[^<]*</td><td[^>]*>[^<]*</td><td[^>]*>[^<]*</td><td>([^<]*)</td><td>([^<]*)</td><td align=left class=text2 nowrap>([^<]*)</td></tr>' % args,data)
