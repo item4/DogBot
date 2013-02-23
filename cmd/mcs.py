@@ -16,6 +16,7 @@ def cmd_mcs(bot,line,args):
 
     try:
         s = socket.socket()
+        s.settimeout(5)
         s.connect((server,port))
     except:
         bot.con.query(
