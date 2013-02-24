@@ -7,7 +7,7 @@ import urllib
 import urllib2
 
 def cmd_calc(bot, line, args):
-    if args is None:
+    if not args:
         bot.con.query(
             'PRIVMSG',
             line.target,
@@ -15,8 +15,11 @@ def cmd_calc(bot, line, args):
         )
         return
 
+    opener = urllib2.build_opener()
+    opener.addheaders = [('User-agent', 'Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.52 Safari/537.17')]
+
     try:
-        data = urllib2.urlopen('https://www.google.co.kr/search?%s' % urllib.urlencode({'q':args+'='}),None,3).read()
+        data = opener.open('https://www.google.co.kr/search?%s' % urllib.urlencode({'q':args+'='}),None,3).read()
     except:
         bot.con.query(
             'PRIVMSG',
@@ -33,13 +36,13 @@ def cmd_calc(bot, line, args):
     r'<div class="cwtld">\s<div class="cwtlb" id="cwtlbb"></div>\s'+\
     r'<div class="cwtlwm"></div>\s<div class="cwtltbl" id="cwotbl">\s'+\
     r'<div id="cwtltblr" tabindex="0">\s<div class="cwtlptc"></div>\s'+\
-    r'<div class="cwtlotc">\s<span class="cwcot" dir="ltr" id="cwos">(.+?)</span>'+\
+    r'<div class="cwtlotc">\s<span class="cwcot" dir="ltr" id="cwos">(.+?)</span>'
 
     res = re.search(pattern,data)
     bot.con.query(
         'PRIVMSG',
         line.target,
-        u'%s %s' % (res.group(1),res.group(2))
+        u'%s %s' % (res.group(1).strip(),res.group(2).strip())
     )
 
 
