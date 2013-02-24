@@ -4,6 +4,10 @@ alias = [u'기억',u'덧붙',u'잊어',u'알려']
 
 import sqlite3
 
+"""
+DB Scheme
+create table memo (uid integer primary key autoincrement, keyword varchar(50), content text, writer varchar(30))
+"""
 def cmd_memo(bot, line, args):
     cmd, _ = line.message[1:].split(' ',1)
 
