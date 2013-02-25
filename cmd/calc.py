@@ -39,11 +39,19 @@ def cmd_calc(bot, line, args):
     r'<div class="cwtlotc">\s<span class="cwcot" dir="ltr" id="cwos">(.+?)</span>'
 
     res = re.search(pattern,data)
-    bot.con.query(
-        'PRIVMSG',
-        line.target,
-        u'%s %s' % (res.group(1).strip(),res.group(2).strip())
-    )
+
+    if res:
+        bot.con.query(
+            'PRIVMSG',
+            line.target,
+            u'%s %s' % (res.group(1).strip().replace(u'\xa0',','),res.group(2).strip())
+        )
+    else:
+        bot.con.query(
+            'PRIVMSG',
+            line.target,
+            u'멍멍! 수식이 잘못되었거나 계산할 수 없어요.'
+        )
 
 
 def main():
