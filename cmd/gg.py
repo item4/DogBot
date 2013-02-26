@@ -167,6 +167,7 @@ li class="g"><div class="vsc" sig="t9t">  <div data-ved="0CG4QkgowDA">  <div dat
             res = res.replace('<b>','').replace('</b>','')
             res = res.replace('<em>','\x02').replace('</em>','\x02')
             res = res.replace('<span class="f">','').replace('</span>','')
+            res = re.sub('<a [^>]+>(.+?)</a>',r'\1',res)
 
             res = HTMLParser.HTMLParser().unescape(res)
             bot.con.query(
