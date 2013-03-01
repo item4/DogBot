@@ -24,17 +24,18 @@ def cmd_dday(bot, line, args):
         return
 
     today = time.localtime()
-    dday -= time.mktime((today[0],today[1],today[2],0,0,0,today[6],today[7],today[8]))
+    day = (today[0],today[1],today[2],0,0,0,today[6],today[7],today[8])
+    dday -= time.mktime(day)
 
     if dday > 0:
         bot.con.query(
             'PRIVMSG',
             line.target,
-            u'{0}까지 {1:,}일 남았습니다.'.format(args,int(dday//86400))
+            u'{0}까지 {1:,}일 남았습니다.'.format(time.strftime('%Y-%m-%d',day),int(dday//86400))
         )
     else:
         bot.con.query(
             'PRIVMSG',
             line.target,
-            u'{0}로부터 {1:,}일 지났습니다.'.format(args,int(-dday//86400))
+            u'{0}로부터 {1:,}일 지났습니다.'.format(time.strftime('%Y-%m-%d',day),int(-dday//86400))
         )
