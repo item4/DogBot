@@ -3,18 +3,33 @@
 alias = []
 
 import time
+import sqlite3
 
 def cmd_dday(bot, line, args):
     if not args:
         bot.con.query(
             'PRIVMSG',
             line.target,
-            u'해당 날짜까지 며칠 남았는지, 혹은 며칠 지났는지 계산합니다. | usage: ?dday 20131231'
+            u'해당 날짜까지 며칠 남았는지, 혹은 며칠 지났는지 계산합니다. ?기억 기능과 연동됩니다. 기억과 날짜가 겹칠경우 앞에 @를 붙여주세요. | usage: ?dday 20131231 | ?dday 지구멸망'
         )
         return
+    if args[0] == '@':
+        args = args[1:]
+    else:
+        conn = sqlite3.connect(bot.system.dbname)
+        with conn:
+            c = conn.cursor()
+            c.execute('select `uid`,`content` from `memo` where `keyword`=? limit 1;',(args,))
+
+            uid, content = c.fetchone()
+
+            if uid:
+                args = content
 
     try:
-        dday = time.mktime(time.strptime(args,'%Y%m%d'))
+
+        day = time.strptime(args,'%Y%m%d')
+        dday = time.mktime(day)
     except:
         bot.con.query(
             'PRIVMSG',
@@ -24,8 +39,7 @@ def cmd_dday(bot, line, args):
         return
 
     today = time.localtime()
-    day = (today[0],today[1],today[2],0,0,0,today[6],today[7],today[8])
-    dday -= time.mktime(day)
+    dday -= time.mktime((today[0],today[1],today[2],0,0,0,today[6],today[7],today[8]))
 
     if dday > 0:
         bot.con.query(
