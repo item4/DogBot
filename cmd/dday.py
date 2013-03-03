@@ -13,21 +13,22 @@ def cmd_dday(bot, line, args):
             u'해당 날짜까지 며칠 남았는지, 혹은 며칠 지났는지 계산합니다. ?기억 기능과 연동됩니다. 기억과 날짜가 겹칠경우 앞에 @를 붙여주세요. | usage: ?dday 20131231 | ?dday 지구멸망'
         )
         return
+
+
     if args[0] == '@':
         args = args[1:]
     else:
         conn = sqlite3.connect(bot.system.dbname)
         with conn:
             c = conn.cursor()
-            c.execute('select `uid`,`content` from `memo` where `keyword`=? limit 1;',(args,))
+            c.execute('select `content` from `memo` where `keyword`=? limit 1;',(args,))
 
-            uid, content = c.fetchone()
+            data = c.fetchone()
 
-            if uid:
-                args = content
+            if data is not None:
+                args = data[0]
 
     try:
-
         day = time.strptime(args,'%Y%m%d')
         dday = time.mktime(day)
     except:
