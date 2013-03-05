@@ -29,9 +29,9 @@ def cmd_urle(bot, line, args):
             for x in data.query.split('&'):
                 t = x.split('=',1)
                 if len(t) == 2:
-                    temp.append(urllib(t[0].encode('utf8')) + '=' + urllib.quote(t[1].encode('utf8')))
+                    temp.append(urllib.quote(t[0].encode('utf8')) + '=' + urllib.quote(t[1].encode('utf8')))
                 else:
-                    temp.append(urllib(t[0].encode('utf8')))
+                    temp.append(urllib.quote(t[0].encode('utf8')))
 
             new_data.append('&'.join(temp))
         else:
