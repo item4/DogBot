@@ -15,16 +15,28 @@ def cmd_urld(bot, line, args):
 
     data = urllib.unquote(args)
 
-    print repr(data)
+    data = data.encode('latin-1')
 
-    data = data.encode('latin-1').decode('utf8')
+    try:
+        data = data.decode('utf8')
+        encoding = 'UTF-8'
+    except:
+        try:
+            data = data.decode('cp949')
+            encoding = 'CP949'
+        except:
+            bot.con.query(
+                'PRIVMSG',
+                line.target,
+                u'멍멍! 인코딩 파악에 실패했습니다.'
+            )
 
     #print repr(data)
 
     bot.con.query(
         'PRIVMSG',
         line.target,
-        u'%s: %s' % (args, data)
+        u'[%s] %s: %s' % (encoding, args, data)
     )
 
 
