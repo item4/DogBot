@@ -19,37 +19,25 @@ def cmd_urle(bot, line, args):
     data = urlparse.urlparse(args)
 
     if data.netloc:
-        new_data = [data.scheme,data.netloc]
-
-        if data.path:
-            temp = []
-            for x in data.path.split('/'):
-                temp.append(urllib.quote(x.encode('utf8')))
-            new_data.append('/'.join(temp))
-        else:
-            new_data['path'].append('')
-
-        new_data.append(data.params)
+        new_data = [data.scheme,
+                    data.netloc,
+                    urllib.quote(data.path.encode('utf8')),
+                    data.params]
 
         if data.query:
             temp = []
             for x in data.query.split('&'):
                 t = x.split('=',1)
                 if len(t) == 2:
-                    temp.append(t[0] + '=' + urllib.quote(t[1].encode('utf8')))
+                    temp.append(urllib(t[0].encode('utf8')) + '=' + urllib.quote(t[1].encode('utf8')))
                 else:
-                    temp.append(t[0])
+                    temp.append(urllib(t[0].encode('utf8')))
 
             new_data.append('&'.join(temp))
         else:
             new_data.append('')
 
         new_data.append(data.fragment)
-
-        #new_data['username'] = data.username
-        #new_data['password'] = data.password
-        #new_data['hostname'] = data.hostname
-        #new_data['port'] = data.port
 
         data = urlparse.urlunparse(new_data)
 
