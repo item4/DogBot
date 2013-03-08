@@ -23,7 +23,7 @@ def cmd_phpf(bot,line,args):
 
     function = function.replace('_','-')
 
-    url = 'http://kr.php.net/manual/kr/%s.%s.php' % (category,function)
+    url = 'http://php.net/manual/en/%s.%s.php' % (category,function)
 
 
     data = urllib.urlopen(url).read()

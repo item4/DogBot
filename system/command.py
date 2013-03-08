@@ -202,11 +202,19 @@ class DogBotCommand:
             line.target,
             u'총 %d개의 명령어와 %d개의 시스템 명령어가 있습니다' % (len(self.cmdlist),len(self.syscmd))
         )
-        bot.con.query(
-            'PRIVMSG',
-            line.target,
-            ', '.join(sorted(self.cmdlist.keys()+self.syscmd))
-        )
+        check = False
+        cmd = self.cmdlist.keys()+self.syscmd
+        res = ''
+        for x in cmd:
+            res += ' ?' + x
+            if len(res) > 150:
+                bot.con.query(
+                    'PRIVMSG',
+                    line.target,
+                    res[1:]
+                )
+                res = ''
+
 
 def main():
     pass
