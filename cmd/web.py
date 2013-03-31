@@ -1,12 +1,14 @@
 # -*- coding:utf-8 -*-
-alias=[]
+
+alias = []
+handler = []
 
 import urllib
 import urllib2
 import re
 import HTMLParser
 
-def cmd_web(bot,line,args):
+def cmd_web(bot, line, args):
     if not args:
         bot.con.query(
             'PRIVMSG',

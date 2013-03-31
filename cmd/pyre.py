@@ -1,6 +1,7 @@
 # -*- coding:utf-8 -*-
 
 alias = []
+handler = []
 
 def cmd_pyre(bot, line, args):
     if not args:

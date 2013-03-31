@@ -1,6 +1,7 @@
 # -*- coding:utf-8 -*-
 
 alias = []
+handler = []
 
 import urllib
 import re

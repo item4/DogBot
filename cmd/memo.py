@@ -1,6 +1,7 @@
 # -*- coding:utf-8 -*-
 
 alias = [u'기억',u'덧붙',u'잊어',u'알려']
+handler = []
 
 import sqlite3
 
@@ -9,7 +10,19 @@ DB Scheme
 create table memo (uid integer primary key autoincrement, keyword varchar(50), content text, writer varchar(30))
 """
 def cmd_memo(bot, line, args):
-    cmd, _ = line.message[1:].split(' ',1)
+    if ' ' not in line.message[1:]:
+        if line.message[1:].startswith('memo'):
+            bot.con.query(
+                'PRIVMSG',
+                line.target,
+                u'메모 기능입니다 | usage: ?memo add 단어 정보'
+            )
+            return
+        else:
+            cmd = line.message[1:]
+            args = ''
+    else:
+        cmd, _ = line.message[1:].split(' ',1)
 
     if args is None:
         args = ''
@@ -22,23 +35,35 @@ def cmd_memo(bot, line, args):
         cmd = 'remove'
     elif cmd == u'알려':
         cmd = 'view'
-    elif args.startswith('add '):
+    elif args.startswith('add'):
         cmd = 'add'
-        _, args = args.split(' ',1)
-    elif args.startswith('append '):
+        if ' ' in args:
+            _, args = args.split(' ',1)
+        else:
+            args = ''
+    elif args.startswith('append'):
         cmd = 'append'
-        _, args = args.split(' ',1)
-    elif args.startswith('remove '):
+        if ' ' in args:
+            _, args = args.split(' ',1)
+        else:
+            args = ''
+    elif args.startswith('remove'):
         cmd = 'remove'
-        _, args = args.split(' ',1)
-    elif args.startswith('view '):
+        if ' ' in args:
+            _, args = args.split(' ',1)
+        else:
+            args = ''
+    elif args.startswith('view'):
         cmd = 'view'
-        _, args = args.split(' ',1)
+        if ' ' in args:
+            _, args = args.split(' ',1)
+        else:
+            args = ''
     else:
         bot.con.query(
             'PRIVMSG',
             line.target,
-            u'멍멍?'
+            u'멍멍! 알 수 없는 명령어입니다.'
         )
         return
 
@@ -66,10 +91,9 @@ def cmd_memo(bot, line, args):
         bot.con.query(
             'PRIVMSG',
             line.target,
-            u'멍멍?? %s ' % cmd
+            u'멍멍! 파라메터가 부족합니다.'
         )
         return
-
 
     if cmd in ['add','append']:
         keyword, desc = args.split(' ',1)

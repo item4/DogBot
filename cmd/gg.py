@@ -1,13 +1,15 @@
 # -*- coding:utf-8 -*-
-alias=[]
+
+alias = []
+handler = []
 
 import urllib
 import urllib2
 import re
 import HTMLParser
 
-def cmd_gg(bot,line,args):
-    if args is None:
+def cmd_gg(bot, line, args):
+    if not args:
         bot.con.query(
             'PRIVMSG',
             line.target,

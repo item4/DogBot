@@ -1,10 +1,12 @@
 # -*- coding:utf-8 -*-
-alias=[u'pf']
+
+alias = [u'pf']
+handler = []
 
 import urllib
 import re
 
-def cmd_phpf(bot,line,args):
+def cmd_phpf(bot, line, args):
     if args is None:
         bot.con.query(
             'PRIVMSG',
@@ -37,12 +39,13 @@ def cmd_phpf(bot,line,args):
         description = data.group(4)
         description = re.sub(r'</?[^>]+>','',description)
         description = re.sub('\s{2,}',' ',description).strip()
+        description = description.replace('&quot;',"'")
 
         bot.con.query(
             'PRIVMSG',
             line.target,
             u'\x02%s\x02: %s (%s)' % (data.group(2).replace('&gt;','>'),
-                                    data.group(3).replace('&#039;',"'"),
+                                    data.group(3).replace('&#039;',"'").replace('&quot;',"'"),
                                     data.group(1).replace('&gt;','>'))
         )
         bot.con.query(

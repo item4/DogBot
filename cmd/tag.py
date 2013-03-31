@@ -1,10 +1,12 @@
 # -*- coding:utf-8 -*-
-alias=[u'html']
+
+alias = [u'html']
+handler = []
 
 import urllib
 import re
 
-def cmd_tag(bot,line,args):
+def cmd_tag(bot, line, args):
     if args is None:
         bot.con.query(
             'PRIVMSG',

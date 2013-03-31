@@ -2,11 +2,12 @@
 
 __all__ = ['DogBotLine']
 
-class DogBotLine:
+class DogBotLine(object):
     __slots__ = "nick", "ident", "ip", "mask", "server", "type", "target", "message", "login"
-    nick = ident = ip = mask = server = type = target = message = login = None
+
 
     def __init__(self, msg, login):
+        self.nick = self.ident = self.ip = self.mask = self.server = self.type = self.target = self.message = self.login = None
         if ':' in msg[1:]:
             temp, message = msg[1:].split(' :',1)
 
@@ -47,7 +48,7 @@ class DogBotLine:
                 temp[i] = temp[i].encode('utf8')
 
         format = "'nick':{!r},'ident':{!r},'ip':{!r},'server':{!r},"
-        format += "type:{!r},target:{!r},message:{!r},login:{!r}"
+        format += "type:{!r},target:{!r},msg:{!r},login:{!r}"
         return '<DogBotLine>{' + format.format(*temp) + '}'
 
 def main():

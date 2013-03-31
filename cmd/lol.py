@@ -1,6 +1,7 @@
 # -*- coding:utf-8 -*-
 
 alias = [u'롤']
+handler = []
 
 import re
 import urllib

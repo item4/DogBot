@@ -1,5 +1,7 @@
 # -*- coding:utf-8 -*-
-alias=[u'도쿄도','tokyotosho']
+
+alias = [u'도쿄도','tokyotosho']
+handler = []
 
 import urllib
 import re

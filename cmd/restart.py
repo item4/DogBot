@@ -1,6 +1,7 @@
 # -*- coding:utf-8 -*-
 
 alias = []
+handler = []
 
 def cmd_restart(bot, line, args):
     if line.login != 'item4':
@@ -10,7 +11,7 @@ def cmd_restart(bot, line, args):
             u'멍멍! 관리자만 사용가능한 명령어입니다.'
         )
         return
-    if args is None:
+    if not args:
         args = 'RESTART'
 
     bot.con.send(

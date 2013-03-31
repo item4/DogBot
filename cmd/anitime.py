@@ -1,6 +1,7 @@
 # -*- coding:utf-8 -*-
 
 alias = [u'애니시간표']
+handler = []
 
 #import xml.etree.ElementTree
 import re

@@ -1,6 +1,7 @@
 # -*- coding:utf-8 -*-
 
 alias = []
+handler = []
 
 def cmd_topic(bot, line, args):
     try:

@@ -1,11 +1,13 @@
 # -*- coding:utf-8 -*-
-alias=[]
+
+alias = []
+handler = []
 
 import urllib
 import re
 
-def cmd_css(bot,line,args):
-    if args is None:
+def cmd_css(bot, line, args):
+    if not args:
         bot.con.query(
             'PRIVMSG',
             line.target,

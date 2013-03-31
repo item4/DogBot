@@ -8,14 +8,16 @@ import sys
 from system.error import *
 from utility.time import read_time
 
-class DogBotCommand:
-    def __init__(self):
+class DogBotCommand(object):
+    def __init__(self, bot):
         self.cmdlist = {}
         self.syscmd = ['load','reload','list']
+        self.bot = bot
         self.reload()
 
     def reload(self, cmdname=None):
         if cmdname is None:
+            self.bot.del_handler_all()
             self.cmdlist.clear()
             os.chdir('./')
             cmdlist = os.listdir('./cmd/')
@@ -39,6 +41,12 @@ class DogBotCommand:
                     aliasname = alias.pop()
                     if aliasname in self.cmdlist:
                         del self.cmdlist[aliasname]
+
+                handler = list(module.handler) # 임시 땜빵.
+
+                for x in handler:
+                    self.bot.del_handler(x, cmdname)
+
                 return self._load(cmdname)
             else:
                 raise DogBotError(u'로딩된적 없는 명령어')
@@ -50,16 +58,15 @@ class DogBotCommand:
             raise DogBotError(u'이미 로딩된 명령어')
 
     def _load(self, cmdname):
-
         modname = ".".join(["cmd", cmdname])
-        print modname
+        print 'SYS: Load ' + modname
 
         temp = sys.modules.get(modname)
         try:
             if temp:
                 reload(temp)
             else:
-                    __import__(modname)
+                __import__(modname)
         except:
             return 0
         else:
@@ -77,6 +84,12 @@ class DogBotCommand:
                 func = getattr(module,'cmd_%s' % cmdname)
                 func._dogbot_modname = modname
                 self.cmdlist[aliasname] = func
+
+            handler = list(module.handler) # 임시 땜빵.
+            for x in handler:
+                self.bot.add_handler(x, cmdname, getattr(module,'on_%s' % x))
+                print 'SYS: Link handler %s-%s' % (cmdname, x)
+
             return 1
 
     def run(self, bot, line):
@@ -111,7 +124,7 @@ class DogBotCommand:
             bot.con.query(
                 'PRIVMSG',
                 line.target,
-                u'멍멍! 관리자만 사용가능한 명령어입니다.'
+                u'으르렁…!! 관리자만 사용가능한 명령어입니다.'
             )
             return
         if not args:
@@ -152,7 +165,7 @@ class DogBotCommand:
             bot.con.query(
                 'PRIVMSG',
                 line.target,
-                u'멍멍! 관리자만 사용가능한 명령어입니다.'
+                u'으르렁…!! 관리자만 사용가능한 명령어입니다.'
             )
             return
         if args:

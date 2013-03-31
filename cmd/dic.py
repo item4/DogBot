@@ -1,6 +1,7 @@
 # -*- coding:utf-8 -*-
 
 alias = [u'사전']
+handler = []
 
 import re
 import urllib

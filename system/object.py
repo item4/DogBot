@@ -2,6 +2,7 @@
 
 __all__ = ['DogBotObject']
 
+import cmd
 import os
 import random
 import re
@@ -13,7 +14,7 @@ from system.error import *
 from system.line import *
 from threading import Thread
 
-class DogBotObject:
+class DogBotObject(object):
     def __init__(self, system, connect, encoding, channels):
         self.system = system
         self.con = connect
@@ -25,10 +26,11 @@ class DogBotObject:
         self.login = {}
         self.db = {}
         self.start_time = 0.
+        self.handler = {}
 
         self.nick = u'멍멍이'
 
-        self.cmd = DogBotCommand()
+        self.cmd = DogBotCommand(self)
 
         while self.system.running and (self.running or self.restart):
             try:
@@ -109,6 +111,19 @@ class DogBotObject:
         else:
             line = DogBotLine(msg,self.login)
             #print(repr(line.message))
+            handler = self.handler.get(line.type.upper())
+            if handler:
+                for k, v in handler.iteritems():
+                    try:
+                        res = v(self, line)
+                    except Exception as e:
+                        self.con.query(
+                            'PRIVMSG',
+                            line,target,
+                            u'[%s] %s: %s' % (k, e.__class__.__name__, e)
+                        )
+                    if res == cmd.STOP:
+                        return
             try:
                 func = getattr(self,'on_%s' % line.type.upper())
             except:
@@ -116,101 +131,25 @@ class DogBotObject:
             else:
                 func(line)
 
+    def add_handler(self, event, name, func):
+        event = event.upper()
+        if event not in self.handler:
+            self.handler[event] = {}
+
+        self.handler[event][name] = func
+
+    def del_handler(self, event, name):
+        event = event.upper()
+        if event not in self.handler or name not in self.handler[event]:
+            return
+        del self.handler[event][name]
+
+    def del_handler_all(self):
+        self.handler.clear()
+
+
     def on_001(self, line): # 서버 접속
         self.con.send(u'MODE %s +x' % self.nick)
-
-    def on_433(self, line): # nick 중복
-        self.nick = u'멍멍이%d호' % random.randint(1,9999)
-        self.con.send(u'NICK %s' % self.nick)
-
-    def on_330(self, line): # whois login
-        _, nick, id = line.target.split(' ')
-
-        """if id in self.login.values():
-            for k,v in self.login.items():
-                if v == id:
-                    del self.login[k]"""
-
-        self.login[nick] = id
-
-        self.con.query(
-            u'NOTICE',
-            nick,
-            u'로그인 되었습니다.'
-        )
-
-    def on_QUIT(self, line):
-        if line.nick in self.login:
-            del self.login[line.nick]
-
-        if line.nick in self.db['busy']:
-            del self.db['busy'][line.nick]
-
-        for chan in self.db['channel']:
-            if line.nick in self.db['channel'][chan]['member']:
-                del self.db['channel'][chan]['member'][line.nick]
-
-    def on_PART(self, line):
-        if line.nick == self.nick:
-            self.db['channel'][line.target].clear()
-        else:
-            del self.db['channel'][line.target]['member'][line.nick]
-
-    def on_JOIN(self, line):
-        if line.message in self.db['channel']:
-            self.db['channel'][line.message]['member'][line.nick] = ''
-
-    def on_KICK(self, line):
-        chan, nick = line.target.split(' ')
-
-        if nick == self.nick:
-            self.db['channel'][chan]['member'].clear()
-
-            if chan in self.channels:
-                self.con.query(
-                    'JOIN',
-                    chan
-                )
-                time.sleep(.1)
-                self.con.query(
-                    'PRIVMSG',
-                    chan,
-                    u'깨갱'
-                )
-        else:
-            del self.db['channel'][chan]['member'][nick]
-
-
-    def on_NICK(self, line): # change nick
-        temp = self.login.get(line.nick)
-
-        if temp:
-            del self.login[line.nick]
-            self.login[line.message] = temp
-
-
-        temp = self.db['busy'].get(line.nick)
-
-        if temp:
-            del self.db['busy'][line.nick]
-            self.db['busy'][line.message] = temp
-
-
-        for chan in self.db['channel']:
-            temp = self.db['channel'][chan]['member'].get(line.nick)
-
-            if temp:
-                del self.db['channel'][chan]['member'][line.nick]
-                self.db['channel'][chan]['member'][line.message] = temp
-
-
-
-    def on_396(self, line): # motd 끝
-        for x in self.channels:
-            self.con.query(
-                'JOIN',
-                x
-            )
 
     def on_005(self, line): # server options
         option = line.target.split(' ')[1:]
@@ -261,11 +200,61 @@ class DogBotObject:
                 pre = ''
                 nick = x
 
-            self.db['channel'][channel]['member'][nick] = pre
+    def on_396(self, line): # motd 끝
+        for x in self.channels:
+            self.con.query(
+                'JOIN',
+                x
+            )
 
-    def on_TOPIC(self, line): # set topic
-        self.db['channel'][line.target]['topic'] = line.message
-        self.db['channel'][line.target]['topic_setter'] = line.mask
+    def on_433(self, line): # nick 중복
+        self.nick = u'멍멍이%d호' % random.randint(1,9999)
+        self.con.send(u'NICK %s' % self.nick)
+
+    def on_JOIN(self, line):
+        if line.message in self.db['channel']:
+            self.db['channel'][line.message]['member'][line.nick] = ''
+
+    def on_KICK(self, line):
+        chan, nick = line.target.split(' ')
+
+        if nick == self.nick:
+            self.db['channel'][chan]['member'].clear()
+
+            if chan in self.channels:
+                self.con.query(
+                    'JOIN',
+                    chan
+                )
+                time.sleep(.1)
+                self.con.query(
+                    'PRIVMSG',
+                    chan,
+                    u'깨갱'
+                )
+        else:
+            del self.db['channel'][chan]['member'][nick]
+
+    def on_NICK(self, line): # change nick
+        temp = self.db['busy'].get(line.nick)
+
+        if temp:
+            del self.db['busy'][line.nick]
+            self.db['busy'][line.message] = temp
+
+
+        for chan in self.db['channel']:
+            temp = self.db['channel'][chan]['member'].get(line.nick)
+
+            if temp:
+                del self.db['channel'][chan]['member'][line.nick]
+                self.db['channel'][chan]['member'][line.message] = temp
+
+    def on_PART(self, line):
+        if line.nick == self.nick:
+            self.db['channel'][line.target].clear()
+        else:
+            del self.db['channel'][line.target]['member'][line.nick]
 
     def on_PRIVMSG(self, line):
         if line.message.startswith(self.nick):
@@ -285,26 +274,16 @@ class DogBotObject:
                 target = self.cmd.run,
                 kwargs = {'bot':self,'line':line},
             ).start()
-        else:
-            for x in self.db['busy'].keys():
-                reason, busytime = self.db['busy'].get(x)
-                busytime = time.time() - busytime
 
-                if line.nick == x:
-                    self.con.query(
-                        u'PRIVMSG',
-                        line.target,
-                        u'%s, 부재를 해지합니다. (%s 동안 부재였음.)' % (x,read_time(busytime))
-                    )
-                    del self.db['busy'][x]
+    def on_QUIT(self, line):
+        for chan in self.db['channel']:
+            if line.nick in self.db['channel'][chan]['member']:
+                del self.db['channel'][chan]['member'][line.nick]
 
-                elif line.message.startswith(x) and x in self.db['channel'][line.target]['member']:
+    def on_TOPIC(self, line): # set topic
+        self.db['channel'][line.target]['topic'] = line.message
+        self.db['channel'][line.target]['topic_setter'] = line.mask
 
-                    self.con.query(
-                        u'PRIVMSG',
-                        line.target,
-                        u'%s, %s님은 %s 전부터 부재중입니다. (이유: %s)' % (line.nick,x,read_time(busytime),reason)
-                    )
 
 def main():
     pass

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 alias = [u'환율']
+handler = []
 
 import urllib
 import re

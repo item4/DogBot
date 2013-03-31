@@ -1,6 +1,7 @@
 # -*- coding:utf-8 -*-
 
 alias = [u'나이']
+handler = []
 
 import time
 

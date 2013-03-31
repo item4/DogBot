@@ -1,11 +1,13 @@
 # -*- coding:utf-8 -*-
-alias=[u'냐토렌트']
+
+alias = [u'냐토렌트']
+handler = []
 
 import urllib
 import re
 import HTMLParser
 
-def cmd_nyaa(bot,line,args):
+def cmd_nyaa(bot, line, args):
     try:
         data = urllib.urlopen('http://www.nyaa.eu/?%s' % urllib.urlencode({'page':'search','cats':'1_11','filter':0,'term':args.encode('utf8') if args else ''})).read()
     except IOError:

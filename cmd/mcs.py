@@ -1,11 +1,13 @@
 # -*- coding:utf-8 -*-
-alias=[u'마크서버']
+
+alias = [u'마크서버']
+handler = []
 
 import socket
 import re
 
-def cmd_mcs(bot,line,args):
-    if args == None:
+def cmd_mcs(bot, line, args):
+    if not args:
         args='mc.sjkoon.com'
 
     if args.find(':') > 0:

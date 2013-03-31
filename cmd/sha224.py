@@ -1,10 +1,12 @@
 # -*- coding:utf-8 -*-
-alias=[]
+
+alias = []
+handler = []
 
 import hashlib
 
-def cmd_sha224(bot,line,args):
-    if args==None:
+def cmd_sha224(bot, line, args):
+    if not args:
         bot.con.query(
             'PRIVMSG',
             line.target,

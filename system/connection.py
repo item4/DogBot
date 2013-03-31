@@ -7,7 +7,7 @@ import time
 from threading import Thread
 from Queue import Queue
 
-class DogBotConnection:
+class DogBotConnection(object):
     def __init__(self, system, host, port, encoding):
         self.system = system
         self.host = host

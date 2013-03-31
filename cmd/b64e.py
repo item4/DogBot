@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 alias = []
+handler = []
 
 import base64
 

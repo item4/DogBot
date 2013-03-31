@@ -7,7 +7,7 @@ from threading import Thread
 from system.connection import *
 from system.object import *
 
-class DogBot:
+class DogBot(object):
     def __init__(self):
         self.thread = []
         self.start_time = time.time()

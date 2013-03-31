@@ -1,10 +1,12 @@
 # -*- coding:utf-8 -*-
-alias=[u'날씨']
+
+alias = [u'날씨']
+handler = []
 
 import re
 import urllib2
 
-def cmd_aws(bot,line,args):
+def cmd_aws(bot, line, args):
     if args is None:
         bot.con.query(
             'PRIVMSG',
