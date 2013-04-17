@@ -7,7 +7,7 @@ import urllib
 import re
 
 def cmd_phpf(bot, line, args):
-    if args is None:
+    if not args:
         bot.con.query(
             'PRIVMSG',
             line.target,
