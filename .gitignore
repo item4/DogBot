@@ -9,6 +9,9 @@ run.bat
 # Database
 DogBot.db
 
+# Config
+config.json
+
 # C extensions
 *.so
 

@@ -15,8 +15,9 @@ from system.line import *
 from threading import Thread
 
 class DogBotObject(object):
-    def __init__(self, system, connect, encoding, channels):
+    def __init__(self, system, server, connect, encoding, channels):
         self.system = system
+        self.server = server
         self.con = connect
         self.encoding = encoding
         self.channels = channels
@@ -28,7 +29,7 @@ class DogBotObject(object):
         self.start_time = 0.
         self.handler = {}
 
-        self.nick = u'멍멍이'
+        self.nick = system.config['nick']
 
         self.cmd = DogBotCommand(self)
 
@@ -201,6 +202,9 @@ class DogBotObject(object):
                 nick = x
 
     def on_396(self, line): # motd 끝
+        if self.system.config['nickserv'][self.server]['login']:
+            self.con.send(self.system.config['nickserv'][self.server]['login'] % self.nick)
+
         for x in self.channels:
             self.con.query(
                 'JOIN',
@@ -208,8 +212,10 @@ class DogBotObject(object):
             )
 
     def on_433(self, line): # nick 중복
-        self.nick = u'멍멍이%d호' % random.randint(1,9999)
-        self.con.send(u'NICK %s' % self.nick)
+        self.con.send(u'NICK %s．%d' % (self.nick,random.randint(1,99)))
+        if self.system.config['nickserv'][self.server]['kick']:
+            self.con.send(self.system.config['nickserv'][self.server]['kick'] % self.nick)
+            self.con.send(u'NICK %s' % self.nick)
 
     def on_JOIN(self, line):
         if line.message in self.db['channel']:

@@ -2,6 +2,7 @@
 
 __all__ = ['DogBot']
 
+import json
 import time
 from threading import Thread
 from system.connection import *
@@ -15,6 +16,7 @@ class DogBot(object):
         self.exit_reason = ''
         self.encoding = 'cp949' #system encoding
         self.dbname = 'DogBot.db'
+        self.config = {}
 
     def add_connect(self, server, port, encoding, channels):
         connect = DogBotConnection(self, server, port, encoding)
@@ -22,7 +24,7 @@ class DogBot(object):
         th = Thread(
             target = DogBotObject,
             name = 'DogObj#%s' % server,
-            kwargs = {'system':self, 'connect':connect, 'encoding':encoding, 'channels':channels},
+            kwargs = {'system':self, 'server':server, 'connect':connect, 'encoding':encoding, 'channels':channels},
         )
 
         self.thread.append(th)
@@ -30,6 +32,15 @@ class DogBot(object):
     def start(self):
         for th in self.thread:
             th.start()
+
+    def load_config(self):
+        try:
+            with open('config.json','r') as f:
+                self.config = json.load(f)
+        except IOError:
+            with open('config.json','w') as f:
+                f.write('{"nick":"botname","nickserv":{"some server":{"kick":"how to kick dup nick","login":"how to login"}},"db":""}')
+            exit
 
 def main():
     pass

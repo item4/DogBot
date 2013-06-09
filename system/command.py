@@ -227,6 +227,12 @@ class DogBotCommand(object):
                     res[1:]
                 )
                 res = ''
+        if res:
+            bot.con.query(
+                'PRIVMSG',
+                line.target,
+                res[1:]
+            )
 
 
 def main():
