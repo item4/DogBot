@@ -17,23 +17,30 @@ def cmd_css(bot, line, args):
 
     args = args.lower()
 
-    data = urllib.urlopen('http://w3schools.com/cssref/default.asp').read()
+    if args == ':after':
+        args = '::after (:after)'
+    elif args == ':before':
+        args = '::before (:before)'
+
+    args = args.replace('<','&lt;').replace('>','&gt;').replace('(','\(').replace(')','\)')
+
+    data = urllib.urlopen('https://developer.mozilla.org/en-US/docs/Web/CSS/Reference').read()
     data = data.decode('utf8').replace('\r','').replace('\n','')
-    data = re.search(r'<tr>\s*<td>(?:<a href="([^"]+)">)?%s(?:</a>)?(?:<br>\s*)?</td>\s*<td>([^<]+)</td>\s*<td>(\d+)</td>\s*</tr>' % args,data)
-    """
+    data = re.search(r'<li><a (class="new" )?href="([^"]+)"><code>%s</code></a>' % args,data)
 
-
-    """
     if not data:
         bot.con.query(
             'PRIVMSG',
             line.target,
-            u'그런거 없다'
+            u'멍멍! 해당하는 CSS를 찾을 수 없어요!'
         )
     else:
-        res = u'[%s/CSS%s] %s' % (args,data.group(3),data.group(2))
+        res = u'{%s} - ' % args.replace('&lt;','<').replace('&gt;','>').replace('\(','(').replace('\)',')')
+
         if data.group(1):
-            res += u' - http://w3schools.com/cssref/%s' % data.group(1)
+            res += u'MDN에 문서가 제작되지 않음'
+        else:
+            res += u'https://developer.mozilla.org%s' % data.group(2)
         bot.con.query(
             'PRIVMSG',
             line.target,
