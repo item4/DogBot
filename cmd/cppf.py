@@ -28,8 +28,9 @@ def cmd_cppf(bot, line, args):
     con = urllib.urlopen(url)
     data = con.read()
     data = data.decode('utf8').replace('\n','')
-    data = re.search(ur'<div id="I_type">(.+?)</div><h1>(.+?)</h1><div id="I_file"[^>]+>&lt;(.+?)&gt;\r?</div>(?:<div class="C_prototype">((?:<div[^>]+>.+?</div>)+|<pre>.+?</pre>|<table>.+?</table>)</div>)?<div id="I_description">(.+?)</div>',data)
+    data = re.search(ur'<div id="I_type">(.+?)</div><div id="I_file"[^>]*>&lt;(.+?)&gt;\r?</div><h1>(.+?)</h1>(?:<div class="C_prototype">((?:<div[^>]+>.+?</div>)+|<pre>.+?</pre>|<table>.+?</table>)</div>)?<div id="I_description">(.+?)</div>',data)
     """
+
 <table><tr class="odd"><th>default (1)</th><td><pre>
 template &lt;class RandomAccessIterator&gt;
   void sort (RandomAccessIterator first, RandomAccessIterator last);
