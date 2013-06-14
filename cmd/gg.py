@@ -38,15 +38,35 @@ def cmd_gg(bot, line, args):
         website = r'<li class="g"><div[^>]*>\s*<div[^>]*>\s*<div[^>]*>\s*</div>\s*</div>\s*'+\
         r'<h3 class="r"><a href="([^"]+)"[^>]+>(.+?)</a></h3>'+\
         r'<div class="s"><div class="f kv"><cite>.*?</cite>(?:.*?</div>)?'+\
-        r'(?:<span class="gl">.+?</span>)?(?:<span class="vshid">.+?</span>)?(?:<span class="std">.+?</span>)?(?:<a[^>]+><span class="pplsrsl">.+?</span></a>)?'+\
+        r'(?:<span class="gl">.+?</span>)?(?:<span class="vshid">.+?</span>)?(?:<span class="std">(?:&nbsp;<span class=gl>-</span>)?.+?</span>)?(?:<a[^>]+><span class="pplsrsl">.+?</span></a>)?'+\
         r'(?:<div data-ved[^>]+>.+?</div>)?'+\
         r'</div>(?:<div class="esc slp"[^>]+>.+?</div>)?(?:<span class="f">.+?</span>)?'+\
         r'(?:<table class="ts">(?<!<span class="st">))?'+\
         r'<span class="st">(.+?)</span>'+\
         r'(?:<div class=osl>.+?</div>)?(?:<table[^>]*>.+?</table>)?'+\
         r'(?:</td></tr></table>)?'+\
-        r'</div></div>(?:<h3[^>]+>.+?</h3>)?<!--n-->(?:<table class="nrgt" cellpadding="0" cellspacing="0">.+?</table>)?</li>'
+        r'</div>(?:<h3[^>]+>.+?</h3>)?<!--n--></div>(?:<table class="nrgt" cellpadding="0" cellspacing="0">.+?</table>)?</li>'
         """
+<li class="g"><div data-hveid="72" class="vsc" sig="lkW">  <div data-ved="0CEkQkgowAg">  <div data-ved="0CEoQkQowAg"> </div>   </div>
+<h3 class="r"><a href="https://twitter.com/bufferapp"><em>Buffer</em> (bufferapp) on <em>Twitter</em></a></h3>
+<div class="s"><div class="f kv"><cite>https://<b>twitter</b>.com/<b>buffer</b>app</cite
+><span class="gl">&nbsp;-&nbsp;</span><a ><span class="pplsrsl">공유</span></a>
+<div data-ved="0CE4Q5xkw></div>
+</div><div class="esc slp"></div>
+<span class="st">The latest from Buffer (@bufferapp). Hi guys, the official <em>Buffer Twitter</em> account is over at @buffer. Come join us there! Oh and feel free to email us any questions&nbsp;<b>...</b><br></span>
+</div><!--n--></div></li>
+
+<li class="g"><div data-hveid="46" class="vsc" sig="9fR">  <div data-ved="0CC8QkgowAA">  <div data-ved="0CDAQkQowAA"> </div>   </div>
+<h3 class="r"><a href="http://bufferapp.com/"><em>Buffer</em> - A Smarter Way to Share on Social Media</a></h3>
+<div class="s"><div class="f kv"><cite><b>buffer</b>app.com/</cite>
+<span class="gl">&nbsp;-&nbsp;</span><span class="vshid"></span><span class="std">&nbsp;<span class=gl>-</span></a></span><a href="javascript:void(0)" ><span class="pplsrsl">공유</span></a>
+<div data-ved="0CDcQ5xkwAA" class="pplsrslc" id="srslc_0"></div>
+</div><div class="esc slp"></div>
+<span class="st">Easily add great articles, pictures and videos to your <em>Buffer</em> and we automagically share them for you through the day! Sign in or Sign up! Sign In with <em>Twitter</em>&nbsp;<b>...</b><br></span>
+<div class=osl></div>
+</div><!--n--></div></li>
+
+
 <li class="g"><div class="vsc" sig="Wth">  <div data-ved="0CDkQkgowAA">  <div data-ved="0CDoQkQowAA"> </div>   </div>   <h3 class="r">
 <a href="http://flask.pocoo.org/">Welcome | <em>Flask</em> (A <em>Python</em> Microframework)</a></h3>
 <div class="s"><div class="f kv"><cite><b>flask</b>.pocoo.org/</cite>
