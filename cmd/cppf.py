@@ -70,7 +70,6 @@ template &lt;class RandomAccessIterator, class Compare&gt;
                     for t in temp:
                         if not t:
                             continue
-                        print t
                         res = t.strip().replace('&amp;','&')
                         res = re.sub('\s{2,}',' ',res)
                         res = res.replace('&lt;','<').replace('&gt;','>')
@@ -87,10 +86,10 @@ template &lt;class RandomAccessIterator, class Compare&gt;
         bot.con.query(
             'PRIVMSG',
             line.target,
-            u'\x02%s\x02: %s (%s, #include <%s>)' % (name.replace('&lt;','<').replace('&gt;','>'),
+            u'\x02%s\x02: %s (%s, #include <%s>)' % (data.group(3).replace('&lt;','<').replace('&gt;','>'),
                                                     data.group(5),
                                                     data.group(1),
-                                                    data.group(3))
+                                                    name)
         )
         for x in description:
             bot.con.query(
