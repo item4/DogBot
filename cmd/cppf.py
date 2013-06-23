@@ -30,6 +30,12 @@ def cmd_cppf(bot, line, args):
     data = data.decode('utf8').replace('\n','')
     data = re.search(ur'<div id="I_type">(.+?)</div><div id="I_file"[^>]*>&lt;(.+?)&gt;\r?</div><h1>(.+?)</h1>(?:<div class="C_prototype">((?:<div[^>]+>.+?</div>)+|<pre>.+?</pre>|<table>.+?</table>)</div>)?<div id="I_description">(.+?)</div>',data)
     """
+<div id="I_type">class template
+</div>
+<div id="I_file">&lt;array&gt;
+</div>
+<h1><span class="namespace" title="namespace std">std::</span>array<span class="C_ico cpp11warning" title="This page describes a feature introduced by the latest revision of the C++ standard (2011). Older compilers may not support it." alt="This page describes a feature introduced by the latest revision of the C++ standard (2011). Older compilers may not support it."></span></h1>
+<div class="C_prototype"><pre>template &lt; class T, size_t N &gt; class array;</pre></div><div id="I_description">Array class</div>
 
 <table><tr class="odd"><th>default (1)</th><td><pre>
 template &lt;class RandomAccessIterator&gt;
@@ -79,17 +85,19 @@ template &lt;class RandomAccessIterator, class Compare&gt;
                             res = '[%s]' % version + res
                         description.append(res)
 
-        name = data.group(2).replace('\r','')
+        lib = data.group(2).replace('\r','')
+        lib = re.sub(r'</?[^>]+>', '', lib)
 
-        name = re.sub(r'</?[^>]+>','',name)
+        name = data.group(3).replace('&lt;','<').replace('&gt;','>')
+        name = re.sub(r'</?[^>]+>', '', name)
 
         bot.con.query(
             'PRIVMSG',
             line.target,
-            u'\x02%s\x02: %s (%s, #include <%s>)' % (data.group(3).replace('&lt;','<').replace('&gt;','>'),
+            u'\x02%s\x02: %s (%s, #include <%s>)' % (name,
                                                     data.group(5),
                                                     data.group(1),
-                                                    name)
+                                                    lib)
         )
         for x in description:
             bot.con.query(
