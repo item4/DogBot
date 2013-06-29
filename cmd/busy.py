@@ -21,7 +21,6 @@ def cmd_busy(bot, line, args):
     )
 
 def on_PRIVMSG(bot, line):
-    print repr(cmd)
     for x in bot.db['busy'].keys():
         reason, busytime = bot.db['busy'].get(x)
         busytime = time.time() - busytime

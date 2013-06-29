@@ -4,10 +4,8 @@ __all__ = ['DogBotCommand']
 
 import os
 import sys
-import types
 
 import cmd
-import utility
 
 from system.error import *
 from utility.time import read_time
@@ -100,21 +98,21 @@ class DogBotCommand(object):
         try:
             print 'SYS: Load command.' + cmdname
 
-            self.cmdenv[cmdname] = types.ModuleType(cmdname)
+            self.cmdenv[cmdname] = {}#types.ModuleType(cmdname) // .__dict__
 
-            execfile('./cmd/' + cmdname + '.py', self.cmdenv[cmdname].__dict__, self.cmdenv[cmdname].__dict__)
+            execfile('./cmd/' + cmdname + '.py', self.cmdenv[cmdname], self.cmdenv[cmdname])
 
-            func = self.cmdenv[cmdname].__dict__.get('cmd_' + cmdname)
+            func = self.cmdenv[cmdname].get('cmd_' + cmdname)
 
             self.cmdlist[cmdname] = func
 
-            alias = list(self.cmdenv[cmdname].__dict__.get('alias'))
+            alias = list(self.cmdenv[cmdname].get('alias'))
             for x in alias:
                 self.cmdlist[x] = func
 
-            handler = list(self.cmdenv[cmdname].__dict__.get('handler'))
+            handler = list(self.cmdenv[cmdname].get('handler'))
             for x in handler:
-                self.bot.add_handler(x, cmdname, self.cmdenv[cmdname].__dict__.get('on_%s' % x))
+                self.bot.add_handler(x, cmdname, self.cmdenv[cmdname].get('on_%s' % x))
                 print 'SYS: Link handler %s-%s' % (cmdname, x)
 
             return 1
