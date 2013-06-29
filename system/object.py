@@ -87,9 +87,6 @@ class DogBotObject(object):
                     pass
                 except socket.error:
                     return
-                """else:
-                    if not recv:
-                        pass"""
 
             recv = temp + recv
             #lines = recv.splitlines()
