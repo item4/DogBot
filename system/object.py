@@ -7,6 +7,8 @@ import os
 import random
 import re
 import select
+import sys
+import traceback
 import time
 
 from system.command import *
@@ -40,6 +42,14 @@ class DogBotObject(object):
             except DogBotError as e:
                 if e == 'QUIT':
                     break
+            except Exception as e:
+                with open('exception.log','a') as f:
+                    exc_type, exc_value, exc_traceback = sys.exc_info()
+
+                    f.write('Uncatched Exception at ' + time.strftime('%Y-%m-%d %H:%M:%S') + '\n')
+                    traceback.print_exception(exc_type, exc_value, exc_traceback, file=f)
+                    f.write('\n\n')
+                raise e
             finally:
                 self._stop()
 
@@ -90,7 +100,6 @@ class DogBotObject(object):
                 self.parse(line)
 
             temp = lines[-1]
-
 
         return
 
@@ -195,11 +204,13 @@ class DogBotObject(object):
             if not x:
                 continue
             if x[0] in prefix:
-                pre = x[0]
+                pre = set(x[0])
                 nick = x[1:]
             else:
-                pre = ''
+                pre = set()
                 nick = x
+
+            self.db['channel'][channel]['member'][nick] = pre
 
     def on_396(self, line): # motd 끝
         if self.system.config['nickserv'][self.server]['login']:
@@ -221,6 +232,47 @@ class DogBotObject(object):
         if line.message in self.db['channel']:
             self.db['channel'][line.message]['member'][line.nick] = ''
 
+    def on_MODE(self, line):
+        temp = re.match('\((.+?)\)(.+$)', self.db['server']['PREFIX'])
+
+        mode_str = list(temp.group(1))
+        prefix_str = list(temp.group(2))
+
+        chunk = line.message.split(' ')
+
+        if len(chunk) == 3 and chunk[0][0] == '#':
+            channel, mode, temp = chunk
+            flag = ''
+            i = 0
+            nicks = temp.split()
+            for m in list(mode):
+                if m in '+-':
+                    flag = m
+                else:
+                    try:
+                        if flag == '+':
+                            self.db['channel'][channel][nicks[i]] = self.db['channel'][channel][nicks[i]] | set(prefix_str[mode_str.index(m)])
+                        else:
+                            self.db['channel'][channel][nicks[i]] = self.db['channel'][channel][nicks[i]] - set(prefix_str[mode_str.index(m)])
+                    except:
+                        pass
+                    i += 1
+
+    def on_NICK(self, line): # change nick
+        temp = self.db['busy'].get(line.nick)
+
+        if temp:
+            del self.db['busy'][line.nick]
+            self.db['busy'][line.message] = temp
+
+
+        for chan in self.db['channel']:
+            temp = self.db['channel'][chan]['member'].get(line.nick)
+
+            if temp:
+                del self.db['channel'][chan]['member'][line.nick]
+                self.db['channel'][chan]['member'][line.message] = temp
+
     def on_KICK(self, line):
         chan, nick = line.target.split(' ')
 
@@ -240,21 +292,6 @@ class DogBotObject(object):
                 )
         else:
             del self.db['channel'][chan]['member'][nick]
-
-    def on_NICK(self, line): # change nick
-        temp = self.db['busy'].get(line.nick)
-
-        if temp:
-            del self.db['busy'][line.nick]
-            self.db['busy'][line.message] = temp
-
-
-        for chan in self.db['channel']:
-            temp = self.db['channel'][chan]['member'].get(line.nick)
-
-            if temp:
-                del self.db['channel'][chan]['member'][line.nick]
-                self.db['channel'][chan]['member'][line.message] = temp
 
     def on_PART(self, line):
         if line.nick == self.nick:

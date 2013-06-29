@@ -5,7 +5,6 @@ __all__ = ['DogBotLine']
 class DogBotLine(object):
     __slots__ = "nick", "ident", "ip", "mask", "server", "type", "target", "message", "login"
 
-
     def __init__(self, msg, login):
         self.nick = self.ident = self.ip = self.mask = self.server = self.type = self.target = self.message = self.login = None
         if ':' in msg[1:]:
@@ -45,7 +44,7 @@ class DogBotLine(object):
         temp = [self.nick,self.ident,self.ip,self.server,self.type,self.target,self.message,self.login]
         for i in xrange(len(temp)):
             if temp[i] is not None:
-                temp[i] = temp[i].encode('utf8')
+                temp[i] = temp[i].encode('u8')
 
         format = "'nick':{!r},'ident':{!r},'ip':{!r},'server':{!r},"
         format += "type:{!r},target:{!r},msg:{!r},login:{!r}"
