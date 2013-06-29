@@ -15,6 +15,7 @@ from utility.time import read_time
 class DogBotCommand(object):
     def __init__(self, bot):
         self.cmdlist = {}
+        self.cmdenv = {}
         self.syscmd = ['load','reload','list']
         self.bot = bot
         self.reload()
@@ -99,24 +100,21 @@ class DogBotCommand(object):
         try:
             print 'SYS: Load command.' + cmdname
 
-            tmp_module = types.ModuleType('cmd_'+cmdname)
+            self.cmdenv[cmdname] = types.ModuleType(cmdname)
 
-            #tmp_module.__dict__['cmd'] = __import__('cmd')
-            #tmp_module.__dict__['utility'] = utility
+            execfile('./cmd/' + cmdname + '.py', self.cmdenv[cmdname].__dict__, self.cmdenv[cmdname].__dict__)
 
-            execfile('./cmd/' + cmdname + '.py', tmp_module.__dict__, tmp_module.__dict__)
-
-            func = tmp_module.__dict__.get('cmd_' + cmdname)
+            func = self.cmdenv[cmdname].__dict__.get('cmd_' + cmdname)
 
             self.cmdlist[cmdname] = func
 
-            alias = list(tmp_module.__dict__.get('alias'))
+            alias = list(self.cmdenv[cmdname].__dict__.get('alias'))
             for x in alias:
                 self.cmdlist[x] = func
 
-            handler = list(tmp_module.__dict__.get('handler'))
+            handler = list(self.cmdenv[cmdname].__dict__.get('handler'))
             for x in handler:
-                self.bot.add_handler(x, cmdname, tmp_module.__dict__.get('on_%s' % x))
+                self.bot.add_handler(x, cmdname, self.cmdenv[cmdname].__dict__.get('on_%s' % x))
                 print 'SYS: Link handler %s-%s' % (cmdname, x)
 
             return 1
