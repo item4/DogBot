@@ -4,6 +4,10 @@ __all__ = ['DogBotCommand']
 
 import os
 import sys
+import types
+
+import cmd
+import utility
 
 from system.error import *
 from utility.time import read_time
@@ -57,7 +61,7 @@ class DogBotCommand(object):
         else:
             raise DogBotError(u'이미 로딩된 명령어')
 
-    def _load(self, cmdname):
+    """def _load(self, cmdname):
         modname = ".".join(["cmd", cmdname])
         print 'SYS: Load ' + modname
 
@@ -80,7 +84,6 @@ class DogBotCommand(object):
             alias = list(module.alias)
             while alias:
                 aliasname = alias.pop()
-                #func = getattr(module,'cmd_%s' % aliasname)
                 func = getattr(module,'cmd_%s' % cmdname)
                 func._dogbot_modname = modname
                 self.cmdlist[aliasname] = func
@@ -91,6 +94,36 @@ class DogBotCommand(object):
                 print 'SYS: Link handler %s-%s' % (cmdname, x)
 
             return 1
+        """
+    def _load(self, cmdname):
+        try:
+            print 'SYS: Load command.' + cmdname
+
+            tmp_module = types.ModuleType('cmd_'+cmdname)
+
+            #tmp_module.__dict__['cmd'] = __import__('cmd')
+            #tmp_module.__dict__['utility'] = utility
+
+            execfile('./cmd/' + cmdname + '.py', tmp_module.__dict__, tmp_module.__dict__)
+
+            func = tmp_module.__dict__.get('cmd_' + cmdname)
+
+            self.cmdlist[cmdname] = func
+
+            alias = list(tmp_module.__dict__.get('alias'))
+            for x in alias:
+                self.cmdlist[x] = func
+
+            handler = list(tmp_module.__dict__.get('handler'))
+            for x in handler:
+                self.bot.add_handler(x, cmdname, tmp_module.__dict__.get('on_%s' % x))
+                print 'SYS: Link handler %s-%s' % (cmdname, x)
+
+            return 1
+        except Exception as e:
+            print 'SYS: Load cmd.' + cmdname + ' failed'
+            print u'%s: %s' % (e.__class__.__name__,e)
+            return 0
 
     def run(self, bot, line):
         temp = line.message.split(' ', 1)

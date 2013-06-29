@@ -129,7 +129,7 @@ class DogBotObject(object):
                     except Exception as e:
                         self.con.query(
                             'PRIVMSG',
-                            line,target,
+                            line.target,
                             u'[%s] %s: %s' % (k, e.__class__.__name__, e)
                         )
                     if res == cmd.STOP:

@@ -6,6 +6,9 @@ cmd/test.py
 # Launcher
 run.bat
 
+# Log
+exception.log
+
 # Database
 DogBot.db
 

@@ -4,6 +4,7 @@ alias = [u'부재']
 handler = ['PRIVMSG','QUIT']
 
 import cmd
+
 import time
 
 from utility.time import read_time
@@ -20,6 +21,7 @@ def cmd_busy(bot, line, args):
     )
 
 def on_PRIVMSG(bot, line):
+    print repr(cmd)
     for x in bot.db['busy'].keys():
         reason, busytime = bot.db['busy'].get(x)
         busytime = time.time() - busytime
