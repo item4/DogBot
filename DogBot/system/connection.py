@@ -79,9 +79,3 @@ class DogBotConnection(object):
             pass
         del self.connect
         del self.queue
-
-def main():
-    pass
-
-if __name__ == '__main__':
-    main()

@@ -5,7 +5,7 @@ handler = []
 
 import time
 
-from utility.time import read_time
+from DogBot.utility.time import read_time
 
 def cmd_uptime(bot, line, args):
     temp = time.time()

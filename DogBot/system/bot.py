@@ -4,9 +4,11 @@ __all__ = ['DogBot']
 
 import json
 import time
+
 from threading import Thread
-from system.connection import *
-from system.object import *
+
+from DogBot.system.connection import *
+from DogBot.system.object import *
 
 class DogBot(object):
     def __init__(self):

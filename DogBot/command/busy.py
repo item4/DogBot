@@ -3,11 +3,11 @@
 alias = [u'부재']
 handler = ['PRIVMSG','QUIT']
 
-import cmd
-
 import time
 
-from utility.time import read_time
+from DogBot import command
+
+from DogBot.utility.time import read_time
 
 def cmd_busy(bot, line, args):
     if not args:
@@ -40,10 +40,10 @@ def on_PRIVMSG(bot, line):
                 line.target,
                 u'%s, %s님은 %s 전부터 부재중입니다. (이유: %s)' % (line.nick,x,read_time(busytime),reason)
             )
-    return cmd.KEEP
+    return command.KEEP
 
 def on_QUIT(bot, line):
     if line.nick in bot.db['busy']:
         del bot.db['busy'][line.nick]
 
-    return cmd.KEEP
+    return command.KEEP

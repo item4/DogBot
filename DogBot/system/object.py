@@ -2,7 +2,6 @@
 
 __all__ = ['DogBotObject']
 
-import cmd
 import os
 import random
 import re
@@ -11,10 +10,12 @@ import sys
 import traceback
 import time
 
-from system.command import *
-from system.error import *
-from system.line import *
 from threading import Thread
+
+from DogBot import command
+from DogBot.system.command import *
+from DogBot.system.error import *
+from DogBot.system.line import *
 
 class DogBotObject(object):
     def __init__(self, system, server, connect, encoding, channels):
@@ -129,7 +130,7 @@ class DogBotObject(object):
                             line.target,
                             u'[%s] %s: %s' % (k, e.__class__.__name__, e)
                         )
-                    if res == cmd.STOP:
+                    if res == command.STOP:
                         return
             try:
                 func = getattr(self,'on_%s' % line.type.upper())
@@ -261,7 +262,6 @@ class DogBotObject(object):
         if temp:
             del self.db['busy'][line.nick]
             self.db['busy'][line.message] = temp
-
 
         for chan in self.db['channel']:
             temp = self.db['channel'][chan]['member'].get(line.nick)

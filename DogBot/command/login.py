@@ -3,7 +3,7 @@
 alias = [u'로그인']
 handler = ['330','NICK','QUIT']
 
-import cmd
+from DogBot import command
 
 def cmd_login(bot, line, args):
     bot.con.query(
@@ -22,7 +22,7 @@ def on_330(bot, line): # whois login
         u'로그인 되었습니다.'
     )
 
-    return cmd.KEEP
+    return command.KEEP
 
 def on_NICK(bot, line): # change nick
     temp = bot.login.get(line.nick)
@@ -31,10 +31,10 @@ def on_NICK(bot, line): # change nick
         del bot.login[line.nick]
         bot.login[line.message] = temp
 
-    return cmd.KEEP
+    return command.KEEP
 
 def on_QUIT(bot, line):
     if line.nick in bot.login:
         del bot.login[line.nick]
 
-    return cmd.KEEP
+    return command.KEEP

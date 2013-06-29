@@ -5,10 +5,10 @@ __all__ = ['DogBotCommand']
 import os
 import sys
 
-import cmd
+import DogBot.command
 
-from system.error import *
-from utility.time import read_time
+from DogBot.system.error import *
+from DogBot.utility.time import read_time
 
 class DogBotCommand(object):
     def __init__(self, bot):
@@ -23,7 +23,7 @@ class DogBotCommand(object):
             self.bot.del_handler_all()
             self.cmdlist.clear()
             os.chdir('./')
-            cmdlist = os.listdir('./cmd/')
+            cmdlist = os.listdir('./DogBot/command/')
             res = 0
             total = 0
             for x in cmdlist:
@@ -60,47 +60,13 @@ class DogBotCommand(object):
         else:
             raise DogBotError(u'이미 로딩된 명령어')
 
-    """def _load(self, cmdname):
-        modname = ".".join(["cmd", cmdname])
-        print 'SYS: Load ' + modname
-
-        temp = sys.modules.get(modname)
-        try:
-            if temp:
-                reload(temp)
-            else:
-                __import__(modname)
-        except:
-            return 0
-        else:
-            module = sys.modules[modname]
-
-            func = getattr(module, 'cmd_%s' % cmdname)
-
-            func._dogbot_modname = modname
-            self.cmdlist[cmdname] = func
-
-            alias = list(module.alias)
-            while alias:
-                aliasname = alias.pop()
-                func = getattr(module,'cmd_%s' % cmdname)
-                func._dogbot_modname = modname
-                self.cmdlist[aliasname] = func
-
-            handler = list(module.handler) # 임시 땜빵.
-            for x in handler:
-                self.bot.add_handler(x, cmdname, getattr(module,'on_%s' % x))
-                print 'SYS: Link handler %s-%s' % (cmdname, x)
-
-            return 1
-        """
     def _load(self, cmdname):
         try:
             print 'SYS: Load command.' + cmdname
 
             self.cmdenv[cmdname] = {}#types.ModuleType(cmdname) // .__dict__
 
-            execfile('./cmd/' + cmdname + '.py', self.cmdenv[cmdname], self.cmdenv[cmdname])
+            execfile('./DogBot/command/' + cmdname + '.py', self.cmdenv[cmdname], self.cmdenv[cmdname])
 
             func = self.cmdenv[cmdname].get('cmd_' + cmdname)
 
