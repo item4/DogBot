@@ -118,7 +118,9 @@ class DogBotObject(object):
                 self.restart = True
         else:
             line = DogBotLine(msg,self.login)
-            #print(repr(line.message))
+            if line.target == self.nick:
+                line.target = line.nick
+
             handler = self.handler.get(line.type.upper())
             if handler:
                 for k, v in handler.iteritems():
