@@ -238,7 +238,7 @@ class DogBotObject(object):
         mode_str = list(temp.group(1))
         prefix_str = list(temp.group(2))
 
-        chunk = line.message.split(' ')
+        chunk = line.message.split(' ',3)
 
         if len(chunk) == 3 and chunk[0][0] == '#':
             channel, mode, temp = chunk
