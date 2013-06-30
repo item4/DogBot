@@ -12,6 +12,7 @@ def cmd_topic(bot, line, args):
             line.target,
             u'토픽이 없거나 추출할 수 없는 환경'
         )
+        return
     bot.con.query(
         'PRIVMSG',
         line.target,
