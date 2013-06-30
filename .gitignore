@@ -1,7 +1,7 @@
 *.py[cod]
 
 # Test files
-cmd/test.py
+command/test.py
 
 # Launcher
 run.bat

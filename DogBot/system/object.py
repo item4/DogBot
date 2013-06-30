@@ -249,9 +249,9 @@ class DogBotObject(object):
                 else:
                     try:
                         if flag == '+':
-                            self.db['channel'][channel][nicks[i]] = self.db['channel'][channel][nicks[i]] | set(prefix_str[mode_str.index(m)])
+                            self.db['channel'][channel]['member'][nicks[i]] = self.db['channel'][channel]['member'][nicks[i]] | set(prefix_str[mode_str.index(m)])
                         else:
-                            self.db['channel'][channel][nicks[i]] = self.db['channel'][channel][nicks[i]] - set(prefix_str[mode_str.index(m)])
+                            self.db['channel'][channel]['member'][nicks[i]] = self.db['channel'][channel]['member'][nicks[i]] - set(prefix_str[mode_str.index(m)])
                     except:
                         pass
                     i += 1

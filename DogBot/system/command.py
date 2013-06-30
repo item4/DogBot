@@ -15,6 +15,7 @@ class DogBotCommand(object):
         self.cmdlist = {}
         self.cmdenv = {}
         self.syscmd = ['load','reload','list']
+        self.syscmd_alias = {u'명령':'list',u'명령어':'list'}
         self.bot = bot
         self.reload()
 
@@ -36,17 +37,14 @@ class DogBotCommand(object):
         else:
             func = self.cmdlist.get(cmdname)
             if func:
-                module = sys.modules[func._dogbot_modname]
                 del self.cmdlist[cmdname]
 
-                alias = list(module.alias)
-                while alias:
-                    aliasname = alias.pop()
-                    if aliasname in self.cmdlist:
-                        del self.cmdlist[aliasname]
+                alias = list(self.cmdenv[cmdname]['alias'])
+                for x in alias:
+                    if x in self.cmdlist:
+                        del self.cmdlist[x]
 
-                handler = list(module.handler) # 임시 땜빵.
-
+                handler = list(self.cmdenv[cmdname]['handler'])
                 for x in handler:
                     self.bot.del_handler(x, cmdname)
 
@@ -112,6 +110,9 @@ class DogBotCommand(object):
                     )
         elif cmd in self.syscmd:
             func = getattr(self,'cmd_%s' % cmd)
+            func(bot,line,args)
+        elif cmd in self.syscmd_alias.keys():
+            func = getattr(self,'cmd_%s' % self.syscmd_alias[cmd])
             func(bot,line,args)
 
     def cmd_load(self, bot, line, args):
@@ -208,10 +209,10 @@ class DogBotCommand(object):
         bot.con.query(
             'PRIVMSG',
             line.target,
-            u'총 %d개의 명령어와 %d개의 시스템 명령어가 있습니다' % (len(self.cmdlist),len(self.syscmd))
+            u'총 %d개의 명령어와 %d개의 시스템 명령어가 있습니다' % (len(self.cmdlist), len(self.syscmd) + len(self.syscmd_alias.keys()))
         )
         check = False
-        cmd = self.cmdlist.keys()+self.syscmd
+        cmd = sorted(self.cmdlist.keys() + self.syscmd + self.syscmd_alias.keys())
         res = ''
         for x in cmd:
             res += ' ?' + x
