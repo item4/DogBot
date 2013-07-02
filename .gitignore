@@ -1,7 +1,7 @@
 *.py[cod]
 
 # Test files
-command/test.py
+DogBot/command/test.py
 
 # Eclipse Project file
 .project
