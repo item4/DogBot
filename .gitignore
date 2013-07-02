@@ -3,6 +3,11 @@
 # Test files
 command/test.py
 
+# Eclipse Project file
+.project
+.pydevproject
+.settings
+
 # Launcher
 run.bat
 
