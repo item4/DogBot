@@ -6,6 +6,7 @@ handler = []
 import urllib
 import re
 
+
 def cmd_sub(bot, line, args):
     if not args:
         bot.con.query(
@@ -16,13 +17,13 @@ def cmd_sub(bot, line, args):
         return
 
     end = False
-    for i in xrange(6):
+    for i in xrange(7):
         data = urllib.urlopen('http://gs.saro.me/api/aw' + str(i)).read()
         data = data.decode('utf8')
 
         #tree = xml.etree.ElementTree.fromstring(data)
 
-        data = re.findall('<n t="[^"]+" s="([^"]+)"/>',data)
+        data = re.findall('<n t="[^"]+" s="([^"]+)"/>', data)
 
         for x in data:
             if args in x:
@@ -33,8 +34,9 @@ def cmd_sub(bot, line, args):
         if end:
             break
 
-    data = urllib.urlopen('http://gs.saro.me/api/as?s=' + urllib.quote(args.encode('u8'))).read()
-    data = data.decode('utf8')
+    data = urllib.urlopen('http://gs.saro.me/api/as?s=' +\
+                           urllib.quote(args.encode('u8'))).read()
+    data = data.decode('u8')
 
     if data == '<r v=""/>':
         bot.con.query(
@@ -54,6 +56,6 @@ def cmd_sub(bot, line, args):
             bot.con.query(
                 'PRIVMSG',
                 line.target,
-                u'#%s %s - http://%s (%s.%s %s:%s)' % (ep, nick, url, month, day, hour, minute)
+                u'#%s %s - http://%s (%s.%s %s:%s)' %
+                 (ep, nick, url, month, day, hour, minute)
             )
-
