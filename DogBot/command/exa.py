@@ -19,7 +19,7 @@ def cmd_exa(bot, line, args):
         bot.con.query(
             'PRIVMSG',
             line.target,
-            u'Usage: >? <Function Name>(<Arguments>, <Keyword Arguments>)'
+            u'Usage: ?> func(None, 1, 2.0, help="me!")'
         )
         return
 
@@ -27,7 +27,7 @@ def cmd_exa(bot, line, args):
         token = AUTH_TOKEN,
         nick = line.nick,
         ident = hashlib.sha256(line.ip).hexdigest()[::4],
-        server = bot.host,
+        server = bot.server,
         line = args,
         method = "item4/DogBot",
     )
@@ -61,5 +61,5 @@ def cmd_exa(bot, line, args):
         bot.con.query(
             'PRIVMSG',
             line.target,
-            u'[@] Empty result.',
+            u'[@] .',
         )
