@@ -1,7 +1,6 @@
 # -*- coding:utf-8 -*-
-from __future__ import print_function
 
-alias = ["?"]
+alias = ['>']
 handler = []
 
 from urllib import urlencode
@@ -14,22 +13,23 @@ AUTH_TOKEN = "5961a3a8ab0192813db1d47f21353455"
 MAXINUM_LINE_LENGTH = 450
 MAXIMUM_SPEAK_CHANCE = 3
 
+
 def cmd_exa(bot, line, args):
     if not args:
         bot.con.query(
             'PRIVMSG',
             line.target,
-            u'Usage: ?> func(None, [1, 2.0, {3:4}, True], something=" is happen!")'
+            u'EcmaXp의 API 모음집 연동 명령어 입니다. | usage: ?> help()'
         )
         return
 
     ctx = dict(
-        token = AUTH_TOKEN,
-        nick = line.nick,
-        ident = hashlib.sha256(line.ip).hexdigest()[::4],
-        server = bot.server,
-        line = args,
-        method = "item4/DogBot",
+        token=AUTH_TOKEN,
+        nick=line.nick,
+        ident=hashlib.sha256(line.ip).hexdigest()[::4],
+        server=bot.server,
+        line=args,
+        method='item4/DogBot',
     )
 
     try:
