@@ -8,19 +8,20 @@ import urllib2
 import re
 import HTMLParser
 
+
 def cmd_gg(bot, line, args):
     if not args:
         bot.con.query(
             'PRIVMSG',
             line.target,
-            u'구글 검색 명령어입니다. | usgae: ?gg 검색어'
+            u'구글 검색 명령어입니다. | usage: ?gg 검색어'
         )
         return
 
     opener = urllib2.build_opener()
     opener.addheaders = [('User-agent', 'Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.52 Safari/537.17')]
     try:
-        data = opener.open('http://www.google.co.kr/search?%s' % urllib.urlencode({'q':args.encode('utf8')}),None,3).read()
+        data = opener.open('http://www.google.co.kr/search?%s' % urllib.urlencode({'q': args.encode('utf8')}), None, 3).read()
     except:
         bot.con.query(
             'PRIVMSG',
@@ -29,11 +30,11 @@ def cmd_gg(bot, line, args):
         )
         return
 
-    data = data.decode('utf8','replace')
-    data = data.replace('\n',' ').replace('\r','')
+    data = data.decode('utf8', 'replace')
+    data = data.replace('\n', ' ').replace('\r', '')
     f = data.find('<li class="g')
     if f == -1:
-        bot.con.query('PRIVMSG',line.target,u'검색 실패')
+        bot.con.query('PRIVMSG', line.target, u'검색 실패')
     else:
         website = r'<li class="g"><div[^>]*>\s*<div[^>]*>\s*<div[^>]*>\s*</div>\s*</div>\s*'+\
         r'<h3 class="r"><a href="([^"]+)"[^>]+>(.+?)</a></h3>'+\
@@ -159,7 +160,6 @@ li class="g"><div class="vsc" sig="t9t">  <div data-ved="0CG4QkgowDA">  <div dat
 <nobr> - <span class=f>2012년 1월 31일</span></nobr></span>
 <div class=s><cite><span class=a>coolpunch.tistory.com/&nbsp;-&nbsp;쿨펀치의 세상리뷰</span></cite><br>장점 1. <em>CMD</em> 창에서 사용한 명령어 드래그 <em>복사</em>가 가능하다. 2. 마우스 드래그 <em>복사</em> 명령어 메모장이나 기타 텍스트 편집 유틸에 <em>복사</em>가 가능 단점 1.</div></div><!--n--><!--m-->"""
 
-
         data = data[f:]
         blog_pos = data.find('<li class="g ">')
         web_pos = data.find('<li class="g">')
@@ -180,16 +180,16 @@ li class="g"><div class="vsc" sig="t9t">  <div data-ved="0CG4QkgowDA">  <div dat
             pattern = website
         pattern = re.compile(pattern)
 
-        iter = pattern.finditer(data)
+        iterator = pattern.finditer(data)
 
-        c=1
-        for x in iter:
-            res = u'[ %s - %s ] %s' % (x.group(2),x.group(1),x.group(3))
-            res = res.replace('<br>','').replace('<wbr>','')
-            res = res.replace('<b>','').replace('</b>','')
-            res = res.replace('<em>','\x02').replace('</em>','\x02')
-            res = res.replace('<span class="f">','').replace('</span>','')
-            res = re.sub('<a [^>]+>(.+?)</a>',r'\1',res)
+        c = 1
+        for x in iterator:
+            res = u'[ %s - %s ] %s' % (x.group(2), x.group(1), x.group(3))
+            res = res.replace('<br>', '').replace('<wbr>', '')
+            res = res.replace('<b>', '').replace('</b>', '')
+            res = res.replace('<em>', '\x02').replace('</em>', '\x02')
+            res = res.replace('<span class="f">', '').replace('</span>', '')
+            res = re.sub('<a [^>]+>(.+?)</a>', r'\1', res)
 
             res = HTMLParser.HTMLParser().unescape(res)
             bot.con.query(
