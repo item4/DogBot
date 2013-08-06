@@ -61,5 +61,5 @@ def cmd_exa(bot, line, args):
         bot.con.query(
             'PRIVMSG',
             line.target,
-            u'[@] .',
+            u'[@] Empty Result.',
         )
