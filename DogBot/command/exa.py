@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 from __future__ import print_function
 
-alias = ["#"]
+alias = ["?"]
 handler = []
 
 from urllib import urlencode
@@ -18,7 +18,7 @@ def cmd_exa(bot, line, args):
         bot.con.query(
             'PRIVMSG',
             line.target,
-            u'Usage: $# <Function Name>(<Arguments>, <Keyword Arguments>)'
+            u'Usage: >? <Function Name>(<Arguments>, <Keyword Arguments>)'
         )
         return
 
