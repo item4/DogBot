@@ -19,7 +19,7 @@ def cmd_exa(bot, line, args):
         bot.con.query(
             'PRIVMSG',
             line.target,
-            u'Usage: ?> func(None, 1, 2.0, help="me!")'
+            u'Usage: ?> func(None, [1, 2.0, {3:4}, True], something=" is happen!")'
         )
         return
 
