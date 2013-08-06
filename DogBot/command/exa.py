@@ -12,6 +12,7 @@ import hashlib
 BASE_URL = "https://ecmaxp.pe.kr/api/_export/irc"
 AUTH_TOKEN = "5961a3a8ab0192813db1d47f21353455"
 MAXINUM_LINE_LENGTH = 450
+MAXIMUM_SPEAK_CHANCE = 3
 
 def cmd_exa(bot, line, args):
     if not args:
@@ -42,7 +43,7 @@ def cmd_exa(bot, line, args):
         )
         return
 
-    count = maxcount = 3
+    count = maxcount = MAXIMUM_SPEAK_CHANCE
     for ret in data.decode("utf-8", "replace").splitlines():
         ret = ret.rstrip()
         ret = ret[:MAXINUM_LINE_LENGTH]
