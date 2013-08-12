@@ -44,7 +44,7 @@ def request(bot, line, args):
 def delay_request(bot, line, key):
     ws = websocket.create_connection(DELAY_REQUEST_URL + key)
     try:
-        return ws.recv()
+        return ws.recv().decode('u8')
     finally:
         ws.close()
 
