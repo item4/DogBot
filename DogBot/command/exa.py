@@ -1,4 +1,4 @@
-# -*- coding:utf-8 -*-
+# -*- coding: utf-8 -*-
 
 alias = ['>']
 handler = []
@@ -6,13 +6,50 @@ handler = []
 from urllib import urlencode
 from urllib2 import urlopen, URLError, HTTPError
 from contextlib import closing
+import threading
+import weakref
 import hashlib
+import traceback
 
-BASE_URL = "https://ecmaxp.pe.kr/api/_export/irc"
+try:
+    import websocket
+except ImportError:
+    websocket = None
+
+REQUEST_URL     = "https://ecmaxp.pe.kr/api/_export/irc"
+DELAY_REQUEST_URL = "wss://ecmaxp.pe.kr/api/_export/irc/wait/"
+
 AUTH_TOKEN = "5961a3a8ab0192813db1d47f21353455"
 MAXINUM_LINE_LENGTH = 450
-MAXIMUM_SPEAK_CHANCE = 3
+MAXIMUM_WAIT_CHANCE = 2
+MAXIMUM_SPEAK_CHANCE = 4
 
+bot_control = weakref.WeakKeyDictionary()
+
+def build_ctx(bot, line, args):
+    ctx = dict(
+        token=AUTH_TOKEN,
+        nick=line.nick,
+        ident=hashlib.sha256(line.ip).hexdigest()[::4],
+        server=bot.server,
+        line=args,
+        method='item4/DogBot',
+    )
+
+    return ctx
+
+def request(bot, line, args):
+    ctx = build_ctx(bot, line, args)
+
+    with closing(urlopen(REQUEST_URL, urlencode(ctx))) as res:
+        return res.read(4096)
+
+def delay_request(bot, line, key):
+    ws = create_connection(DELAY_REQUEST_URL + key)
+    try:
+        return ws.recv()
+    finally:
+        ws.close()
 
 def cmd_exa(bot, line, args):
     if not args:
@@ -23,41 +60,70 @@ def cmd_exa(bot, line, args):
         )
         return
 
-    ctx = dict(
-        token=AUTH_TOKEN,
-        nick=line.nick,
-        ident=hashlib.sha256(line.ip).hexdigest()[::4],
-        server=bot.server,
-        line=args,
-        method='item4/DogBot',
-    )
-
     try:
-        with closing(urlopen(BASE_URL, urlencode(ctx))) as res:
-            data = res.read(4096)
+        data = request(bot, line, args)
     except (URLError, HTTPError), e:
+        emsg = traceback.format_exception_only(type(e), e)[-1]
         bot.con.query(
             'PRIVMSG',
             line.target,
-            u'[!:INTERNAL] %s' % (e,)
+            u'[!:INTERNAL] %s' % (emsg,)
         )
         return
 
-    count = maxcount = MAXIMUM_SPEAK_CHANCE
-    for ret in data.decode("utf-8", "replace").splitlines():
+    speaked = False
+    speakcount = MAXIMUM_SPEAK_CHANCE
+    waitcount = MAXIMUM_WAIT_CHANCE
+
+    lines = data.decode("utf-8", "replace").splitlines()
+    while lines:
+        ret = lines.pop(0)
+        target, mode = line.target, "PRIVMSG"
+
         ret = ret.rstrip()
+        cmd, sep, arg = ret.partition(" ")
+        if cmd.startswith("[#") and cmd.endswith("]"):
+            if cmd == "[#:DELAY]":
+                if waitcount:
+                    waitcount -= 1
+                    if not websocket:
+                        ret = "[!:INTERNAL] DELAY Call Failed (ImportError: No module named websocket)"
+                    else:
+                        try:
+                            ret = delay_request(bot, line, arg)
+                        except websocket.WebSocketException, e:
+                            emsg = traceback.format_exception_only(type(e), e)[-1]
+                            bot.con.query(
+                                'PRIVMSG',
+                                line.target,
+                                u'[!:INTERNAL] %s' % (emsg,)
+                            )
+                            return
+                else:
+                    ret = "[!:INTERNAL] DELAY Call Failed (No more chance)"
+
+                lines.append(ret)
+                continue
+            elif cmd == "[#:NOTICE]":
+                target, mode = line.nick, "NOTICE"
+                ret = arg
+            else:
+                continue
+
         ret = ret[:MAXINUM_LINE_LENGTH]
         if ret:
+            speaked = True
             bot.con.query(
-                'PRIVMSG',
-                line.target,
+                mode,
+                target,
                 ret,
             )
-            count -= 1
-            if not count:
+
+            speakcount -= 1
+            if not speakcount:
                 break
 
-    if maxcount == count:
+    if not speaked:
         bot.con.query(
             'PRIVMSG',
             line.target,
