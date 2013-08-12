@@ -7,7 +7,6 @@ from urllib import urlencode
 from urllib2 import urlopen, URLError, HTTPError
 from contextlib import closing
 import threading
-import weakref
 import hashlib
 import traceback
 
@@ -23,8 +22,6 @@ AUTH_TOKEN = "5961a3a8ab0192813db1d47f21353455"
 MAXINUM_LINE_LENGTH = 450
 MAXIMUM_WAIT_CHANCE = 2
 MAXIMUM_SPEAK_CHANCE = 4
-
-bot_control = weakref.WeakKeyDictionary()
 
 def build_ctx(bot, line, args):
     ctx = dict(
