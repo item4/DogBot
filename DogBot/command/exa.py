@@ -42,7 +42,7 @@ def request(bot, line, args):
         return res.read(4096)
 
 def delay_request(bot, line, key):
-    ws = create_connection(DELAY_REQUEST_URL + key)
+    ws = websocket.create_connection(DELAY_REQUEST_URL + key)
     try:
         return ws.recv()
     finally:
