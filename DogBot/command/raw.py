@@ -5,6 +5,7 @@ handler = []
 
 import re
 
+
 def cmd_raw(bot, line, args):
     if line.login != 'item4':
         bot.con.query(
@@ -21,7 +22,7 @@ def cmd_raw(bot, line, args):
         )
         return
 
-    temp = args.split(' ',3)
+    temp = args.split(' ', 2)
     temp[0] = temp[0].upper()
     if temp[0] == 'NICK':
         bot.nick = temp[1]
@@ -61,12 +62,15 @@ def cmd_raw(bot, line, args):
 
         bot.con.query(' '.join(temp))
         return
-    elif temp[0] in ['QUIT','EXIT']:
+    elif temp[0] in ['QUIT', 'EXIT']:
         bot.con.query(
             'PRIVMSG',
             line.target,
             u'멍멍! QUIT, EXIT는 명령어를 이용해주세요!'
         )
         return
+
+    if temp[2][0] == ':':
+        temp[2] = temp[2][1:]
 
     bot.con.query(*temp)
