@@ -29,7 +29,7 @@ def build_ctx(bot, line, args):
         nick=line.nick,
         ident=hashlib.sha256(line.ip).hexdigest()[::4],
         server=bot.server,
-        line=args,
+        line=args.encode('u8', 'replace'),
         method='item4/DogBot',
     )
 
