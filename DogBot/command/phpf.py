@@ -31,12 +31,24 @@ def cmd_phpf(bot, line, args):
         description = re.sub('\s{2,}', ' ', description).strip()
         description = description.replace('&quot;', "'")
 
+        msg = u'%s: %s (%s)' % (match.group(2).replace('&gt;', '>'),
+                                match.group(3).replace('&#039;', "'").replace('&quot;', "'"),
+                                match.group(1).replace('&gt;', '>'))
+
+        warning = re.search('<div class="warning">\s*<strong class="warning">Warning</strong>\s*<p[^>]+>(.+?)</p>', data)
+
+        if warning:
+            warning = warning.group(1)
+            if 'deprecated' in warning.lower():
+                msg = '\x02[DEPRECATED]\x02 ' + msg + ' / Deprecated' +\
+                 re.search('(?:<[^>]+>DEPRECATED</[^>]+>|deprecated)( as of PHP \d+\.\d+\.\d+)', data).group(1)
+            else:
+                msg = '\x02[WARNING]\x02 ' + msg
+
         bot.con.query(
             'PRIVMSG',
             line.target,
-            u'\x02%s\x02: %s (%s)' % (match.group(2).replace('&gt;', '>'),
-                                    match.group(3).replace('&#039;', "'").replace('&quot;', "'"),
-                                    match.group(1).replace('&gt;', '>'))
+            msg
         )
         bot.con.query(
             'PRIVMSG',
