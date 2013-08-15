@@ -7,6 +7,7 @@ import urllib
 import re
 import HTMLParser
 
+
 def cmd_nyaa(bot, line, args):
     try:
         data = urllib.urlopen('http://www.nyaa.eu/?%s' % urllib.urlencode({'page':'search','cats':'1_11','filter':0,'term':args.encode('utf8') if args else ''})).read()
@@ -18,7 +19,7 @@ def cmd_nyaa(bot, line, args):
         )
         return
     data = data.decode('utf8')
-    data = re.finditer(r'<tr[^>]+><td[^>]+><a[^>]+><img[^>]+></a></td><td[^>]+><a[^>]+>(.+?)</a></td><td[^>]+><a href="([^"]+)"[^>]+><img[^>]+></a></td><td[^>]+>(.+?)</td><td[^>]+>(\d+)</td><td[^>]+>(\d+)</td><td[^>]+>(\d+)</td><td[^>]+>\d+</td></tr>',data)
+    data = re.finditer(r'<tr[^>]+><td[^>]+><a[^>]+><img[^>]+></a></td><td[^>]+><a[^>]+>(.+?)</a></td><td[^>]+><a href="([^"]+)"[^>]+><img[^>]+></a></td><td[^>]+>(.+?)</td>(?:<td[^>]+>(\d+)</td><td[^>]+>(\d+)</td>|<td class="tlistfailed" colspan="2">.+?</td>)<td[^>]+>(\d+)</td><td[^>]+>\d+</td></tr>',data)
     """
 
 
