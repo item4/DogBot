@@ -6,6 +6,7 @@ handler = []
 import urllib
 import re
 
+
 def cmd_phpf(bot, line, args):
     if not args:
         bot.con.query(
@@ -15,38 +16,27 @@ def cmd_phpf(bot, line, args):
         )
         return
 
-    args = args.lower()
+    path = args.replace('::', '.')
 
-    if args.find('::') > 0:
-        category,function = args.split('::',1)
-    else:
-        category = 'function'
-        function = args
-
-    function = function.replace('_','-')
-
-    url = 'http://php.net/manual/en/%s.%s.php' % (category,function)
-
+    url = 'http://php.net/%s' % (path,)
 
     data = urllib.urlopen(url).read()
-    data = data.decode('utf8','ignore').replace('\r','').replace('\n','')
+    data = data.decode('utf8', 'ignore').replace('\r', '').replace('\n', '')
 
-    data = re.search(ur'<p class="verinfo">\(([^\)]+)\)</p><p class="refpurpose"><span class="refname">([^<]+)</span> &mdash; <span class="dc-title">([^<]+)</span></p>\s*</div>\s*<div[^>]+>\s*<h3 class="title">[^<]+</h3>\s*<div class="methodsynopsis dc-description">(.+?)</div>',data)
-    """
+    match = re.search(ur'<p class="verinfo">\(([^\)]+)\)</p><p class="refpurpose"><span class="refname">([^<]+)</span> &mdash; <span class="dc-title">([^<]+)</span>', data)
 
-    """
-    if data:
-        description = data.group(4)
-        description = re.sub(r'</?[^>]+>','',description)
-        description = re.sub('\s{2,}',' ',description).strip()
-        description = description.replace('&quot;',"'")
+    if match:
+        description = re.search('<div class="methodsynopsis dc-description">(.+?)</div>', data).group(1)
+        description = re.sub(r'</?[^>]+>', '', description)
+        description = re.sub('\s{2,}', ' ', description).strip()
+        description = description.replace('&quot;', "'")
 
         bot.con.query(
             'PRIVMSG',
             line.target,
-            u'\x02%s\x02: %s (%s)' % (data.group(2).replace('&gt;','>'),
-                                    data.group(3).replace('&#039;',"'").replace('&quot;',"'"),
-                                    data.group(1).replace('&gt;','>'))
+            u'\x02%s\x02: %s (%s)' % (match.group(2).replace('&gt;', '>'),
+                                    match.group(3).replace('&#039;', "'").replace('&quot;', "'"),
+                                    match.group(1).replace('&gt;', '>'))
         )
         bot.con.query(
             'PRIVMSG',
