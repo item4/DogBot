@@ -28,11 +28,18 @@ def cmd_calc(bot, line, args):
             u'멍멍! 에러났어요! - %s' % (e,)
         )
     else:
-        bot.con.query(
-            'PRIVMSG',
-            line.target,
-            '%s == %s' % (args, round(res, 6))
-        )
+        if type(res) == Decimal:
+            bot.con.query(
+                'PRIVMSG',
+                line.target,
+                '%s == %s' % (args, round(res, 6))
+            )
+        else:
+            bot.con.query(
+                'PRIVMSG',
+                line.target,
+                u'멍멍! 결과가 상수가 아니에요!'
+            )
 
 operator_function = [
                      'abs', 'sqrt', 'factorial',
