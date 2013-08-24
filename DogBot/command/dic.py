@@ -7,38 +7,50 @@ import re
 import urllib
 import time
 
+
 def cmd_dic(bot, line, args):
     if not args:
         bot.con.query(
             'PRIVMSG',
             line.target,
-            u'다음 사전에서 검색하여 결과를 보여줍니다 | usage: ?dic 단어'
+            u'다음 사전에서 검색하여 결과를 보여줍니다 | usage: ?dic 단어 | ?dic -dic ke 단어 (ke:한영, ek:영한, kk:국어, ee:영영, hh:한자, kj:한일, kc:한중)'
         )
         return
 
     if ' ' in args:
-        temp = args.split(' ')
-        keyword = ' '.join(temp[:-1])
-        num = temp[-1]
-        try:
-            num = int(num) - 1
-        except ValueError:
-            keyword = args
-            num = 0
-        if num < 0:
+        if args.startswith('-dic'):
+            dic, args = args[5:].split(' ', 1)
+        else:
+            dic = None
+        if ' ' in args:
+            temp = args.split(' ')
+            keyword = ' '.join(temp[:-1])
+            num = temp[-1]
+            try:
+                num = int(num) - 1
+            except ValueError:
+                keyword = args
+                num = 0
+            if num < 0:
+                keyword = args
+                num = 0
+        else:
             keyword = args
             num = 0
     else:
+        dic = None
         keyword = args
         num = 0
 
-
     data = urllib.urlopen('http://dic.daum.net/search.do?%s' % \
-                          urllib.urlencode({'q':keyword.encode('utf8')})).read()
+                          urllib.urlencode({'q': keyword.encode('utf8')})).read()
 
-    data = data.decode('utf8').replace('\r','').replace('\n','')
+    data = data.decode('utf8').replace('\r', '').replace('\n', '')
 
-    data = re.findall('<strong[^>]+>\s*<a href="([^>]+)" class="link_txt">', data)
+    data = re.findall('<strong[^>]+>\s*<a href="([^>]+)" class="\s*link_txt\s*">', data)
+
+    if dic:
+        data = filter(lambda x: '=' + dic + 'w' in x, data)
 
     if not data:
         bot.con.query(
@@ -51,7 +63,7 @@ def cmd_dic(bot, line, args):
     try:
         url = 'http://dic.daum.net' + data[num]
         if url.find('view_example.do') > 0:
-            url = url.replace('view_example.do','view.do')
+            url = url.replace('view_example.do', 'view.do')
     except IndexError:
         bot.con.query(
             'PRIVMSG',
@@ -62,11 +74,39 @@ def cmd_dic(bot, line, args):
 
     data = urllib.urlopen(url).read()
 
-    data = data.decode('utf8','ignore').replace('\r','').replace('\n','')
+    data = data.decode('utf8', 'ignore').replace('\r', '').replace('\n', '')
+
+    try:
+        keyword = re.search('<strong class="tit"><span class="inner_tit">(.+?)</span>.+', data).group(1)
+    except:
+        keyword = '?'
+
+    temp = url[40:42]
+    if temp == 'ek':
+        dic_category = u'영한'
+    elif temp == 'ke':
+        dic_category = u'한영'
+    elif temp == 'ee':
+        dic_category = u'영영'
+    elif temp == 'kk':
+        dic_category = u'국어'
+    elif temp == 'hh':
+        dic_category = u'한자'
+    elif temp == 'kj':
+        dic_category = u'한일'
+    elif temp == 'kc':
+        dic_category = u'한중'
+    else:
+        dic_category = u'미상'
 
     data = re.findall('(?:<h4[^>]+>([^<]+)</h4>\s*<div[^>]+>\s*<div[^>]+>\s*)?(?:<span[^>]+>([^<]+)</span>\s*)?<p class="txt_sense( no_num)?">(.+?)</p>', data)
 
     if data:
+        bot.con.query(
+            'PRIVMSG',
+            line.target,
+            u'검색단어 : %s (사전 : %s)' % (keyword, dic_category)
+        )
         res = ''
         i = 1
         lines = 0
@@ -91,7 +131,7 @@ def cmd_dic(bot, line, args):
                 )
                 res = ''
                 lines += 1
-                if lines > 4:
+                if lines > 2:
                     bot.con.query(
                         'PRIVMSG',
                         line.target,
@@ -105,7 +145,6 @@ def cmd_dic(bot, line, args):
                 line.target,
                 res[:cut]
             )
-
 
             time.sleep(.4)
     else:
