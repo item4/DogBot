@@ -295,6 +295,8 @@ def calc(args):
                 elif op == ',':
                     if type(front) == list:
                         res = front + [back]
+                    elif type(back) == list:
+                        res = [front] + back
                     else:
                         res = [front, back]
 
