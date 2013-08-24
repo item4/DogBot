@@ -28,11 +28,18 @@ def cmd_calc(bot, line, args):
             u'멍멍! 에러났어요! - %s' % (e,)
         )
     else:
-        bot.con.query(
-            'PRIVMSG',
-            line.target,
-            '%.8f' % (res,)
-        )
+        if res == int(res):
+            bot.con.query(
+                'PRIVMSG',
+                line.target,
+                '%s == %d' % (args, res)
+            )
+        else:
+            bot.con.query(
+                'PRIVMSG',
+                line.target,
+                '%s == %.8f' % (args, res)
+            )
 
 operator_function = [
                      'abs', 'sqrt', 'factorial',
@@ -86,7 +93,7 @@ def calc(args):
     if args[0] == '+':
         args = '0' + args
 
-    args = args.replace('(+', '(0+')
+    args = args.replace('(+', '(0+').replace(' ', '')
 
     term_pattern = re.compile('-?(?:\d+\.\d+|\.\d+|\d+\.|\d+)|pi|e')
     operator_pattern = re.compile(',|\+|-|\*\*|\*|/|%|\(|\)|' + '|'.join(operator_function))
@@ -172,7 +179,7 @@ def calc(args):
                 elif op == 'factorial':
                     res = math.factorial(t)
                 elif op == 'log':
-                    res = math.log(t[0],t[1])
+                    res = math.log(t[0], t[1])
                 elif op == 'ln':
                     res = math.log(t)
                 elif op == 'log10':
