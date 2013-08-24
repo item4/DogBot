@@ -28,26 +28,22 @@ def cmd_calc(bot, line, args):
             u'멍멍! 에러났어요! - %s' % (e,)
         )
     else:
-        if res == int(res):
-            bot.con.query(
-                'PRIVMSG',
-                line.target,
-                '%s == %d' % (args, res)
-            )
-        else:
-            bot.con.query(
-                'PRIVMSG',
-                line.target,
-                '%s == %.8f' % (args, res)
-            )
+        bot.con.query(
+            'PRIVMSG',
+            line.target,
+            '%s == %s' % (args, round(res, 6))
+        )
 
 operator_function = [
                      'abs', 'sqrt', 'factorial',
+                     'max', 'min', 'sum', 'count', 'len',
+                     'avg', 'average', 'varp', 'var', 'stdevp', 'stdev',
                      'ceil', 'floor', 'round',
                      'log', 'ln', 'log10',
                      'deg', 'rad', 'degree', 'radian',
                      'acosh', 'asinh', 'atanh', 'acos', 'asin', 'atan', 'cosh',
-                     'sinh', 'tanh', 'cos', 'sin', 'tan'
+                     'sinh', 'tanh', 'cos', 'sin', 'tan',
+                     'test'
                      ]
 
 operator_level = {}
@@ -79,6 +75,21 @@ for x in operator_function:
     operator_term[x] = 1
 
 
+def average(args):
+    return sum(args) / len(args)
+
+
+def variance(args, entire=False):
+    var = 0
+    avg = average(args)
+    for x in args:
+        var += (avg - x) ** 2
+    if entire:
+        return var / (len(args) - 1)
+    else:
+        return var / len(args)
+
+
 def priority(op):
     return operator_level[op]
 
@@ -93,10 +104,10 @@ def calc(args):
     if args[0] == '+':
         args = '0' + args
 
-    args = args.replace('(+', '(0+').replace(' ', '')
+    args = args.replace('(+', '(0+')
 
-    term_pattern = re.compile('-?(?:\d+\.\d+|\.\d+|\d+\.|\d+)|pi|e')
-    operator_pattern = re.compile(',|\+|-|\*\*|\*|/|%|\(|\)|' + '|'.join(operator_function))
+    term_pattern = re.compile('\s*(-?\s*(?:\d+\.\d+|\.\d+|\d+\.|\d+)|pi|e)\s*')
+    operator_pattern = re.compile('\s*(,|\+|-|\*\*|\*|/|%|\(\s*|\s*\)|' + '|'.join(operator_function) + ')\s*')
 
     result_stack = []
     operator_stack = []
@@ -107,7 +118,7 @@ def calc(args):
     while i < length:
         term = term_pattern.match(args[i:])
         if term:
-            temp = term.group(0)
+            temp = term.group(1).replace(' ', '')
             if temp == 'pi':
                 t = math.pi
             elif temp == 'e':
@@ -116,12 +127,12 @@ def calc(args):
                 t = temp
 
             result_stack.append(Decimal(t))
-            i += len(temp)
+            i += len(term.group(0))
             continue
 
         operator = operator_pattern.match(args[i:])
         if operator:
-            op = operator.group(0)
+            op = operator.group(1).replace(' ', '')
 
             if op == '(':
                 operator_stack.append(op)
@@ -135,9 +146,9 @@ def calc(args):
                     result_stack.append(operator_stack.pop())
                 operator_stack.append(op)
 
-            i += len(op)
+            i += len(operator.group(0))
             continue
-        raise DogBotError(u'비정상적인 연산자')
+        raise DogBotError(u'비정상적인 연산자 : ' + args[i:])
 
     while operator_stack:
         result_stack.append(operator_stack.pop())
@@ -200,6 +211,51 @@ def calc(args):
                     res = math.sinh(t)
                 elif op == 'tanh':
                     res = math.tanh(t)
+                elif op == 'max':
+                    if type(t) != list:
+                        t = [t]
+                    res = max(t)
+                elif op == 'min':
+                    if type(t) != list:
+                        t = [t]
+                    res = min(t)
+                elif op == 'sum':
+                    if type(t) != list:
+                        res = t
+                    else:
+                        res = sum(t)
+                elif op == 'count' or op == 'len':
+                    if type(t) != list:
+                        res = 1
+                    else:
+                        res = len(t)
+                elif op == 'avg' or op == 'average':
+                    if type(t) != list:
+                        res = 1
+                    else:
+                        res = average(t)
+                elif op == 'var':
+                    if type(t) != list:
+                        res = 0
+                    else:
+                        res = variance(t)
+                elif op == 'varp':
+                    if type(t) != list:
+                        res = 0
+                    else:
+                        res = variance(t, True)
+                elif op == 'stdev':
+                    if type(t) != list:
+                        res = 0
+                    else:
+                        res = variance(t) ** .5
+                elif op == 'stdevp':
+                    if type(t) != list:
+                        res = 0
+                    else:
+                        res = variance(t, True) ** .5
+                elif op == 'test':
+                    res = 0
 
             elif temp == 2:
                 try:
@@ -223,9 +279,14 @@ def calc(args):
                 elif op == '^':
                     res = Decimal(front ** back)
                 elif op == ',':
-                    res = (front, back)
+                    if type(front) == list:
+                        res = front + [back]
+                    else:
+                        res = [front, back]
 
             term_stack.append(res)
+    if len(term_stack) > 1:
+        raise DogBotError(u'비정상적인 인자들')
 
     return term_stack[0]
 
