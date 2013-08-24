@@ -34,18 +34,19 @@ def cmd_calc(bot, line, args):
             '%.8f' % (res,)
         )
 
+operator_function = [
+                     'abs', 'sqrt', 'factorial',
+                     'ceil', 'floor', 'round',
+                     'log', 'ln', 'log10',
+                     'deg', 'rad', 'degree', 'radian',
+                     'acosh', 'asinh', 'atanh', 'acos', 'asin', 'atan', 'cosh',
+                     'sinh', 'tanh', 'cos', 'sin', 'tan'
+                     ]
+
 operator_level = {}
 operator_level['('] = 0
 operator_level[')'] = 0
 operator_level[','] = 10000
-operator_level['abs'] = 1000
-operator_level['sin'] = 1000
-operator_level['cos'] = 1000
-operator_level['tan'] = 1000
-operator_level['sqrt'] = 1000
-operator_level['ceil'] = 1000
-operator_level['floor'] = 1000
-operator_level['round'] = 1000
 operator_level['+'] = 1
 operator_level['-'] = 1
 operator_level['%'] = 2
@@ -53,19 +54,13 @@ operator_level['*'] = 3
 operator_level['/'] = 3
 operator_level['**'] = 4
 operator_level['^'] = 4
+for x in operator_function:
+    operator_level[x] = 1000
 
 operator_term = {}
 operator_term['('] = 0
 operator_term[')'] = 0
 operator_term[','] = 2
-operator_term['abs'] = 1
-operator_term['sin'] = 1
-operator_term['cos'] = 1
-operator_term['tan'] = 1
-operator_term['sqrt'] = 1
-operator_term['ceil'] = 1
-operator_term['floor'] = 1
-operator_term['round'] = 1
 operator_term['+'] = 2
 operator_term['-'] = 2
 operator_term['%'] = 2
@@ -73,6 +68,8 @@ operator_term['*'] = 2
 operator_term['/'] = 2
 operator_term['**'] = 2
 operator_term['^'] = 2
+for x in operator_function:
+    operator_term[x] = 1
 
 
 def priority(op):
@@ -92,7 +89,7 @@ def calc(args):
     args = args.replace('(+', '(0+')
 
     term_pattern = re.compile('-?(?:\d+\.\d+|\.\d+|\d+\.|\d+)|pi|e')
-    operator_pattern = re.compile(',|\+|-|\*\*|\*|/|%|\(|\)|abs|sin|cos|tan|sqrt|ceil|floor|round')
+    operator_pattern = re.compile(',|\+|-|\*\*|\*|/|%|\(|\)|' + '|'.join(operator_function))
 
     result_stack = []
     operator_stack = []
@@ -166,6 +163,37 @@ def calc(args):
                     res = math.floor(t)
                 elif op == 'round':
                     res = round(float(t[0]), int(t[1]))
+                elif op == 'acos':
+                    res = math.acos(t)
+                elif op == 'asin':
+                    res = math.asin(t)
+                elif op == 'atan':
+                    res = math.atan(t)
+                elif op == 'factorial':
+                    res = math.factorial(t)
+                elif op == 'log':
+                    res = math.log(t[0],t[1])
+                elif op == 'ln':
+                    res = math.log(t)
+                elif op == 'log10':
+                    res = math.log10(t)
+                elif op == 'deg' or op == 'degree':
+                    res = math.degrees(t)
+                elif op == 'rad' or op == 'radian':
+                    res = math.radians(t)
+                elif op == 'acosh':
+                    res = math.acosh(t)
+                elif op == 'asinh':
+                    res = math.asinh(t)
+                elif op == 'atanh':
+                    res = math.atanh(t)
+                elif op == 'cosh':
+                    res = math.cosh(t)
+                elif op == 'sinh':
+                    res = math.sinh(t)
+                elif op == 'tanh':
+                    res = math.tanh(t)
+
             elif temp == 2:
                 try:
                     back = term_stack.pop()
