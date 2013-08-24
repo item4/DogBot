@@ -54,9 +54,9 @@ operator_function = [
                      ]
 
 operator_level = {}
-operator_level['('] = 0
-operator_level[')'] = 0
-operator_level[','] = 10000
+operator_level['('] = -1
+operator_level[')'] = -1
+operator_level[','] = 0
 operator_level['+'] = 1
 operator_level['-'] = 1
 operator_level['%'] = 2
@@ -111,7 +111,7 @@ def calc(args):
     if args[0] == '+':
         args = '0' + args
 
-    args = args.replace('(+', '(0+')
+    args = args.replace('(+', '(0+').replace(',+', ',0+')
 
     term_pattern = re.compile('\s*(-?\s*(?:\d+\.\d+|\.\d+|\d+\.|\d+)|pi|e)\s*')
     operator_pattern = re.compile('\s*(,|\+|-|\*\*|\*|/|%|\(\s*|\s*\)|' + '|'.join(operator_function) + ')\s*')
@@ -197,7 +197,10 @@ def calc(args):
                 elif op == 'factorial':
                     res = math.factorial(t)
                 elif op == 'log':
-                    res = math.log(t[0], t[1])
+                    if type(t) == list:
+                        res = math.log(t[0], t[1])
+                    else:
+                        res = math.log(t)
                 elif op == 'ln':
                     res = math.log(t)
                 elif op == 'log10':
@@ -220,12 +223,15 @@ def calc(args):
                     res = math.tanh(t)
                 elif op == 'max':
                     if type(t) != list:
-                        t = [t]
-                    res = max(t)
+                        res = t
+                    else:
+                        print t
+                        res = max(t)
                 elif op == 'min':
                     if type(t) != list:
-                        t = [t]
-                    res = min(t)
+                        res = t
+                    else:
+                        res = min(t)
                 elif op == 'sum':
                     if type(t) != list:
                         res = t
@@ -255,15 +261,16 @@ def calc(args):
                     if type(t) != list:
                         res = 0
                     else:
-                        res = variance(t) ** .5
+                        res = float(variance(t)) ** .5
                 elif op == 'stdevp':
                     if type(t) != list:
                         res = 0
                     else:
-                        res = variance(t, True) ** .5
+                        res = float(variance(t, True)) ** .5
                 elif op == 'test':
                     res = 0
 
+                res = Decimal(res)
             elif temp == 2:
                 try:
                     back = term_stack.pop()
