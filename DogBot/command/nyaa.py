@@ -9,14 +9,22 @@ import HTMLParser
 
 
 def cmd_nyaa(bot, line, args):
-    if args.startswith('-all '):
+    if args and args.startswith('-all '):
         cats = '0'
         args = args[5:]
     else:
         cats = '1_11'
 
+    if not args:
+        bot.con.query(
+            'PRIVMSG',
+            line.target,
+            u'NyaaTorrents에서 Raw Anime를 검색해줍니다. | usage: ?nyaa inazuma | ?nyaa -all vanguard (전체 카테고리)'
+        )
+        return
+
     try:
-        data = urllib.urlopen('http://www.nyaa.eu/?%s' % urllib.urlencode({'page':'search','cats':cats,'filter':0,'term':args.encode('utf8') if args else ''})).read()
+        data = urllib.urlopen('http://www.nyaa.eu/?%s' % urllib.urlencode({'page':'search','cats':cats,'filter':0,'term':args.encode('utf8')})).read()
     except IOError:
         bot.con.query(
             'PRIVMSG',
