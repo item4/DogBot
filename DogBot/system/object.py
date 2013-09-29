@@ -17,6 +17,7 @@ from DogBot.system.command import *
 from DogBot.system.error import *
 from DogBot.system.line import *
 
+
 class DogBotObject(object):
     def __init__(self, system, server, connect, encoding, channels):
         self.system = system
@@ -132,8 +133,9 @@ class DogBotObject(object):
                             line.target,
                             u'[%s] %s: %s' % (k, e.__class__.__name__, e)
                         )
-                    if res == command.STOP:
-                        return
+                    else:
+                        if res == command.STOP:
+                            return
             try:
                 func = getattr(self,'on_%s' % line.type.upper())
             except:
