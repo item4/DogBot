@@ -55,6 +55,7 @@ class DogBotObject(object):
             finally:
                 self._stop()
 
+
     def _start(self):
         self.running = True
         self.restart = False
@@ -102,8 +103,10 @@ class DogBotObject(object):
 
         return
 
+
     def _stop(self):
         self.con.close()
+
 
     def parse(self, msg):
         temp = u'[%s]<< %s' % (time.strftime('%H:%M:%S'),msg)
@@ -143,6 +146,7 @@ class DogBotObject(object):
             else:
                 func(line)
 
+
     def add_handler(self, event, name, func):
         event = event.upper()
         if event not in self.handler:
@@ -150,11 +154,13 @@ class DogBotObject(object):
 
         self.handler[event][name] = func
 
+
     def del_handler(self, event, name):
         event = event.upper()
         if event not in self.handler or name not in self.handler[event]:
             return
         del self.handler[event][name]
+
 
     def del_handler_all(self):
         self.handler.clear()
@@ -162,6 +168,7 @@ class DogBotObject(object):
 
     def on_001(self, line): # 서버 접속
         self.con.send(u'MODE %s +x' % self.nick)
+
 
     def on_005(self, line): # server options
         option = line.target.split(' ')[1:]
@@ -173,6 +180,7 @@ class DogBotObject(object):
                 value = 1
             self.db['server'][key] = value
 
+
     def on_332(self, line): # channel topic
         _, channel = line.target.split(' ',1)
 
@@ -180,6 +188,7 @@ class DogBotObject(object):
             self.db['channel'][channel] = {}
 
         self.db['channel'][channel]['topic'] = line.message
+
 
     def on_333(self, line): # channel topic setter and time
         _, channel, setter, settime  = line.message.split(' ',3)
@@ -189,6 +198,7 @@ class DogBotObject(object):
 
         self.db['channel'][channel]['topic_setter'] = setter
         self.db['channel'][channel]['topic_time'] = settime
+
 
     def on_353(self, line): # channel member
         _, _, channel = line.target.split(' ',2)
@@ -214,6 +224,7 @@ class DogBotObject(object):
 
             self.db['channel'][channel]['member'][nick] = pre
 
+
     def on_396(self, line): # motd 끝
         if self.system.config['nickserv'][self.server]['login']:
             self.con.send(self.system.config['nickserv'][self.server]['login'] % self.nick)
@@ -230,9 +241,11 @@ class DogBotObject(object):
             self.con.send(self.system.config['nickserv'][self.server]['kick'] % self.nick)
             self.con.send(u'NICK %s' % self.nick)
 
+
     def on_JOIN(self, line):
         if line.message in self.db['channel']:
             self.db['channel'][line.message]['member'][line.nick] = ''
+
 
     def on_MODE(self, line):
         temp = re.match('\((.+?)\)(.+$)', self.db['server']['PREFIX'])
@@ -274,6 +287,7 @@ class DogBotObject(object):
                 del self.db['channel'][chan]['member'][line.nick]
                 self.db['channel'][chan]['member'][line.message] = temp
 
+
     def on_KICK(self, line):
         chan, nick = line.target.split(' ')
 
@@ -294,11 +308,14 @@ class DogBotObject(object):
         else:
             del self.db['channel'][chan]['member'][nick]
 
+
     def on_PART(self, line):
         if line.nick == self.nick:
             self.db['channel'][line.target].clear()
         else:
-            del self.db['channel'][line.target]['member'][line.nick]
+            if line.nick in self.db['channel'][line.target]['member'].keys():
+                del self.db['channel'][line.target]['member'][line.nick]
+
 
     def on_PRIVMSG(self, line):
         if line.message.startswith(self.nick):
@@ -323,6 +340,7 @@ class DogBotObject(object):
         for chan in self.db['channel']:
             if line.nick in self.db['channel'][chan]['member']:
                 del self.db['channel'][chan]['member'][line.nick]
+
 
     def on_TOPIC(self, line): # set topic
         self.db['channel'][line.target]['topic'] = line.message
