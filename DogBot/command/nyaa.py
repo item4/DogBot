@@ -9,8 +9,14 @@ import HTMLParser
 
 
 def cmd_nyaa(bot, line, args):
+    if args.startswith('-all '):
+        cats = '0'
+        args = args[5:]
+    else:
+        cats = '1_11'
+
     try:
-        data = urllib.urlopen('http://www.nyaa.eu/?%s' % urllib.urlencode({'page':'search','cats':'1_11','filter':0,'term':args.encode('utf8') if args else ''})).read()
+        data = urllib.urlopen('http://www.nyaa.eu/?%s' % urllib.urlencode({'page':'search','cats':cats,'filter':0,'term':args.encode('utf8') if args else ''})).read()
     except IOError:
         bot.con.query(
             'PRIVMSG',
