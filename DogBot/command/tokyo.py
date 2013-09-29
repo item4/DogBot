@@ -3,14 +3,27 @@
 alias = [u'도쿄도','tokyotosho']
 handler = []
 
+
 import urllib
 import re
 
-def cmd_tokyo(bot,line,args):
-    if args is None:
-        url = 'http://www.tokyotosho.info/?cat=7'
+
+def cmd_tokyo(bot, line, args):
+    if args and args.startswith('-all '):
+        search_type = 0
+        args = args[5:]
     else:
-        url = 'http://www.tokyotosho.info/search.php?%s' % urllib.urlencode({'terms':args.encode('utf8'),'type':7})
+        search_type = 7
+
+    if not args:
+        bot.con.query(
+            'PRIVMSG',
+            line.target,
+            u'Tokyo Toshokan(도쿄도서관)에서 Raws를 검색해줍니다. | usage: ?tokyo inazuma | ?tokyo -all vanguard (전체 카테고리)'
+        )
+        return
+
+    url = 'http://www.tokyotosho.info/search.php?%s' % urllib.urlencode({'terms':args.encode('utf8'),'type':search_type})
 
     try:
         data = urllib.urlopen(url).read()
