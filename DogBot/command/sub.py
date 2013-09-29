@@ -28,7 +28,7 @@ def cmd_sub(bot, line, args):
         data = re.findall('<n t="[^"]+" s="([^"]+)"/>', data)
 
         for x in data:
-            if args in x:
+            if args.lower() in x.lower():
                 args = x
                 end = True
                 break
