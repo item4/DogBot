@@ -3,6 +3,7 @@
 alias = [u'자막']
 handler = []
 
+import json
 import urllib
 import re
 
@@ -19,51 +20,59 @@ def cmd_sub(bot, line, args):
         return
 
     end = False
+    find_item = None 
     for i in xrange(7):
-        data = urllib.urlopen('http://gs.saro.me/api/aw' + str(i)).read()
+        data = urllib.urlopen('http://www.anissia.net/anitime/list', urllib.urlencode({'w':str(i)})).read()
         data = data.decode('utf8')
 
-        #tree = xml.etree.ElementTree.fromstring(data)
-
-        data = re.findall('<n t="[^"]+" s="([^"]+)"/>', data)
+        data = json.loads(data)
 
         for x in data:
-            if args.lower() in x.lower():
-                args = x
+            if args.lower() in x['s'].lower():
+                find_item = x
                 end = True
                 break
 
         if end:
             break
 
-    data = urllib.urlopen('http://gs.saro.me/api/as?s=' +\
-                           urllib.quote(args.encode('u8'))).read()
+    if not find_item:
+        bot.con.query(
+            'PRIVMSG',
+            line.target,
+            u'멍멍! 그런 애니를 찾을 수 없어요!'
+        )
+        return
+    data = urllib.urlopen('http://www.anissia.net/anitime/cap', urllib.urlencode({'i':find_item['i']})).read()
     data = data.decode('u8')
+    data = json.loads(data)
 
-    if data == '<r v=""/>':
+    if not data:
         bot.con.query(
             'PRIVMSG',
             line.target,
             u'멍멍! 그런 애니를 찾을 수 없어요!'
         )
     else:
-        data = data[6:-3].split('|')
         bot.con.query(
             'PRIVMSG',
             line.target,
             u'[%s] %s - http://%s' %
-            (wday[i], args, data[0])
+            (wday[i], find_item['s'], find_item['l'])
         )
-        for l in data[1:]:
-            temp, nick, url = l.split(',')
-            ep = temp[:3]
-            month = temp[3:5]
-            day = temp[5:7]
-            hour = temp[7:9]
-            minute = temp[9:11]
+        for l in data:
+            ep = int(l['s'])
+            if ep % 10 == 0:
+                ep = int(ep/10)
+            else:
+                ep = ep/10.
+            month = l['d'][3:5]
+            day = l['d'][5:7]
+            hour = l['d'][7:9]
+            minute = l['d'][9:11]
             bot.con.query(
                 'PRIVMSG',
                 line.target,
                 u'#%s %s - http://%s (%s.%s %s:%s)' %
-                 (ep, nick, url, month, day, hour, minute)
+                 (ep, l['n'], l['a'], month, day, hour, minute)
             )
