@@ -235,6 +235,7 @@ class DogBotObject(object):
                 x
             )
 
+
     def on_433(self, line): # nick 중복
         self.con.send(u'NICK %s．%d' % (self.nick,random.randint(1,99)))
         if self.system.config['nickserv'][self.server]['kick']:
@@ -272,6 +273,7 @@ class DogBotObject(object):
                     except:
                         pass
                     i += 1
+
 
     def on_NICK(self, line): # change nick
         temp = self.db['busy'].get(line.nick)
@@ -335,6 +337,7 @@ class DogBotObject(object):
                 target = self.cmd.run,
                 kwargs = {'bot':self,'line':line},
             ).start()
+
 
     def on_QUIT(self, line):
         for chan in self.db['channel']:
