@@ -63,13 +63,14 @@ def cmd_sub(bot, line, args):
         for l in data:
             ep = int(l['s'])
             if ep % 10 == 0:
-                ep = int(ep/10)
+                ep = '{0:02d}'.format(int(ep/10))
             else:
-                ep = ep/10.
-            month = l['d'][3:5]
-            day = l['d'][5:7]
-            hour = l['d'][7:9]
-            minute = l['d'][9:11]
+                temp = divmod(ep/10.,1)
+                ep = '{0:03d}{1:s}'.format(int(temp[0]),str(temp[1])[0])
+            month = l['d'][4:6]
+            day = l['d'][6:8]
+            hour = l['d'][8:10]
+            minute = l['d'][10:12]
             bot.con.query(
                 'PRIVMSG',
                 line.target,
