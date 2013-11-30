@@ -70,7 +70,7 @@ def cmd_raw(bot, line, args):
         )
         return
 
-    if temp[2][0] == ':':
+    if len(temp) > 2 and temp[2][0] == ':':
         temp[2] = temp[2][1:]
 
     bot.con.query(*temp)
