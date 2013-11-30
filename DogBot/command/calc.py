@@ -16,7 +16,7 @@ def cmd_calc(bot, line, args):
         bot.con.query(
             'PRIVMSG',
             line.target,
-            u'구글 검색을 통해 계산을 수행합니다. | usage: ?= 1+2*3/4'
+            u'자체 계산엔진을 통해 계산을 수행합니다. | usage: ?= 1+2*3/4'
         )
         return
     try:
@@ -106,7 +106,7 @@ def need_term(op):
 
 
 def calc(args):
-    args = re.sub('(-(?:\.\d+|\d+\.|\d+\.\d+|\d+|pi|e))', '+(\\1)', args)
+    args = re.sub('(-(?:\.\d+|\d+\.\d+|\d+\.|\d+|pi|e))', '+(\\1)', args)
 
     if args[0] == '+':
         args = '0' + args
