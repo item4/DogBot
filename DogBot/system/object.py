@@ -45,6 +45,7 @@ class DogBotObject(object):
             except DogBotError as e:
                 if e == 'QUIT':
                     break
+                continue
             except socket.gaierror as e:
                 print '[%s]<> Error! - %s: %s' % (time.strftime('%H:%M:%S'), e.__class__.__name__, e)
                 time.sleep(10)
@@ -90,9 +91,11 @@ class DogBotObject(object):
                     if ready[0]:
                         recv = self.con.recv()
                 except socket.timeout:
-                    return
+                    time.sleep(10)
+                    raise DogBotError()
                 except socket.error:
-                    return
+                    time.sleep(10)
+                    raise DogBotError()
 
             recv = temp + recv
             #lines = recv.splitlines()
