@@ -5,7 +5,6 @@ handler = []
 
 import json
 import urllib
-import re
 
 wday = [u'일', u'월', u'화', u'수', u'목', u'금', u'토']
 
@@ -65,8 +64,7 @@ def cmd_sub(bot, line, args):
             if ep % 10 == 0:
                 ep = '{0:02d}'.format(int(ep/10))
             else:
-                temp = divmod(ep/10.,1)
-                ep = '{0:03d}{1:s}'.format(int(temp[0]),str(temp[1])[0])
+                ep = '{0:03d}.{1:s}'.format(int(ep/10),ep[-1])
             month = l['d'][4:6]
             day = l['d'][6:8]
             hour = l['d'][8:10]
