@@ -15,5 +15,5 @@ def cmd_pyre(bot, line, args):
     bot.con.query(
         'PRIVMSG',
         line.target,
-        u'http://docs.python.org/library/%s.html' % args
+        u'http://docs.python.org/2/library/%s.html' % args
     )
