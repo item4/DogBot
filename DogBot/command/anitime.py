@@ -4,8 +4,9 @@ alias = [u'애니시간표']
 handler = []
 
 #import xml.etree.ElementTree
-import re
+import json
 import urllib
+
 
 def cmd_anitime(bot, line, args):
     if not args:
@@ -40,23 +41,25 @@ def cmd_anitime(bot, line, args):
             u'멍멍?'
         )
         return
-    data = urllib.urlopen('http://gs.saro.me/api/ab' + str(wday)).read()
+
+    data = urllib.urlopen('http://www.anissia.net/anitime/list', urllib.urlencode({'w':wday})).read()
     data = data.decode('utf8')
 
-    #tree = xml.etree.ElementTree.fromstring(data)
-
-    data = re.findall('<n t="([^"]+)" s="([^"]+)" g="([^"]+)"/>',data)
+    data = json.loads(data)
 
     res = ''
-    i = 0
-    #for x in tree.findall('n'):
+    
+    if len(data) > 30:
+        bot.con.query(
+            'PRIVMSG',
+            line.target,
+            u'멍멍! 너무 길어요. 직접 가서 보세요 - http://www.anissia.net/anitime/'
+        )
+        return
+    
     for x in data:
-        time, title, genre = x
-        #time = x.get('t')
+        time, title, genre = x['t'], x['s'], x['g']
         time = time[:2] + ':' + time[2:] if wday not in [7,8] else '20' + time[:2] + '-' + time[2:]
-        #title = x.get('s')
-        #genre = x.get('g')
-
 
         res += '[%s] %s' % (time,title)
         if genre != '/':
@@ -68,14 +71,6 @@ def cmd_anitime(bot, line, args):
                 res
             )
             res = ''
-            i += 1
-            if i > 4:
-                bot.con.query(
-                    'PRIVMSG',
-                    line.target,
-                    u'멍멍! 너무 길어요. 직접 가서 보세요 - http://gs.saro.me/ani/530'
-                )
-                return
         else:
             res += ' | '
 
