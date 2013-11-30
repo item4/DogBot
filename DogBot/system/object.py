@@ -6,6 +6,7 @@ import os
 import random
 import re
 import select
+import socket
 import sys
 import traceback
 import time
@@ -44,6 +45,11 @@ class DogBotObject(object):
             except DogBotError as e:
                 if e == 'QUIT':
                     break
+                continue
+            except socket.gaierror as e:
+                print '[%s]<> Error! - %s: %s' % (time.strftime('%H:%M:%S'), e.__class__.__name__, e)
+                time.sleep(10)
+                continue
             except Exception as e:
                 with open('exception.log','a') as f:
                     exc_type, exc_value, exc_traceback = sys.exc_info()
@@ -85,11 +91,11 @@ class DogBotObject(object):
                     if ready[0]:
                         recv = self.con.recv()
                 except socket.timeout:
-                    pass
-                except select.error:
-                    pass
+                    time.sleep(10)
+                    raise DogBotError()
                 except socket.error:
-                    return
+                    time.sleep(10)
+                    raise DogBotError()
 
             recv = temp + recv
             #lines = recv.splitlines()
@@ -312,15 +318,21 @@ class DogBotObject(object):
 
 
     def on_PART(self, line):
-        if line.nick == self.nick:
-            self.db['channel'][line.target].clear()
+        if line.target:
+            channel = line.target
         else:
-            if line.nick in self.db['channel'][line.target]['member'].keys():
-                del self.db['channel'][line.target]['member'][line.nick]
+            channel = line.msg
+
+        if channel in self.db['channel']:
+            if line.nick == self.nick:
+                self.db['channel'][channel].clear()
+            else:
+                if line.nick in self.db['channel'][channel]['member']:
+                    del self.db['channel'][channel]['member'][line.nick]
 
 
     def on_PRIVMSG(self, line):
-        if line.message.startswith(self.nick):
+        if line.message == self.nick:
             self.con.query(
                 u'PRIVMSG',
                 line.target,
