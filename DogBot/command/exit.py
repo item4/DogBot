@@ -18,7 +18,5 @@ def cmd_exit(bot, line, args):
         'QUIT :' + args
     )
 
-    bot.running = False
-    bot.con.running = False
     bot.system.running = False
     bot.system.exit_reason = args

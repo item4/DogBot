@@ -3,6 +3,9 @@
 alias = []
 handler = []
 
+from DogBot.system.error import *
+
+
 def cmd_quit(bot, line, args):
     if line.login != 'item4':
         bot.con.query(
@@ -19,6 +22,5 @@ def cmd_quit(bot, line, args):
     )
 
     bot.running = False
-    bot.con.running = False
 
     raise DogBotError('QUIT')

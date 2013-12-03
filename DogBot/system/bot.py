@@ -13,13 +13,13 @@ from DogBot.system.object import *
 
 class DogBot(object):
     def __init__(self):
-        self.thread = []
         self.start_time = time.time()
-        self.running = True
+        self._running = True
         self.exit_reason = ''
         self.encoding = 'cp949'  # system encoding
         self.dbname = 'DogBot.db'
         self.config = {}
+        self.connections = []
 
     def add_connect(self, server, port, encoding, channels):
         connect = DogBotConnection(self, server, port, encoding)
@@ -34,11 +34,11 @@ class DogBot(object):
                     'channels': channels},
         )
 
-        self.thread.append(th)
+        self.connections.append({'server':server,'connect':connect,'thread':th})
 
     def start(self):
-        for th in self.thread:
-            th.start()
+        for c in self.connections:
+            c['thread'].start()
 
     def load_config(self):
         try:
@@ -49,8 +49,21 @@ class DogBot(object):
                 f.write('{"nick":"botname","nickserv":'
                         '{"some server":'
                         '"kick":"how to kick dup nick"'
-                        ',"login":"how to login"}},"db":""}')
+                        ',"login":"how to login"},"db":""}')
             exit
+
+
+    @property
+    def running(self):
+        return self._running
+
+
+    @running.setter
+    def running(self, value):
+        self._running = value
+        if value == False:
+            for c in self.connections:
+                c['connect'].running = False
 
 
 def main():

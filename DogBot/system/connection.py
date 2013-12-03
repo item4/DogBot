@@ -15,6 +15,7 @@ class DogBotConnection(object):
         self.encoding = encoding
         self.queue = None
 
+
     def connect(self):
         self.running = True
         self.queue = Queue()
@@ -25,9 +26,11 @@ class DogBotConnection(object):
         #self.connect.setblocking(0)
         Thread(target=self.run).start()
 
+
     def recv(self):
         recv = self.connect.recv(4096).decode(self.encoding, 'replace')
         return recv
+
 
     def send(self, msg):
         temp = u'[%s]>> %s' % (time.strftime('%H:%M:%S'), msg)
@@ -35,27 +38,26 @@ class DogBotConnection(object):
         msg += u"\r\n"
         self.connect.send(msg.encode(self.encoding, 'replace'))
 
+
     def append(self,msg):
         try:
             self.queue.put((msg, self.queue.qsize() / 10))
         except AttributeError:
             pass
 
+
     def run(self):
         while self.running:
-            if not self.system.running:
-                self.com.send(u'QUIT %s' % self.system.exit_reason)
-                break
-            try:
-                while not self.queue.empty():
-                    msg,sleep = self.queue.get()
-                    self.send(msg)
-                    time.sleep(.1+sleep)
-            except AttributeError:
-                break
+            msg,sleep = self.queue.get()
+            self.send(msg)
+            time.sleep(.1+sleep)
 
-    def query(self, type, target=None, message=None):
-        msg = type
+        if not self.system.running:
+            self.com.send(u'QUIT %s' % self.system.exit_reason)
+
+
+    def query(self, msg_type, target=None, message=None):
+        msg = msg_type
         if target:
             if message:
                 msg += ' ' + target
@@ -70,6 +72,7 @@ class DogBotConnection(object):
                 self.append(msg + ' :' + message)
         else:
             self.append(msg)
+
 
     def close(self):
         self.running = False

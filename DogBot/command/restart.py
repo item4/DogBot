@@ -3,6 +3,7 @@
 alias = []
 handler = []
 
+
 def cmd_restart(bot, line, args):
     if line.login != 'item4':
         bot.con.query(
@@ -20,5 +21,3 @@ def cmd_restart(bot, line, args):
 
     bot.running = False
     bot.restart = True
-    bot.con.running = False
-
