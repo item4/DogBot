@@ -20,7 +20,7 @@ def cmd_exchange(bot, line, args):
     shortcut = {
         '$':'USD','KRW':'WON','\\':'WON',u'원':'WON',
         u'엔':'JPY100','JPY':'JPY100','IDR':'IDR100',
-        'VND':'VND100',u'달러':'USD'
+        'VND':'VND100',u'달러':'USD',u'유로':'EUR'
     }
 
     for x in shortcut:
