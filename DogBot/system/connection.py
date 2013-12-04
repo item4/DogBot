@@ -39,7 +39,7 @@ class DogBotConnection(object):
         self.connect.send(msg.encode(self.encoding, 'replace'))
 
 
-    def append(self,msg):
+    def append(self, msg):
         try:
             self.queue.put((msg, self.queue.qsize() / 10))
         except AttributeError:
@@ -49,11 +49,13 @@ class DogBotConnection(object):
     def run(self):
         while self.running:
             msg,sleep = self.queue.get()
+            if msg is None:
+                break
             self.send(msg)
             time.sleep(.1+sleep)
 
-        if not self.system.running:
-            self.com.send(u'QUIT %s' % self.system.exit_reason)
+        if msg and not self.system.running:
+            self.connect.send('QUIT :' + self.system.exit_reason)
 
 
     def query(self, msg_type, target=None, message=None):

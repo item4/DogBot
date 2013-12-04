@@ -47,9 +47,9 @@ class DogBot(object):
         except IOError:
             with open('config.json', 'w') as f:
                 f.write('{"nick":"botname","nickserv":'
-                        '{"some server":'
+                        '{"some server":{'
                         '"kick":"how to kick dup nick"'
-                        ',"login":"how to login"},"db":""}')
+                        ',"login":"how to login"}},"db":""}')
             exit
 
 
@@ -64,6 +64,7 @@ class DogBot(object):
         if value == False:
             for c in self.connections:
                 c['connect'].running = False
+                c['connect'].query(None)
 
 
 def main():

@@ -15,8 +15,12 @@ def cmd_restart(bot, line, args):
     if not args:
         args = 'RESTART'
 
-    bot.con.send(
-        'QUIT ' + args
+    bot.con.query(
+        'QUIT',
+        args
+    )
+    bot.con.query(
+        None
     )
 
     bot.running = False

@@ -17,8 +17,12 @@ def cmd_quit(bot, line, args):
     if not args:
         args = 'QUIT'
 
-    bot.con.send(
-        'QUIT :' + args
+    bot.con.query(
+        'QUIT',
+        args
+    )
+    bot.con.query(
+        None
     )
 
     bot.running = False
