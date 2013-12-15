@@ -3,12 +3,8 @@
 __all__ = ['DogBotCommand']
 
 import os
-import sys
-
-import DogBot.command
 
 from DogBot.system.error import *
-from DogBot.utility.time import read_time
 
 class DogBotCommand(object):
     def __init__(self, bot):
@@ -18,6 +14,7 @@ class DogBotCommand(object):
         self.syscmd_alias = {u'명령':'list',u'명령어':'list'}
         self.bot = bot
         self.reload()
+
 
     def reload(self, cmdname=None):
         if cmdname is None:
@@ -52,11 +49,13 @@ class DogBotCommand(object):
             else:
                 raise DogBotError(u'로딩된적 없는 명령어')
 
+
     def load(self, cmdname=None):
         if cmdname not in self.cmdlist:
             return self._load(cmdname)
         else:
             raise DogBotError(u'이미 로딩된 명령어')
+
 
     def _load(self, cmdname):
         try:
@@ -84,6 +83,7 @@ class DogBotCommand(object):
             print 'SYS: Load cmd.' + cmdname + ' failed'
             print u'%s: %s' % (e.__class__.__name__,e)
             return 0
+
 
     def run(self, bot, line):
         temp = line.message.split(' ', 1)
@@ -114,6 +114,7 @@ class DogBotCommand(object):
         elif cmd in self.syscmd_alias.keys():
             func = getattr(self,'cmd_%s' % self.syscmd_alias[cmd])
             func(bot,line,args)
+
 
     def cmd_load(self, bot, line, args):
         if line.login != 'item4':
@@ -156,6 +157,8 @@ class DogBotCommand(object):
                         line.target,
                         u'%s 명령어 로드 성공' % args
                     )
+
+
     def cmd_reload(self, bot, line, args):
         if line.login != 'item4':
             bot.con.query(
@@ -204,6 +207,7 @@ class DogBotCommand(object):
                     line.target,
                     u'총 %d개의 모듈중 %d개 모듈 로딩 성공, 총합 %d개의 명령어 리로드됨' % (total,success,len(self.cmdlist))
                 )
+
 
     def cmd_list(self, bot, line, args):
         bot.con.query(

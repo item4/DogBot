@@ -345,10 +345,11 @@ class DogBotObject(object):
                 line.message,
             )
         elif line.message.startswith('/') or line.message.startswith('?'):
-            Thread(
-                target = self.cmd.run,
-                kwargs = {'bot':self,'line':line},
-            ).start()
+            if line.message[1:].split(' ')[0] in (self.cmd.cmdlist.keys() + self.cmd.syscmd + self.cmd.syscmd_alias.keys()):
+                Thread(
+                    target = self.cmd.run,
+                    kwargs = {'bot':self,'line':line},
+                ).start()
 
 
     def on_QUIT(self, line):
