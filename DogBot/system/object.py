@@ -321,7 +321,7 @@ class DogBotObject(object):
         if line.target:
             channel = line.target
         else:
-            channel = line.msg
+            channel = line.message
 
         if channel in self.db['channel']:
             if line.nick == self.nick:

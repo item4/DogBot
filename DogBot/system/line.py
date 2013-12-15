@@ -32,7 +32,7 @@ class DogBotLine(object):
                 try:
                     self.nick, t = self.mask.split('!',1)
                 except:
-                    print mask
+                    print self.mask
                 self.ident, self.ip = t.split('@',1)
             else:
                 self.server = self.mask
@@ -47,7 +47,7 @@ class DogBotLine(object):
                 temp[i] = temp[i].encode('u8')
 
         format = "'nick':{!r},'ident':{!r},'ip':{!r},'server':{!r},"
-        format += "type:{!r},target:{!r},msg:{!r},login:{!r}"
+        format += "type:{!r},target:{!r},message:{!r},login:{!r}"
         return '<DogBotLine>{' + format.format(*temp) + '}'
 
 def main():
