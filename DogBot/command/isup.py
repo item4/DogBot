@@ -20,13 +20,13 @@ def cmd_isup(bot, line, args):
 
     data = urllib.urlopen('http://www.isup.me/%s' % args).read().decode('utf8')
 
-    url  = re.search('<a href="([^"]+)" class="domain">',data)
+    url = re.search('<a href="([^"]+)" class="domain">',data)
     if url:
         con = u'가능' if 'is up' in data else u'불가'
         bot.con.query(
             'PRIVMSG',
             line.target,
-            u'[%s] 접속 %s' % (url.group(1), con)
+            u'[%s] 접속 %s' % (url.group(1).replace('&#x2F;','/'), con)
         )
     else:
         bot.con.query(
