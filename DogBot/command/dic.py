@@ -47,7 +47,7 @@ def cmd_dic(bot, line, args):
 
     data = data.decode('utf8').replace('\r', '').replace('\n', '')
 
-    data = re.findall('<strong[^>]+>\s*<a href="([^>]+)" class="\s*link_txt\s*">', data)
+    data = re.findall('<strong[^>]+>\s*<a href="([^>]+)" class="\s*link_txt\s*"\s*>', data)
 
     if dic:
         data = filter(lambda x: '=' + dic + 'w' in x, data)
@@ -96,12 +96,18 @@ def cmd_dic(bot, line, args):
         dic_category = u'한일'
     elif temp == 'kc':
         dic_category = u'한중'
+    elif temp == 'kd':
+        dic_category = u'한프'
+    elif temp == 'kh':
+        dic_category = u'힌디어'
+    elif temp == 'kr':
+        dic_category = u'한러'
     else:
         dic_category = u'미상'
 
-    data = re.findall('(?:<h4[^>]+>([^<]+)</h4>\s*<div[^>]+>\s*<div[^>]+>\s*)?(?:<span[^>]+>([^<]+)</span>\s*)?<p class="txt_sense( no_num)?">(.+?)</p>', data)
+    match = re.findall('(?:<h4[^>]+>([^<]+)</h4>\s*<div[^>]+>\s*<div[^>]+>\s*)?(?:<span[^>]+>([^<]+)</span>\s*)?<p class="txt_sense( no_num)?">(.+?)</p>', data)
 
-    if data:
+    if match:
         bot.con.query(
             'PRIVMSG',
             line.target,
@@ -110,7 +116,7 @@ def cmd_dic(bot, line, args):
         res = ''
         i = 1
         lines = 0
-        for wordtype, n, nonum, desc in data:
+        for wordtype, n, nonum, desc in match:
             desc = re.sub('</?[^>]+>', '', desc)
             if wordtype:
                 res += wordtype + ' '
@@ -148,8 +154,23 @@ def cmd_dic(bot, line, args):
 
             time.sleep(.4)
     else:
-        bot.con.query(
-            'PRIVMSG',
-            line.target,
-            u'파싱할 수 없습니다. 관리자에게 해당 주소를 제보해주세요 : ' + url
-        )
+        match = re.findall('<p class="txt_sense"(?: no_num)?>(.+?)</p>', data)
+        if match:
+            bot.con.query(
+                'PRIVMSG',
+                line.target,
+                u'검색단어 : %s (사전 : %s)' % (keyword, dic_category)
+            )
+            for x in match:
+                x = re.sub('</?[^>]+>', '', x)
+                bot.con.query(
+                    'PRIVMSG',
+                    line.target,
+                    x
+                )
+        else:
+            bot.con.query(
+                'PRIVMSG',
+                line.target,
+                u'파싱할 수 없습니다. 관리자에게 해당 주소를 제보해주세요 : ' + url
+            )
