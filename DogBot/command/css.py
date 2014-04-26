@@ -6,6 +6,7 @@ handler = []
 import urllib
 import re
 
+
 def cmd_css(bot, line, args):
     if not args:
         bot.con.query(
@@ -17,16 +18,14 @@ def cmd_css(bot, line, args):
 
     args = args.lower()
 
-    if args == ':after':
-        args = '::after (:after)'
-    elif args == ':before':
-        args = '::before (:before)'
+    if args in [':after',':before',':first-letter',':first-line']:
+        args = ':%s (%s)' % (args,args)
 
     args = args.replace('<','&lt;').replace('>','&gt;').replace('(','\(').replace(')','\)')
 
     data = urllib.urlopen('https://developer.mozilla.org/en-US/docs/Web/CSS/Reference').read()
-    data = data.decode('utf8').replace('\r','').replace('\n','')
-    data = re.search(r'<li><a (class="new" )?href="([^"]+)"><code>%s</code></a>' % args,data)
+    data = data.decode('u8').replace('\r','').replace('\n','')
+    data = re.search(r'<li><a (class="new" )?href="([^"]+)" title=""><code>%s</code></a>' % args,data)
 
     if not data:
         bot.con.query(
@@ -46,9 +45,3 @@ def cmd_css(bot, line, args):
             line.target,
             res
         )
-
-def main():
-    pass
-
-if __name__ == '__main__':
-    main()
