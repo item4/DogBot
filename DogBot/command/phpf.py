@@ -25,6 +25,13 @@ def cmd_phpf(bot, line, args):
 
     match = re.search(ur'<p class="verinfo">\(([^\)]+)\)</p><p class="refpurpose"><span class="refname">([^<]+)</span> &mdash; <span class="dc-title">([^<]+)</span>', data)
 
+    if not match:
+        url = 'http://www.php.net/manual/kr/function.%s.php' % (path,)
+
+    data = urllib.urlopen(url).read()
+    data = data.decode('utf8', 'ignore').replace('\r', '').replace('\n', '')
+
+    match = re.search(ur'<p class="verinfo">\(([^\)]+)\)</p><p class="refpurpose"><span class="refname">([^<]+)</span> &mdash; <span class="dc-title">([^<]+)</span>', data)
     if match:
         description = re.search('<div class="methodsynopsis dc-description">(.+?)</div>', data).group(1)
         description = re.sub(r'</?[^>]+>', '', description)
@@ -65,7 +72,7 @@ def cmd_phpf(bot, line, args):
         bot.con.query(
             'PRIVMSG',
             line.target,
-            u'그런거 없다'
+            u'멍멍! 그런 함수를 찾을 수 없어요.'
         )
 
 
