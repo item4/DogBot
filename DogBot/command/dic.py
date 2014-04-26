@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
 
-alias = [u'사전']
+alias = ['d',u'사전']
 handler = []
 
 import re
@@ -56,7 +56,7 @@ def cmd_dic(bot, line, args):
         bot.con.query(
             'PRIVMSG',
             line.target,
-            u'검색 결과가 없습니다.'
+            u'멍멍! 검색 결과가 없습니다.'
         )
         return
 
@@ -68,7 +68,7 @@ def cmd_dic(bot, line, args):
         bot.con.query(
             'PRIVMSG',
             line.target,
-            u'검색 범위 초과. (최대 %d까지)' % len(data)
+            u'멍멍! 검색 범위를 초과했어요. 최대 %d까지 가능해요.' % len(data)
         )
         return
 
@@ -87,6 +87,7 @@ def cmd_dic(bot, line, args):
                          'hh':u'한자','kj':u'한일','kc':u'한중','kh':u'힌디',
                          'kt':u'터키',
                          'kr':u'러시아','kd':u'프랑스','kv':u'베트남',
+                         'ki':u'이탈리아'
                          }
     dic_category = dic_category_list.get(temp, u'미상')
 
@@ -157,5 +158,5 @@ def cmd_dic(bot, line, args):
             bot.con.query(
                 'PRIVMSG',
                 line.target,
-                u'파싱할 수 없습니다. 관리자에게 해당 주소를 제보해주세요 : ' + url
+                u'멍멍! 파싱할 수 없습니다. 관리자에게 해당 주소를 제보해주세요 : ' + url
             )
