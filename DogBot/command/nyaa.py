@@ -24,24 +24,20 @@ def cmd_nyaa(bot, line, args):
         return
 
     try:
-        data = urllib.urlopen('http://www.nyaa.eu/?%s' % urllib.urlencode({'page':'search','cats':cats,'filter':0,'term':args.encode('utf8')})).read()
+        data = urllib.urlopen('http://www.nyaa.eu/?%s' % urllib.urlencode({'page':'search','cats':cats,'filter':0,'term':args.encode('u8')})).read()
     except IOError:
         bot.con.query(
             'PRIVMSG',
             line.target,
-            u'timeout'
+            u'멍멍! 냐토렌트에 접속할 수 없어요.'
         )
         return
-    data = data.decode('utf8')
-    data = re.finditer(r'<tr[^>]+><td[^>]+><a[^>]+><img[^>]+></a></td><td[^>]+><a[^>]+>(.+?)</a></td><td[^>]+><a href="([^"]+)"[^>]+><img[^>]+></a></td><td[^>]+>(.+?)</td>(?:<td[^>]+>(\d+)</td><td[^>]+>(\d+)</td>|<td class="tlistfailed" colspan="2">.+?</td>)<td[^>]+>(\d+)</td><td[^>]+>\d+</td></tr>',data)
-    """
+    data = data.decode('u8')
+    match = re.finditer(r'<tr[^>]+><td[^>]+><a[^>]+><img[^>]+></a></td><td[^>]+><a[^>]+>(.+?)</a></td><td[^>]+><a href="([^"]+)"[^>]+><img[^>]+></a></td><td[^>]+>(.+?)</td>(?:<td[^>]+>(.+?)</td><td[^>]+>(.+?)</td>|<td class="tlistfailed" colspan="2">.+?</td>)<td[^>]+>(.+?)</td><td[^>]+>\d+</td></tr>', data)
 
-
-    """
     i = 1
-    for x in data:
-
-        res=u'%s (%s/S:%s/L:%s/DLs:%s) - %s' % (
+    for x in match:
+        res = u'%s (%s/S:%s/L:%s/DLs:%s) - %s' % (
             x.group(1),
             x.group(3),
             x.group(4),
@@ -58,18 +54,37 @@ def cmd_nyaa(bot, line, args):
         i += 1
         if i > 3:
             break
-    else:
-        bot.con.query(
-            'PRIVMSG',
-            line.target,
-            u'그런거 없다'
-        )
-
-
-
-
-def main():
-    pass
-
-if __name__ == '__main__':
-    main()
+        
+    if i == 1:
+        match = re.search('<td class="viewtorrentname">(.+?)</td>', data)
+        if match:
+            title = match.group(1)
+            
+            match = re.search('<td class="thead">Seeders:</td><td class="vtop">(.+?)</td></tr><tr><td class="thead">Tracker:</td><td>.+?</td><td class="thead">Leechers:</td><td class="vtop">(.+?)</td></tr><tr><td class="thead">Information:</td><td>.+?</td><td class="thead">Downloads:</td><td class="vtop">(.+?)</td></tr><tr><td class="thead">Stardom:</td><td>.+?</td><td class="thead">File size:</td><td class="vtop">(.+?)</td>', data)
+            seeders = match.group(1)
+            leechers = match.group(2)
+            downloads = match.group(3)
+            filesize = match.group(4)
+            url = re.search('<div class="viewdownloadbutton"><a href="(.+?)" rel="nofollow"><img src="http://files.nyaa.se/www-download.png" alt="Download"></a>', data).group(1)
+            
+            res = u'%s (%s/S:%s/L:%s/DLs:%s) - %s' % (
+                title,
+                filesize,
+                seeders,
+                leechers,
+                downloads,
+                url
+            )
+            res = HTMLParser.HTMLParser().unescape(res)
+            res = re.sub('</?[^>]+>', '', res)
+            bot.con.query(
+                'PRIVMSG',
+                line.target,
+                res
+            )
+        else:
+            bot.con.query(
+                'PRIVMSG',
+                line.target,
+                u'멍멍! 검색 결과가 없어요!'
+            )
