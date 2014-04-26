@@ -82,28 +82,13 @@ def cmd_dic(bot, line, args):
         keyword = '?'
 
     temp = url[40:42]
-    if temp == 'ek':
-        dic_category = u'영한'
-    elif temp == 'ke':
-        dic_category = u'한영'
-    elif temp == 'ee':
-        dic_category = u'영영'
-    elif temp == 'kk':
-        dic_category = u'국어'
-    elif temp == 'hh':
-        dic_category = u'한자'
-    elif temp == 'kj':
-        dic_category = u'한일'
-    elif temp == 'kc':
-        dic_category = u'한중'
-    elif temp == 'kd':
-        dic_category = u'한프'
-    elif temp == 'kh':
-        dic_category = u'힌디어'
-    elif temp == 'kr':
-        dic_category = u'한러'
-    else:
-        dic_category = u'미상'
+    
+    dic_category_list = {'ek':u'영한','ke':u'한영','ee':u'영영','kk':u'국어',
+                         'hh':u'한자','kj':u'한일','kc':u'한중','kh':u'힌디',
+                         'kt':u'터키',
+                         'kr':u'러시아','kd':u'프랑스','kv':u'베트남',
+                         }
+    dic_category = dic_category_list.get(temp, u'미상')
 
     match = re.findall('(?:<h4[^>]+>([^<]+)</h4>\s*<div[^>]+>\s*<div[^>]+>\s*)?(?:<span[^>]+>([^<]+)</span>\s*)?<p class="txt_sense( no_num)?">(.+?)</p>', data)
 
