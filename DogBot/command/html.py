@@ -16,35 +16,36 @@ def cmd_html(bot, line, args):
         return
 
     args = args.lower()
-    tag = args
 
-    if tag in ['h1','h2','h3','h4','h5','h6']:
+    if args in ['h1','h2','h3','h4','h5','h6']:
         tag = '&lt;h1&gt;,&lt;h2&gt;,&lt;h3&gt;,&lt;h4&gt;,&lt;h5&gt;,&lt;h6&gt;'
     else:
-        tag = '&lt;%s&gt;' % tag
+        tag = '&lt;%s&gt;' % args
 
     data = urllib.urlopen('https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/HTML5/HTML5_element_list').read()
     data = data.decode('utf8').replace('\r','').replace('\n','')
-    data = re.search(r'<tr>\s*<td><a href="([^"]+)"><code>%s</code></a>( <a href="/en-US/docs/HTML/HTML5">.+?</a>)?</td>\s*<td>(.+?)</td>\s*</tr>' % tag,data)
-    """
+    data = re.search(r'<td><a href="([^"]+)"(?: title="([^"]+)")?><code>%s</code></a>( <a href="/en-US/docs/HTML/HTML5">.+?</a>)?</td>\s*<td>(.+?)</td>' % tag,data)
 
-    """
     if not data:
         bot.con.query(
             'PRIVMSG',
             line.target,
-            u'그런거 없다'
+            u'멍멍! 그런 HTML Tag는 목록에 없어요.'
         )
     else:
-        tag = tag.replace('&lt;','<').replace('&gt;','>')
-        description = data.group(3)
-        if data.group(2):
+        description = data.group(2) if data.group(2) else re.sub('</?[^>]+>', '', data.group(4))
+        if data.group(3):
             description = '[HTML5] ' + description
-        description = re.sub('</?[^>]*>','',description)
+        description = description.replace('&lt;', '<').replace('&gt;', '>')
         bot.con.query(
             'PRIVMSG',
             line.target,
-            u'%s %s - https://developer.mozilla.org%s' % (tag,description,data.group(1))
+            description
+        )
+        bot.con.query(
+            'PRIVMSG',
+            line.target,
+            'https://developer.mozilla.org' + data.group(1)
         )
 
 def main():
