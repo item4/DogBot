@@ -6,7 +6,7 @@ handler = []
 import json
 import urllib
 
-wday = [u'일', u'월', u'화', u'수', u'목', u'금', u'토']
+wday = [u'일', u'월', u'화', u'수', u'목', u'금', u'토', u'기타', u'방영예정']
 
 
 def cmd_sub(bot, line, args):
@@ -20,11 +20,19 @@ def cmd_sub(bot, line, args):
 
     end = False
     find_item = None 
-    for i in xrange(7):
-        data = urllib.urlopen('http://www.anissia.net/anitime/list', urllib.urlencode({'w':str(i)})).read()
-        data = data.decode('utf8')
-
-        data = json.loads(data)
+    for i in xrange(9):
+        try:
+            data = urllib.urlopen('http://www.anissia.net/anitime/list', urllib.urlencode({'w':str(i)})).read()
+            data = data.decode('u8')
+    
+            data = json.loads(data)
+        except IOError:
+            bot.con.query(
+                'PRIVMSG',
+                line.target,
+                u'멍멍! 자막 목록 서버에 접근할 수 없어요!'
+            )
+            return
 
         for x in data:
             if args.lower() in x['s'].lower():
@@ -43,9 +51,9 @@ def cmd_sub(bot, line, args):
         )
         return
     data = urllib.urlopen('http://www.anissia.net/anitime/cap', urllib.urlencode({'i':find_item['i']})).read()
-    data = data.decode('u8')
+    data = data.decode('utf8')
     data = json.loads(data)
-
+    print data
     if not data:
         bot.con.query(
             'PRIVMSG',
