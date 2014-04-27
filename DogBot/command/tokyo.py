@@ -31,15 +31,12 @@ def cmd_tokyo(bot, line, args):
         bot.con.query(
             'PRIVMSG',
             line.target,
-            u'timeout'
+            u'멍멍! 도쿄도서관에 접속할 수 없어요!'
         )
         return
     data = data.decode('utf8').replace('\r','').replace('\n','')
     data = re.finditer(r'<tr[^>]+><td[^>]+><a[^>]+><span[^>]+></span></a></td><td[^>]+><a[^>]+><span[^>]+></span></a> <a rel="nofollow" type="application/x-bittorrent" href="([^"]+)">(.+?)</a></td><td[^>]+>(?:<a[^>]+>Website</a> \| )?<a[^>]+>Details</a></td></tr><tr[^>]+><td[^>]+>(?:Authorized: <span class="auth_ok">Yes</span> )?Submitter: (?:<a[^>]+>.*?</a>|Anonymous) \| Size: ([^\|]+) \| Date: ([^\|]+)(?: \| Comment: .*?)?</td><td[^>]+>S: <span[^>]+>(\d+)</span> L: <span[^>]+>(\d+)</span> C: <span[^>]+>(\d+)</span> ID: \d+</td></tr>',data)
-    """
 
-
-    """
     i = 1
     for x in data:
         res=u'%s (%s/%s/S:%s/L:%s/C:%s) - %s' % (\
@@ -54,18 +51,10 @@ def cmd_tokyo(bot, line, args):
         i += 1
         if i > 3:
             break
-    else:
+    
+    if i == 1:
         bot.con.query(
             'PRIVMSG',
             line.target,
-            u'그런거 없다'
+            u'멍멍! 검색결과가 없어요.'
         )
-
-
-
-
-def main():
-    pass
-
-if __name__ == '__main__':
-    main()
