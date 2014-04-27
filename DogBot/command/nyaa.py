@@ -60,7 +60,7 @@ def cmd_nyaa(bot, line, args):
         if match:
             title = match.group(1)
             
-            match = re.search('<td class="thead">Seeders:</td><td class="vtop">(.+?)</td></tr><tr><td class="thead">Tracker:</td><td>.+?</td><td class="thead">Leechers:</td><td class="vtop">(.+?)</td></tr><tr><td class="thead">Information:</td><td>.+?</td><td class="thead">Downloads:</td><td class="vtop">(.+?)</td></tr><tr><td class="thead">Stardom:</td><td>.+?</td><td class="thead">File size:</td><td class="vtop">(.+?)</td>', data)
+            match = re.search('<td class="thead">Seeders:</td><td class="vtop">(.+?)</td></tr><tr><td class="thead">Tracker:</td><td>.+?</td><td class="thead">Leechers:</td><td class="vtop">(.+?)</td></tr><tr><td class="thead">Information:</td><td>.*?</td><td class="thead">Downloads:</td><td class="vtop">(.+?)</td></tr><tr><td class="thead">Stardom:</td><td>.+?</td><td class="thead">File size:</td><td class="vtop">(.+?)</td>', data)
             seeders = match.group(1)
             leechers = match.group(2)
             downloads = match.group(3)
