@@ -33,7 +33,7 @@ def cmd_nyaa(bot, line, args):
         )
         return
     data = data.decode('u8')
-    match = re.finditer(r'<tr[^>]+><td[^>]+><a[^>]+><img[^>]+></a></td><td[^>]+><a[^>]+>(.+?)</a></td><td[^>]+><a href="([^"]+)"[^>]+><img[^>]+></a></td><td[^>]+>(.+?)</td>(?:<td[^>]+>(.+?)</td><td[^>]+>(.+?)</td>|<td class="tlistfailed" colspan="2">.+?</td>)<td[^>]+>(.+?)</td><td[^>]+>\d+</td></tr>', data)
+    match = re.finditer(r'<tr[^>]+><td[^>]+><a[^>]+><img[^>]+></a></td><td[^>]+><a[^>]+>(.+?)</a></td><td[^>]+><a href="([^"]+)"[^>]+><img[^>]+></a></td><td[^>]+>(.+?)</td>(?:<td[^>]+>(\d+)</td><td[^>]+>(\d+)</td>|<td class="tlistfailed" colspan="2">.+?</td>)<td[^>]+>(.+?)</td><td[^>]+>\d+</td></tr>', data)
 
     i = 1
     for x in match:
