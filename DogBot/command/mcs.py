@@ -42,7 +42,7 @@ def cmd_mcs(bot, line, args):
         else:
             data = map(lambda x:x.replace('\x00',''),data[3:].split('\x00\x00'))
             data[3] = re.sub(r'\xa7.','',data[3]).replace(r'\xa7','')
-            data = map(lambda x:x.decode('utf8','ignore'),data)
+            data = map(lambda x:x.decode('u8','ignore'),data)
 
             res='[%s/%s] Online - %s' % (args,data[2],data[3])
             if len(data) == 6:

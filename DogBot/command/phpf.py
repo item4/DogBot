@@ -21,17 +21,18 @@ def cmd_phpf(bot, line, args):
     url = 'http://php.net/%s' % (path,)
 
     data = urllib.urlopen(url).read()
-    data = data.decode('utf8', 'ignore').replace('\r', '').replace('\n', '')
+    data = data.decode('u8', 'ignore').replace('\r', '').replace('\n', '')
 
     match = re.search(ur'<p class="verinfo">\(([^\)]+)\)</p><p class="refpurpose"><span class="refname">([^<]+)</span> &mdash; <span class="dc-title">([^<]+)</span>', data)
 
     if not match:
         url = 'http://www.php.net/manual/kr/function.%s.php' % (path,)
 
-    data = urllib.urlopen(url).read()
-    data = data.decode('utf8', 'ignore').replace('\r', '').replace('\n', '')
+        data = urllib.urlopen(url).read()
+        data = data.decode('u8', 'ignore').replace('\r', '').replace('\n', '')
 
-    match = re.search(ur'<p class="verinfo">\(([^\)]+)\)</p><p class="refpurpose"><span class="refname">([^<]+)</span> &mdash; <span class="dc-title">([^<]+)</span>', data)
+        match = re.search(ur'<p class="verinfo">\(([^\)]+)\)</p><p class="refpurpose"><span class="refname">([^<]+)</span> &mdash; <span class="dc-title">([^<]+)</span>', data)
+
     if match:
         description = re.search('<div class="methodsynopsis dc-description">(.+?)</div>', data).group(1)
         description = re.sub(r'</?[^>]+>', '', description)
