@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
 
-alias = []
+alias = [u'구글','g']
 handler = []
 
 import urllib
@@ -21,20 +21,24 @@ def cmd_gg(bot, line, args):
     opener = urllib2.build_opener()
     opener.addheaders = [('User-agent', 'Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.52 Safari/537.17')]
     try:
-        data = opener.open('http://www.google.co.kr/search?%s' % urllib.urlencode({'q': args.encode('utf8')}), None, 3).read()
+        data = opener.open('http://www.google.co.kr/search?%s' % urllib.urlencode({'q': args.encode('u8')}), None, 3).read()
     except:
         bot.con.query(
             'PRIVMSG',
             line.target,
-            u'멍멍! 접속에 실패했어요.'
+            u'멍멍! 접속에 실패했어요!'
         )
         return
 
-    data = data.decode('utf8', 'replace')
+    data = data.decode('u8', 'replace')
     data = data.replace('\n', ' ').replace('\r', '')
     f = data.find('<li class="g"')
     if f == -1:
-        bot.con.query('PRIVMSG', line.target, u'멍멍! 검색결과가 없어요.')
+        bot.con.query(
+            'PRIVMSG',
+            line.target,
+            u'멍멍! 검색결과가 없어요!'
+        )
     else:
         base_pattern = re.compile(r'<li class="g"[^>]*><!--m-->(.+?)<!--n--></li>')
 
@@ -46,13 +50,13 @@ def cmd_gg(bot, line, args):
                 bot.con.query(
                     'PRIVMSG',
                     line.target,
-                    u'멍멍! 검색결과가 없어요.'
+                    u'멍멍! 검색결과가 없어요!'
                 )
             else:
                 bot.con.query(
                     'PRIVMSG',
                     line.target,
-                    u'멍멍! 파싱에 실패했어요. 디버그 코드 : ' + str(data.find('<li class="g">'))
+                    u'멍멍! 파싱에 실패했어요! 디버그 코드 : ' + str(data.find('<li class="g">'))
                 )
             return
 
@@ -78,10 +82,3 @@ def cmd_gg(bot, line, args):
                 line.target,
                 res
             )
-
-
-def main():
-    pass
-
-if __name__ == '__main__':
-    main()

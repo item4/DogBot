@@ -6,6 +6,7 @@ handler = []
 import json
 import urllib
 
+
 def cmd_dns(bot, line, args):
     if not args:
         bot.con.query(

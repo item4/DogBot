@@ -6,6 +6,7 @@ handler = []
 import socket
 import re
 
+
 def cmd_mcs(bot, line, args):
     if not args:
         args='mc.sjkoon.com'
@@ -51,9 +52,3 @@ def cmd_mcs(bot, line, args):
                 line.target,
                 res
             )
-
-def main():
-    pass
-
-if __name__ == '__main__':
-    main()

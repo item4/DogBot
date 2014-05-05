@@ -6,6 +6,7 @@ handler = []
 import urllib
 import re
 
+
 def cmd_cppf(bot, line, args):
     if not args:
         bot.con.query(
@@ -27,7 +28,7 @@ def cmd_cppf(bot, line, args):
 
     con = urllib.urlopen(url)
     data = con.read()
-    data = data.decode('utf8').replace('\n','')
+    data = data.decode('u8').replace('\n','')
     data = re.search(ur'<div id="I_type">(.+?)</div><div id="I_file"[^>]*>&lt;(.+?)&gt;\r?</div><h1>(.+?)</h1>(?:<div class="C_prototype">((?:<div[^>]+>.+?</div>)+|<pre>.+?</pre>|<table>.+?</table>)</div>)?<div id="I_description">(.+?)</div>',data)
     """
 <div id="I_type">class template
@@ -115,12 +116,5 @@ template &lt;class RandomAccessIterator, class Compare&gt;
         bot.con.query(
             'PRIVMSG',
             line.target,
-            u'그런거 없다'
+            u'멍멍! 해당 요소가 Cplusplus.com에 등록되어 있지 않아요!'
         )
-
-
-def main():
-    pass
-
-if __name__ == '__main__':
-    main()

@@ -6,7 +6,6 @@ handler = []
 import urllib
 import urlparse
 
-from collections import namedtuple
 
 def cmd_urle(bot, line, args):
     if not args:
@@ -22,7 +21,7 @@ def cmd_urle(bot, line, args):
     if data.netloc:
         new_data = [data.scheme,
                     data.netloc,
-                    urllib.quote(data.path.encode('utf8')),
+                    urllib.quote(data.path.encode('u8')),
                     data.params]
 
         if data.query:
@@ -30,9 +29,9 @@ def cmd_urle(bot, line, args):
             for x in data.query.split('&'):
                 t = x.split('=',1)
                 if len(t) == 2:
-                    temp.append(urllib.quote(t[0].encode('utf8')) + '=' + urllib.quote(t[1].encode('utf8')))
+                    temp.append(urllib.quote(t[0].encode('u8')) + '=' + urllib.quote(t[1].encode('u8')))
                 else:
-                    temp.append(urllib.quote(t[0].encode('utf8')))
+                    temp.append(urllib.quote(t[0].encode('u8')))
 
             new_data.append('&'.join(temp))
         else:
@@ -43,7 +42,7 @@ def cmd_urle(bot, line, args):
         data = urlparse.urlunparse(new_data)
 
     else:
-        data = urllib.quote(args.encode('utf8'))
+        data = urllib.quote(args.encode('u8'))
 
     bot.con.query(
         'PRIVMSG',

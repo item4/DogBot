@@ -6,6 +6,7 @@ handler = []
 import time
 import sqlite3
 
+
 def cmd_dday(bot, line, args):
     if not args:
         bot.con.query(
@@ -36,7 +37,7 @@ def cmd_dday(bot, line, args):
         bot.con.query(
             'PRIVMSG',
             line.target,
-            u'멍멍! 날짜가 올바른 형식이 아닙니다.'
+            u'멍멍! 날짜가 올바른 형식이 아닙니다!'
         )
         return
 

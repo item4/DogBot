@@ -18,7 +18,7 @@ def cmd_raw(bot, line, args):
         bot.con.query(
             'PRIVMSG',
             line.target,
-            u'멍멍! 명령어를 입력해주세요.'
+            u'멍멍! 명령어를 입력해주세요!'
         )
         return
 

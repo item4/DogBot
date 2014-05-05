@@ -305,10 +305,3 @@ def calc(args):
         raise DogBotError(u'비정상적인 인자들')
 
     return term_stack[0]
-
-
-def main():
-    pass
-
-if __name__ == '__main__':
-    main()

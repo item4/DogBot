@@ -9,6 +9,7 @@ from distutils.version import StrictVersion, LooseVersion
 
 # source base : https://github.com/pypa/pip/blob/develop/pip/commands/search.py
 
+
 def cmd_pypi(bot, line, args):
     if not args:
         bot.con.query(
@@ -65,6 +66,7 @@ def cmd_pypi(bot, line, args):
             res
         )
 
+
 def compare_versions(version1, version2):
     try:
         return cmp(StrictVersion(version1), StrictVersion(version2))
@@ -78,6 +80,7 @@ def compare_versions(version1, version2):
     # fallback to string comparison
         return cmp([str(v) for v in LooseVersion(version1).version],
                    [str(v) for v in LooseVersion(version2).version])
+
 
 def highest_version(versions):
     return reduce((lambda v1, v2: compare_versions(v1, v2) == 1 and v1 or v2), versions)

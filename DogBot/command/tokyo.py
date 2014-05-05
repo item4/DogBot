@@ -23,7 +23,7 @@ def cmd_tokyo(bot, line, args):
         )
         return
 
-    url = 'http://www.tokyotosho.info/search.php?%s' % urllib.urlencode({'terms':args.encode('utf8'),'type':search_type})
+    url = 'http://www.tokyotosho.info/search.php?%s' % urllib.urlencode({'terms':args.encode('u8'),'type':search_type})
 
     try:
         data = urllib.urlopen(url).read()
@@ -34,7 +34,7 @@ def cmd_tokyo(bot, line, args):
             u'멍멍! 도쿄도서관에 접속할 수 없어요!'
         )
         return
-    data = data.decode('utf8').replace('\r','').replace('\n','')
+    data = data.decode('u8').replace('\r','').replace('\n','')
     data = re.finditer(r'<tr[^>]+><td[^>]+><a[^>]+><span[^>]+></span></a></td><td[^>]+><a[^>]+><span[^>]+></span></a> <a rel="nofollow" type="application/x-bittorrent" href="([^"]+)">(.+?)</a></td><td[^>]+>(?:<a[^>]+>Website</a> \| )?<a[^>]+>Details</a></td></tr><tr[^>]+><td[^>]+>(?:Authorized: <span class="auth_ok">Yes</span> )?Submitter: (?:<a[^>]+>.*?</a>|Anonymous) \| Size: ([^\|]+) \| Date: ([^\|]+)(?: \| Comment: .*?)?</td><td[^>]+>S: <span[^>]+>(\d+)</span> L: <span[^>]+>(\d+)</span> C: <span[^>]+>(\d+)</span> ID: \d+</td></tr>',data)
 
     i = 1
@@ -56,5 +56,5 @@ def cmd_tokyo(bot, line, args):
         bot.con.query(
             'PRIVMSG',
             line.target,
-            u'멍멍! 검색결과가 없어요.'
+            u'멍멍! 검색결과가 없어요!'
         )

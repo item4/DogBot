@@ -3,6 +3,7 @@
 alias = []
 handler = []
 
+
 def cmd_topic(bot, line, args):
     try:
         topic = bot.db['channel'][line.target]['topic']
@@ -10,7 +11,7 @@ def cmd_topic(bot, line, args):
         bot.con.query(
             'PRIVMSG',
             line.target,
-            u'토픽이 없거나 추출할 수 없는 환경'
+            u'멍멍! 토픽이 없거나 추출할 수 없는 환경이에요!'
         )
         return
     bot.con.query(

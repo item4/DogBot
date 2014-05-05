@@ -53,7 +53,7 @@ def cmd_anitime(bot, line, args):
         bot.con.query(
             'PRIVMSG',
             line.target,
-            u'멍멍! 너무 길어요. 직접 가서 보세요 - http://www.anissia.net/anitime/'
+            u'멍멍! 너무 길어요! 직접 가서 보세요 - http://www.anissia.net/anitime/'
         )
         return
     

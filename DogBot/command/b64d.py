@@ -5,6 +5,7 @@ handler = []
 
 import base64
 
+
 def cmd_b64d(bot, line, args):
     if not args:
         bot.con.query(
@@ -14,7 +15,7 @@ def cmd_b64d(bot, line, args):
         )
         return
 
-    data = base64.b64decode(args).decode('utf8').splitlines()
+    data = base64.b64decode(args).decode('u8').splitlines()
     check = 0
 
     for x in data:
@@ -31,9 +32,3 @@ def cmd_b64d(bot, line, args):
                 line.target,
                 u'%s' % x
             )
-
-def main():
-    pass
-
-if __name__ == '__main__':
-    main()

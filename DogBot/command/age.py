@@ -28,7 +28,7 @@ def cmd_age(bot, line, args):
         bot.con.query(
             'PRIVMSG',
             line.target,
-            u'비정상적인 시간입력. (YYYYMMDD)'
+            u'멍멍! 비정상적인 시간입력이에요! (YYYYMMDD 형식)'
         )
         return
 

@@ -9,6 +9,8 @@ import sqlite3
 DB Scheme
 create table memo (uid integer primary key autoincrement, keyword varchar(50), content text, writer varchar(30))
 """
+
+
 def cmd_memo(bot, line, args):
     if ' ' not in line.message[1:]:
         if line.message[1:].startswith('memo'):
@@ -191,7 +193,5 @@ def cmd_memo(bot, line, args):
                         line.target,
                         u'이런건 좀 더 기억해주겠다.'
                     )
-
-
 
         con.commit()

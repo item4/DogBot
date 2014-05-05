@@ -5,6 +5,7 @@ handler = []
 
 import base64
 
+
 def cmd_b64e(bot, line, args):
     if not args:
         bot.con.query(
@@ -17,11 +18,5 @@ def cmd_b64e(bot, line, args):
     bot.con.query(
         'PRIVMSG',
         line.target,
-        u'%s: %s' % (args,base64.b64encode(args.encode('utf8')))
+        u'%s: %s' % (args,base64.b64encode(args.encode('u8')))
     )
-
-def main():
-    pass
-
-if __name__ == '__main__':
-    main()

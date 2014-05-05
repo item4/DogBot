@@ -20,7 +20,7 @@ def cmd_urld(bot, line, args):
     data = data.encode('latin-1')
 
     try:
-        data = data.decode('utf8')
+        data = data.decode('u8')
         encoding = 'UTF-8'
     except:
         try:
@@ -30,7 +30,7 @@ def cmd_urld(bot, line, args):
             bot.con.query(
                 'PRIVMSG',
                 line.target,
-                u'멍멍! 인코딩 파악에 실패했습니다.'
+                u'멍멍! 인코딩 파악에 실패했어요!'
             )
             return
 
@@ -39,10 +39,3 @@ def cmd_urld(bot, line, args):
         line.target,
         u'[%s] %s: %s' % (encoding, args, data)
     )
-
-
-def main():
-    pass
-
-if __name__ == '__main__':
-    main()

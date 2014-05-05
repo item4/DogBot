@@ -18,7 +18,7 @@ def cmd_isup(bot, line, args):
     if args.startswith('http://'):
         args = args[7:]
 
-    data = urllib.urlopen('http://www.isup.me/%s' % args).read().decode('utf8')
+    data = urllib.urlopen('http://www.isup.me/%s' % args).read().decode('u8')
 
     url = re.search('<a href="([^"]+)" class="domain">',data)
     if url:

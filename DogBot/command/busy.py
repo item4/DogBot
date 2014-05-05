@@ -9,6 +9,7 @@ from DogBot import command
 
 from DogBot.utility.time import read_time
 
+
 def cmd_busy(bot, line, args):
     if not args:
         args = u'그냥'
@@ -19,6 +20,7 @@ def cmd_busy(bot, line, args):
         line.target,
         u'%s, 부재중으로 설정합니다. (이유: %s)' % (line.nick, args)
     )
+
 
 def on_PRIVMSG(bot, line):
     for x in bot.db['busy'].keys():
@@ -41,6 +43,7 @@ def on_PRIVMSG(bot, line):
                 u'%s, %s님은 %s 전부터 부재중입니다. (이유: %s)' % (line.nick,x,read_time(busytime),reason)
             )
     return command.KEEP
+
 
 def on_QUIT(bot, line):
     if line.nick in bot.db['busy']:

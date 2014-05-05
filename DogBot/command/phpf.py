@@ -72,12 +72,5 @@ def cmd_phpf(bot, line, args):
         bot.con.query(
             'PRIVMSG',
             line.target,
-            u'멍멍! 그런 함수를 찾을 수 없어요.'
+            u'멍멍! 그런 함수를 찾을 수 없어요!'
         )
-
-
-def main():
-    pass
-
-if __name__ == '__main__':
-    main()

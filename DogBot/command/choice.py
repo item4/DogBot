@@ -5,6 +5,7 @@ handler = []
 
 import random
 
+
 def cmd_choice(bot, line, args):
     if not args:
         bot.con.query(

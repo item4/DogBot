@@ -5,11 +5,13 @@ handler = ['330','NICK','QUIT']
 
 from DogBot import command
 
+
 def cmd_login(bot, line, args):
     bot.con.query(
         'WHOIS',
         line.nick
     )
+
 
 def on_330(bot, line): # whois login
     _, nick, id = line.target.split(' ')
@@ -24,6 +26,7 @@ def on_330(bot, line): # whois login
 
     return command.KEEP
 
+
 def on_NICK(bot, line): # change nick
     temp = bot.login.get(line.nick)
 
@@ -32,6 +35,7 @@ def on_NICK(bot, line): # change nick
         bot.login[line.message] = temp
 
     return command.KEEP
+
 
 def on_QUIT(bot, line):
     if line.nick in bot.login:

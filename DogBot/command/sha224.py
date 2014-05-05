@@ -5,6 +5,7 @@ handler = []
 
 import hashlib
 
+
 def cmd_sha224(bot, line, args):
     if not args:
         bot.con.query(
@@ -18,9 +19,3 @@ def cmd_sha224(bot, line, args):
         line.target,
         '[SHA224] %s = %s' % (args,hashlib.sha224(args).hexdigest())
     )
-
-def main():
-    pass
-
-if __name__ == '__main__':
-    main()

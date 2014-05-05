@@ -6,6 +6,7 @@ handler = []
 import re
 import urllib2
 
+
 def cmd_aws(bot, line, args):
     if args is None:
         bot.con.query(
@@ -26,7 +27,7 @@ def cmd_aws(bot, line, args):
         bot.con.query(
             'PRIVMSG',
             line.target,
-            u'멍멍! 기상청 AWS에 접속할 수 없습니다.'
+            u'멍멍! 기상청 AWS에 접속할 수 없어요!'
         )
         return
 
@@ -77,14 +78,5 @@ def cmd_aws(bot, line, args):
         bot.con.query(
             'PRIVMSG',
             line.target,
-            u'그런거 없다'
+            u'멍멍! 해당 지역명은 존재하지 않아요!'
         )
-
-
-
-
-def main():
-    pass
-
-if __name__ == '__main__':
-    main()

@@ -5,6 +5,7 @@ handler = []
 
 import hashlib
 
+
 def cmd_md5(bot, line, args):
     if not args:
         bot.con.query(
@@ -18,9 +19,3 @@ def cmd_md5(bot, line, args):
         line.target,
         '[MD5] %s = %s' % (args,hashlib.md5(args).hexdigest())
     )
-
-def main():
-    pass
-
-if __name__ == '__main__':
-    main()

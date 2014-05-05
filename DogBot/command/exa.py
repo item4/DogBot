@@ -23,6 +23,7 @@ MAXINUM_LINE_LENGTH = 450
 MAXIMUM_WAIT_CHANCE = 2
 MAXIMUM_SPEAK_CHANCE = 4
 
+
 def build_ctx(bot, line, args):
     ctx = dict(
         token=AUTH_TOKEN,
@@ -35,11 +36,13 @@ def build_ctx(bot, line, args):
 
     return ctx
 
+
 def request(bot, line, args):
     ctx = build_ctx(bot, line, args)
 
     with closing(urlopen(REQUEST_URL, urlencode(ctx))) as res:
         return res.read(4096)
+
 
 def delay_request(bot, line, key):
     ws = websocket.create_connection(DELAY_REQUEST_URL + key)
@@ -47,6 +50,7 @@ def delay_request(bot, line, key):
         return ws.recv().decode('u8')
     finally:
         ws.close()
+
 
 def cmd_exa(bot, line, args):
     if not args:
@@ -72,7 +76,7 @@ def cmd_exa(bot, line, args):
     speakcount = MAXIMUM_SPEAK_CHANCE
     waitcount = MAXIMUM_WAIT_CHANCE
 
-    lines = data.decode("utf-8", "replace").splitlines()
+    lines = data.decode("u8", "replace").splitlines()
     while lines:
         ret = lines.pop(0)
         target, mode = line.target, "PRIVMSG"

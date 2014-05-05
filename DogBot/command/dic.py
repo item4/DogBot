@@ -74,7 +74,7 @@ def cmd_dic(bot, line, args):
 
     data = urllib.urlopen(url).read()
 
-    data = data.decode('utf8', 'ignore').replace('\r', '').replace('\n', '')
+    data = data.decode('u8', 'ignore').replace('\r', '').replace('\n', '')
 
     try:
         keyword = re.search('<strong class="tit"><span class="inner_tit">(.+?)</span>.+', data).group(1)
@@ -127,7 +127,7 @@ def cmd_dic(bot, line, args):
                     bot.con.query(
                         'PRIVMSG',
                         line.target,
-                        u'멍멍! 너무 길어요. 직접 가서 보세요 - ' + url
+                        u'멍멍! 결과가 너무 길어요! 직접 가서 보세요 - ' + url
                     )
                     return
         if res:
@@ -158,5 +158,5 @@ def cmd_dic(bot, line, args):
             bot.con.query(
                 'PRIVMSG',
                 line.target,
-                u'멍멍! 파싱할 수 없습니다. 관리자에게 해당 주소를 제보해주세요 : ' + url
+                u'멍멍! 파싱할 수 없습니다! 관리자에게 해당 주소를 제보해주세요 : ' + url
             )

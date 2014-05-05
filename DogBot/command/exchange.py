@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 
-alias = [u'환율']
+alias = [u'환율','money']
 handler = []
 
 import urllib
 import re
+
 
 def cmd_exchange(bot, line, args):
     if not args:
@@ -49,7 +50,7 @@ def cmd_exchange(bot, line, args):
         )
         return
 
-    data = urllib.urlopen('http://finance.daum.net/exchange/exchangeMain.daum').read().decode('utf8')
+    data = urllib.urlopen('http://finance.daum.net/exchange/exchangeMain.daum').read().decode('u8')
 
     from_data = re.search(r"""ex\[\d+\] = '%s';ex_rate\[\d+\] = "(.+?)";country\[\d+\] = '(.+?)'; k_ex\[\d+\] = '(.+?)';full_k_ex\[\d+\] = '.+?';""" % ex_from,data)
     to_data = re.search(r"""ex\[\d+\] = '%s';ex_rate\[\d+\] = "(.+?)";country\[\d+\] = '(.+?)'; k_ex\[\d+\] = '(.+?)';full_k_ex\[\d+\] = '.+?';""" % ex_to,data)

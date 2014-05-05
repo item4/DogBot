@@ -8,6 +8,7 @@ import urllib2
 import re
 import HTMLParser
 
+
 def cmd_web(bot, line, args):
     if not args:
         bot.con.query(
@@ -20,42 +21,42 @@ def cmd_web(bot, line, args):
     if not args.startswith('http://') and not args.startswith('https://'):
         args = 'http://' + args
     try:
-        obj = urllib2.urlopen(args,None,3)
+        obj = urllib2.urlopen(args, None, 3)
         data = obj.read()
     except:
         bot.con.query(
             'PRIVMSG',
             line.target,
-            u'멍멍! 접속에 실패하였습니다.'
+            u'멍멍! 접속에 실패하였습니다!'
         )
         return
 
     test = re.search('charset=(.+)', str(obj.info()))
     if not test:
-        test = re.search('charset=["\']?([^"\']+)[^"\']?', data)
+        test = re.search('charset=["\']?([^"\'/]+)[^"\']?', data)
 
     if test:
         charset = test.group(1)
     else:
-        charset = 'utf8'
+        charset = 'u8'
 
     charset = charset.lower()
 
     if charset == 'euc-kr':
         charset = 'cp949'
     elif charset == 'utf-8':
-        charset = 'utf8'
+        charset = 'u8'
 
     try:
-        data = data.decode(charset,'replace') # 'cp949')
+        data = data.decode(charset, 'replace') # 'cp949')
     except:
         try:
-            data = data.decode('utf8','replace')
+            data = data.decode('u8', 'replace')
         except:
             bot.con.query(
                 'PRIVMSG',
                 line.target,
-                u'멍멍! charset 감지에 실패하였습니다.'
+                u'멍멍! charset 감지에 실패하였습니다!'
             )
             return
 
@@ -75,7 +76,7 @@ def cmd_web(bot, line, args):
         bot.con.query(
             'PRIVMSG',
             line.target,
-            u'멍멍! frameset 페이지거나 페이지 내용이 없습니다.'
+            u'멍멍! frameset 페이지거나 페이지 내용이 없습니다!'
         )
         return
 
@@ -84,9 +85,3 @@ def cmd_web(bot, line, args):
         line.target,
         '[%s] %s' % (args, data)
     )
-
-def main():
-    pass
-
-if __name__ == '__main__':
-    main()

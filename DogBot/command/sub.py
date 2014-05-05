@@ -51,7 +51,7 @@ def cmd_sub(bot, line, args):
         )
         return
     data = urllib.urlopen('http://www.anissia.net/anitime/cap', urllib.urlencode({'i':find_item['i']})).read()
-    data = data.decode('utf8')
+    data = data.decode('u8')
     data = json.loads(data)
 
     if not data:
