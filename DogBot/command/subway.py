@@ -30,15 +30,24 @@ def cmd_subway(bot, line, args):
         )
         return
     
+    if start.endswith(u'역'):
+        start = start[:-1]
+
+    if end.endswith(u'역'):
+        end = end[:-1]
+    
     temp = urllib.urlopen('http://m.map.naver.com/external/SubwayProvide.xml?requestFile=metaData.json&readPath=1000&version=1.9').read()
     temp = temp.decode('u8')
     station_list = json.loads(temp)[0]['realInfo']
     
     for code in station_list:
-        if code['name'].startswith(start):
+        if code['name'] == start or code['name'] == start + u'역':
             start_id = code['id']
             break
-    else:
+        elif code['name'].startswith(start):
+            start_id = code['id']
+
+    if start_id == 0:
         bot.con.query(
             'PRIVMSG',
             line.target,
@@ -47,10 +56,13 @@ def cmd_subway(bot, line, args):
         return
 
     for code in station_list:
-        if code['name'].startswith(end):
+        if code['name'] == end or code['name'] == end + u'역':
             end_id = code['id']
             break
-    else:
+        elif code['name'].startswith(end):
+            end_id = code['id']
+
+    if end_id == 0:
         bot.con.query(
             'PRIVMSG',
             line.target,
