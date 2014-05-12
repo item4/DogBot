@@ -44,11 +44,17 @@ class DogBot(object):
         try:
             with open('config.json', 'r') as f:
                 self.config = json.load(f)
+                
+                for server in self.config['server'].keys():
+                    self.add_connect(server, self.config['server'][server]['port'], self.config['server'][server]['encoding'], self.config['server'][server]['channels'])
         except IOError:
             with open('config.json', 'w') as f:
-                f.write('{"nick":"botname","nickserv":'
+                f.write('{"nick":"botname","server":'
                         '{"some server":{'
-                        '"kick":"how to kick dup nick"'
+                        '"port":6667'
+                        ',"encoding":"utf8"'
+                        ',"channels":["#test"]'
+                        ',"kick":"how to kick dup nick"'
                         ',"login":"how to login"}},"db":""}')
             exit
 
@@ -65,10 +71,3 @@ class DogBot(object):
             for c in self.connections:
                 c['connect'].running = False
                 c['connect'].query(None)
-
-
-def main():
-    pass
-
-if __name__ == '__main__':
-    main()

@@ -35,6 +35,9 @@ class DogBotObject(object):
         self.handler = {}
 
         self.nick = system.config['nick']
+        
+        self.on_mode_pattern = re.compile('\((.+?)\)(.+$)')
+        self.msg_bark_pattern = re.compile(ur'((멍뭉?|왈|월|으르릉)+!*\s*)+$')
 
         self.cmd = DogBotCommand(self)
 
@@ -232,8 +235,8 @@ class DogBotObject(object):
 
 
     def on_396(self, line): # motd 끝
-        if self.system.config['nickserv'][self.server]['login']:
-            self.con.send(self.system.config['nickserv'][self.server]['login'] % self.nick)
+        if self.system.config['server'][self.server]['login']:
+            self.con.send(self.system.config['server'][self.server]['login'] % self.nick)
 
         for x in self.channels:
             self.con.query(
@@ -244,8 +247,8 @@ class DogBotObject(object):
 
     def on_433(self, line): # nick 중복
         self.con.send(u'NICK %s．%d' % (self.nick,random.randint(1,99)))
-        if self.system.config['nickserv'][self.server]['kick']:
-            self.con.send(self.system.config['nickserv'][self.server]['kick'] % self.nick)
+        if self.system.config['server'][self.server]['kick']:
+            self.con.send(self.system.config['server'][self.server]['kick'] % self.nick)
             self.con.send(u'NICK %s' % self.nick)
 
 
@@ -255,7 +258,7 @@ class DogBotObject(object):
 
 
     def on_MODE(self, line):
-        temp = re.match('\((.+?)\)(.+$)', self.db['server']['PREFIX'])
+        temp = self.on_mode_pattern.match(self.db['server']['PREFIX'])
 
         mode_str = list(temp.group(1))
         prefix_str = list(temp.group(2))
@@ -338,7 +341,7 @@ class DogBotObject(object):
                 line.target,
                 u'멍멍! %s는 item4가 키우는 파이썬 봇입니다. 명령어 : ?list | https://github.com/item4/DogBot' % self.nick
             )
-        elif re.match(ur'(멍+!*\s*)+$',line.message):
+        elif self.msg_bark_pattern.match(line.message):
             self.con.query(
                 u'PRIVMSG',
                 line.target,
@@ -361,10 +364,3 @@ class DogBotObject(object):
     def on_TOPIC(self, line): # set topic
         self.db['channel'][line.target]['topic'] = line.message
         self.db['channel'][line.target]['topic_setter'] = line.mask
-
-
-def main():
-    pass
-
-if __name__ == '__main__':
-    main()
