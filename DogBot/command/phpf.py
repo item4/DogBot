@@ -23,7 +23,7 @@ def cmd_phpf(bot, line, args):
     data = urllib.urlopen(url).read()
     data = data.decode('u8', 'ignore').replace('\r', '').replace('\n', '')
 
-    match = re.search(ur'<p class="verinfo">\(([^\)]+)\)</p><p class="refpurpose"><span class="refname">([^<]+)</span> &mdash; <span class="dc-title">([^<]+)</span>', data)
+    match = re.search(ur'<p class="verinfo">\(([^\)]+)\)</p><p class="refpurpose"><span class="refname">(.+?)</span> &mdash; <span class="dc-title">(.+?)</span>', data)
 
     if not match:
         url = 'http://www.php.net/manual/kr/function.%s.php' % (path,)
@@ -31,7 +31,7 @@ def cmd_phpf(bot, line, args):
         data = urllib.urlopen(url).read()
         data = data.decode('u8', 'ignore').replace('\r', '').replace('\n', '')
 
-        match = re.search(ur'<p class="verinfo">\(([^\)]+)\)</p><p class="refpurpose"><span class="refname">([^<]+)</span> &mdash; <span class="dc-title">([^<]+)</span>', data)
+        match = re.search(ur'<p class="verinfo">\(([^\)]+)\)</p><p class="refpurpose"><span class="refname">(.+?)</span> &mdash; <span class="dc-title">(.+?)</span>', data)
 
     if match:
         description = re.search('<div class="methodsynopsis dc-description">(.+?)</div>', data).group(1)
@@ -40,7 +40,7 @@ def cmd_phpf(bot, line, args):
         description = description.replace('&quot;', "'")
 
         msg = u'%s: %s (%s)' % (match.group(2).replace('&gt;', '>'),
-                                match.group(3).replace('&#039;', "'").replace('&quot;', "'"),
+                                re.sub(r'</?[^>]+>', '', match.group(3)).replace('&#039;', "'").replace('&quot;', "'"),
                                 match.group(1).replace('&gt;', '>'))
 
         warning = re.search('<div class="warning">\s*<strong class="warning">Warning</strong>\s*<p[^>]+>(.+?)</p>', data)
