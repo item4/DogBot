@@ -17,29 +17,27 @@ def cmd_phpf(bot, line, args):
         return
 
     path = args.replace('::', '.')
+    superclass, func = args.replace('_', '-').split('::') if '::' in args else ('function', args)
+    if args.startswith('mysqli_stmt_'):
+        superclass = 'mysqli-stmt'
+        func = args[12:].replace('_', '-')
+    param = dict(path=path, superclass=superclass, func=func)
 
-    url = 'http://php.net/%s' % (path,)
+    urls = ['http://www.php.net/manual/en/{superclass}.{func}.php', 'http://php.net/{path}']
+    match = None
 
-    data = urllib.urlopen(url).read()
-    data = data.decode('u8', 'ignore').replace('\r', '').replace('\n', '')
-
-    match = re.search(ur'<p class="verinfo">\(([^\)]+)\)</p><p class="refpurpose"><span class="refname">(.+?)</span> &mdash; <span class="dc-title">(.+?)</span>', data)
-
-    if not match:
-        url = 'http://www.php.net/manual/kr/function.%s.php' % (path,)
-
+    while not match and len(urls) > 0:
+        url = urls.pop().format(**param)
+    
         data = urllib.urlopen(url).read()
         data = data.decode('u8', 'ignore').replace('\r', '').replace('\n', '')
-
+    
         match = re.search(ur'<p class="verinfo">\(([^\)]+)\)</p><p class="refpurpose"><span class="refname">(.+?)</span> &mdash; <span class="dc-title">(.+?)</span>', data)
 
     if match:
-        description = re.search('<div class="methodsynopsis dc-description">(.+?)</div>', data).group(1)
-        description = re.sub(r'</?[^>]+>', '', description)
-        description = re.sub('\s{2,}', ' ', description).strip()
-        description = description.replace('&quot;', "'")
+        descriptions = re.findall('<div class="methodsynopsis dc-description">(.+?)</div>', data)
 
-        msg = u'%s: %s (%s)' % (match.group(2).replace('&gt;', '>'),
+        msg = u'%s: %s (%s)' % (match.group(2).replace('&gt;', '>').replace('</span> -- <span class="refname">', ' / '),
                                 re.sub(r'</?[^>]+>', '', match.group(3)).replace('&#039;', "'").replace('&quot;', "'"),
                                 match.group(1).replace('&gt;', '>'))
 
@@ -58,11 +56,15 @@ def cmd_phpf(bot, line, args):
             line.target,
             msg
         )
-        bot.con.query(
-            'PRIVMSG',
-            line.target,
-            description
-        )
+        for description in descriptions:
+            description = re.sub(r'</?[^>]+>', '', description)
+            description = re.sub('\s{2,}', ' ', description).strip()
+            description = description.replace('&quot;', "'")
+            bot.con.query(
+                'PRIVMSG',
+                line.target,
+                description
+            )
         bot.con.query(
             'PRIVMSG',
             line.target,
