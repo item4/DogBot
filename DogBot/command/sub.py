@@ -72,7 +72,7 @@ def cmd_sub(bot, line, args):
             if ep % 10 == 0:
                 ep = '{0:02d}'.format(int(ep/10))
             else:
-                ep = '{0:03d}.{1:s}'.format(int(ep/10),ep[-1])
+                ep = '{0:03d}.{1:s}'.format(int(ep/10),l['s'][-1])
             month = l['d'][4:6]
             day = l['d'][6:8]
             hour = l['d'][8:10]
