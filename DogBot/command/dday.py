@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-alias = []
+alias = [u'디데이']
 handler = []
 
 import time
