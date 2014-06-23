@@ -37,7 +37,7 @@ def cmd_dday(bot, line, args):
         bot.con.query(
             'PRIVMSG',
             line.target,
-            u'멍멍! 날짜가 올바른 형식이 아닙니다!'
+            u'멍멍! 날짜가 올바른 형식이 아닙니다! YYYYMMDD형식으로 입력해주세요!'
         )
         return
 
