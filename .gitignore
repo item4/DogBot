@@ -8,6 +8,10 @@ DogBot/command/test.py
 .pydevproject
 .settings
 
+# IntelliJ Project file
+.idea
+DogBot.iml
+
 # Launcher
 run.bat
 
