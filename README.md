@@ -28,9 +28,9 @@ DogBot is multipurpose IRC bot
 ## Configuration
 * nick : string. Bot's nickname. multi-byte supported.
 * server : JS object contain server address : configure pair. The key is server address, and the value is JS object configure.
-** port : integer. Server port. Ordinary 6667.
-** encoding : string. Server encoding(charset). Ordinary latin-7(english only) or utf8(multi-byte support)
-** channels : array. List of channels about join automatically. **MUST** prefix **#**
-** kick : string. RAW string about how to manage when someone take possession of its nickname.
-** login : string RAW string about how to login NickServ.
+* * port : integer. Server port. Ordinary 6667.
+* * encoding : string. Server encoding(charset). Ordinary latin-7(english only) or utf8(multi-byte support)
+* * channels : array. List of channels about join automatically. **MUST** prefix **#**
+* * kick : string. RAW string about how to manage when someone take possession of its nickname.
+* * login : string RAW string about how to login NickServ.
 * db : not used yet. It will be DSN of its DB.
