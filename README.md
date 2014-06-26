@@ -13,18 +13,29 @@ DogBot is multipurpose IRC bot
 
 ## Basic Usage
 1. install Python2.x and download this source.
-    .. code-block:: console
+
+```console
     $ cd DogBot
     $ git clone git@github.com:item4/DogBot.git .
+```
 
 2. This is NOT need to pip install yet. just execute once.
+
+```console
     $ python run.py
+```
 
 3. It will make configure file automatically. modify it.
+
+```
     $ vi config.json
+```
 
 4. Execute again.
+
+```
     $ python run.py
+```
 
 ## Configuration
 * nick : string. Bot's nickname. multi-byte supported.
