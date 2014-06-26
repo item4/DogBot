@@ -13,6 +13,7 @@ DogBot is multipurpose IRC bot
 
 ## Basic Usage
 1. install Python2.x and download this source.
+    .. code-block:: console
     $ cd DogBot
     $ git clone git@github.com:item4/DogBot.git .
 
