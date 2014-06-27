@@ -16,6 +16,7 @@ def cmd_phpf(bot, line, args):
         )
         return
 
+    args = args.replace('$', '')
     path = args.replace('::', '.')
     superclass, func = args.replace('_', '-').split('::') if '::' in args else ('function', args)
     if args.startswith('mysqli_stmt_'):
