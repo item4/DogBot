@@ -16,11 +16,15 @@ def cmd_phpf(bot, line, args):
         )
         return
 
+    args = args.replace('$', '')
     path = args.replace('::', '.')
     superclass, func = args.replace('_', '-').split('::') if '::' in args else ('function', args)
     if args.startswith('mysqli_stmt_'):
         superclass = 'mysqli-stmt'
         func = args[12:].replace('_', '-')
+    elif args.startswith('mysqli_'):
+        superclass = 'mysqli'
+        func = args[7:].replace('_', '-')
     param = dict(path=path, superclass=superclass, func=func)
 
     urls = ['http://www.php.net/manual/en/{superclass}.{func}.php', 'http://php.net/{path}']
@@ -35,7 +39,7 @@ def cmd_phpf(bot, line, args):
         match = re.search(ur'<p class="verinfo">\(([^\)]+)\)</p><p class="refpurpose"><span class="refname">(.+?)</span> &mdash; <span class="dc-title">(.+?)</span>', data)
 
     if match:
-        descriptions = re.findall('<div class="methodsynopsis dc-description">(.+?)</div>', data)
+        descriptions = re.findall('<div class="(?:method|constructor)synopsis dc-description">(.+?)</div>', data)
 
         msg = u'%s: %s (%s)' % (match.group(2).replace('&gt;', '>').replace('</span> -- <span class="refname">', ' / '),
                                 re.sub(r'</?[^>]+>', '', match.group(3)).replace('&#039;', "'").replace('&quot;', "'"),
