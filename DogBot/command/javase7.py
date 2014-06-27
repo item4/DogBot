@@ -12,7 +12,7 @@ def cmd_javase7(bot, line, args):
         bot.con.query(
             'PRIVMSG',
             line.target,
-            u'Java SE7 Method의 API 문서 링크를 알려줍니다. (대소문자 구분 안함) | usgae: ?javase7 Runnable'
+            u'Java SE7기준 Method의 API 문서 링크를 알려줍니다. (대소문자 구분 안함) | usgae: ?javase7 Runnable'
         )
         return
 

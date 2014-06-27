@@ -12,7 +12,7 @@ def cmd_java(bot, line, args):
         bot.con.query(
             'PRIVMSG',
             line.target,
-            u'Java Method의 API 문서 링크를 알려줍니다. (대소문자 구분 안함) | usgae: ?java Runnable'
+            u'Java SE8기준 Method의 API 문서 링크를 알려줍니다. (대소문자 구분 안함) | usgae: ?java Runnable'
         )
         return
 

@@ -12,7 +12,7 @@ def cmd_javaee(bot, line, args):
         bot.con.query(
             'PRIVMSG',
             line.target,
-            u'Java EE7 Method의 API 문서 링크를 알려줍니다. (대소문자 구분 안함) | usgae: ?javaee Action'
+            u'Java EE7기준 Method의 API 문서 링크를 알려줍니다. (대소문자 구분 안함) | usgae: ?javaee Action'
         )
         return
 
