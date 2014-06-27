@@ -35,7 +35,7 @@ def cmd_phpf(bot, line, args):
         match = re.search(ur'<p class="verinfo">\(([^\)]+)\)</p><p class="refpurpose"><span class="refname">(.+?)</span> &mdash; <span class="dc-title">(.+?)</span>', data)
 
     if match:
-        descriptions = re.findall('<div class="methodsynopsis dc-description">(.+?)</div>', data)
+        descriptions = re.findall('<div class="(method|constructor)synopsis dc-description">(.+?)</div>', data)
 
         msg = u'%s: %s (%s)' % (match.group(2).replace('&gt;', '>').replace('</span> -- <span class="refname">', ' / '),
                                 re.sub(r'</?[^>]+>', '', match.group(3)).replace('&#039;', "'").replace('&quot;', "'"),
