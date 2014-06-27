@@ -21,6 +21,9 @@ def cmd_phpf(bot, line, args):
     if args.startswith('mysqli_stmt_'):
         superclass = 'mysqli-stmt'
         func = args[12:].replace('_', '-')
+    elif args.startswith('mysqli_'):
+        superclass = 'mysqli'
+        func = args[7:].replace('_', '-')
     param = dict(path=path, superclass=superclass, func=func)
 
     urls = ['http://www.php.net/manual/en/{superclass}.{func}.php', 'http://php.net/{path}']
