@@ -12,8 +12,8 @@ book_pattern = re.compile(
     '<p class="goods_name goods_icon">\s*(\[.+?\])\s*<a href="([^"]+)"><strong>(.+?)</strong></a>\s*' +
     '<span class="goods_sname">(.+?)</span>\s*' +
     '(?:<img[^>]+>&nbsp;)?\s*' +
-    '</p>\s*<p class="goods_info">.+?</p>\s*' +
-    u'<p class="goods_price">\s*[0-9,]+원 → <strong>([0-9,]+원)</strong>',
+    '</p>\s*<p class="goods_info">(.+?)</p>\s*' +
+    u'<p class="goods_price">(.+?)</p>',
     re.S
 )
 
@@ -35,11 +35,19 @@ def cmd_yes24(bot, line, args):
     if matches:
         i = 0
         for match in matches:
+            res = match[0] + ' ' + chr(2) + match[2] + chr(2) + ': ' + match[3].strip() +\
+            ' (' + re.sub('</?[^>]+>|\s{2,}', '', match[4]).replace('\r' ,'').replace('\t', '').replace('\n', '').replace('&nbsp;', ' ').replace(' | ', '/') +\
+            '/' + re.sub('</?[^>]+>|\s{2,}', '', match[5]).replace('\r' ,'').replace('\t', '').replace('\n', '').replace('&nbsp;', ' ').replace(' | ', '/') +\
+            ') - http://www.yes24.com' + match[1].split('?', 1)[0]
+            if len(res) > 200:
+                res = match[0] + ' ' + chr(2) + match[2] + chr(2) +\
+                ' (' + re.sub('</?[^>]+>|\s{2,}', '', match[4]).replace('\r' ,'').replace('\t', '').replace('\n', '').replace('&nbsp;', ' ').replace(' | ', '/') +\
+                '/' + re.sub('</?[^>]+>|\s{2,}', '', match[5]).replace('\r' ,'').replace('\t', '').replace('\n', '').replace('&nbsp;', ' ').replace(' | ', '/') +\
+                ') - http://www.yes24.com' + match[1].split('?', 1)[0]
             bot.con.query(
                 'PRIVMSG',
                 line.target,
-                match[0] + ' ' + chr(2) + match[2] + chr(2) + ': ' + match[3].strip() +\
-                ' (' + match[4] + ') - http://www.yes24.com' + match[1]
+                res
             )
             if i > 1:
                 break
