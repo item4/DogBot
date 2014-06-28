@@ -9,6 +9,10 @@ import re
 import HTMLParser
 
 
+charset_pattern1 = re.compile('charset=(.+)')
+charset_pattern2 = re.compile('charset=["\']?([^"\'/]+)[^"\']?')
+
+
 def cmd_web(bot, line, args):
     if not args:
         bot.con.query(
@@ -31,9 +35,9 @@ def cmd_web(bot, line, args):
         )
         return
 
-    test = re.search('charset=(.+)', str(obj.info()))
+    test = charset_pattern1.search(str(obj.info()))
     if not test:
-        test = re.search('charset=["\']?([^"\'/]+)[^"\']?', data)
+        test = charset_pattern2.search(data)
 
     if test:
         charset = test.group(1)
@@ -62,11 +66,11 @@ def cmd_web(bot, line, args):
 
 
     data = HTMLParser.HTMLParser().unescape(data)
-    data = data.replace('\n',' ').replace('\r','')
-    data = re.sub(r'\s{2,}',' ',data)
-    data = re.sub(r'<(style|script|title)[^>]*>.*?</\1>','',data,flags=re.I|re.S)
-    data = re.sub(r'</?[^>]+>','',data)
-    data = re.sub(r'\s{2,}',' ',data)
+    data = data.replace('\n', ' ').replace('\r', ' ')
+    data = re.sub(r'\s{2,}', ' ', data)
+    data = re.sub(r'<(style|script|title)[^>]*>.*?</\1>', '' ,data, flags=re.I|re.S)
+    data = re.sub(r'</?[^>]+>', '', data)
+    data = re.sub(r'\s{2,}', ' ', data)
 
     data = data.strip()
 

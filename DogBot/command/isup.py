@@ -6,6 +6,10 @@ handler = []
 import urllib
 import re
 
+
+isup_pattern = re.compile('<a href="([^"]+)" class="domain">')
+
+
 def cmd_isup(bot, line, args):
     if not args:
         bot.con.query(
@@ -20,13 +24,13 @@ def cmd_isup(bot, line, args):
 
     data = urllib.urlopen('http://www.isup.me/%s' % args).read().decode('u8')
 
-    url = re.search('<a href="([^"]+)" class="domain">',data)
+    url = isup_pattern.search(data)
     if url:
         con = u'가능' if 'is up' in data else u'불가'
         bot.con.query(
             'PRIVMSG',
             line.target,
-            u'[%s] 접속 %s' % (url.group(1).replace('&#x2F;','/'), con)
+            u'[%s] 접속 %s' % (url.group(1).replace('&#x2F;', '/'), con)
         )
     else:
         bot.con.query(

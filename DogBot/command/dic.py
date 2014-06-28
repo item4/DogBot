@@ -8,6 +8,12 @@ import urllib
 import time
 
 
+step1_pattern = re.compile('<strong[^>]+>\s*<a href="([^>]+)" class="\s*link_txt\s*"\s*>')
+keyword_pattern = re.compile('<strong class="tit"><span class="inner_tit">(.+?)</span>.+')
+match_pattern = re.compile('(?:<h4[^>]+>([^<]+)</h4>\s*<div[^>]+>\s*<div[^>]+>\s*)?(?:<span[^>]+>([^<]+)</span>\s*)?<p class="txt_sense( no_num)?">(.+?)</p>')
+alternative_pattern = re.compile('<p class="txt_sense"(?: no_num)?>(.+?)</p>')
+
+
 def cmd_dic(bot, line, args):
     if not args:
         bot.con.query(
@@ -53,11 +59,11 @@ def cmd_dic(bot, line, args):
     dic = dic_lang_list.get(dic, dic)
     
     data = urllib.urlopen('http://dic.daum.net/search.do?%s' % \
-                          urllib.urlencode({'q': keyword.encode('utf8')})).read()
+                          urllib.urlencode({'q': keyword.encode('u8')})).read()
 
-    data = data.decode('utf8').replace('\r', '').replace('\n', '')
+    data = data.decode('u8').replace('\r', '').replace('\n', '')
 
-    data = re.findall('<strong[^>]+>\s*<a href="([^>]+)" class="\s*link_txt\s*"\s*>', data)
+    data = step1_pattern.findall(data)
 
     if dic:
         data = filter(lambda x: '=' + dic + 'w' in x, data)
@@ -87,16 +93,15 @@ def cmd_dic(bot, line, args):
     data = data.decode('u8', 'ignore').replace('\r', '').replace('\n', '')
 
     try:
-        keyword = re.search('<strong class="tit"><span class="inner_tit">(.+?)</span>.+', data).group(1)
+        keyword = keyword_pattern.search(data).group(1)
     except:
         keyword = '?'
 
     temp = url[40:42]
-    
-    
+
     dic_category = dic_category_list.get(temp, u'미상')
 
-    match = re.findall('(?:<h4[^>]+>([^<]+)</h4>\s*<div[^>]+>\s*<div[^>]+>\s*)?(?:<span[^>]+>([^<]+)</span>\s*)?<p class="txt_sense( no_num)?">(.+?)</p>', data)
+    match = match_pattern.findall(data)
 
     if match:
         bot.con.query(
@@ -145,7 +150,7 @@ def cmd_dic(bot, line, args):
 
             time.sleep(.4)
     else:
-        match = re.findall('<p class="txt_sense"(?: no_num)?>(.+?)</p>', data)
+        match = alternative_pattern.findall(data)
         if match:
             bot.con.query(
                 'PRIVMSG',

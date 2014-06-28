@@ -6,6 +6,7 @@ handler = []
 import re
 import urllib2
 
+time_pattern = re.compile(u'\[ 매분관측자료 \] \d+\.\d+\.\d+\.(\d+:\d+)')
 
 def cmd_aws(bot, line, args):
     if args is None:
@@ -17,12 +18,12 @@ def cmd_aws(bot, line, args):
         return
 
     try:
-        data = urllib2.urlopen('http://203.247.66.10/cgi-bin/aws/nph-aws_txt_min',None,3).read()
-        data = data.decode('cp949').replace('\r','').replace('\n','')
+        data = urllib2.urlopen('http://203.247.66.10/cgi-bin/aws/nph-aws_txt_min', None, 3).read()
+        data = data.decode('cp949').replace('\r', '').replace('\n', '')
 
         if '>' + args + '<' not in data:
-            data = urllib2.urlopen('http://203.247.66.10/cgi-bin/aws/nph-aws_txt_min?&0&MINDB_60M&0&a',None,3).read()
-            data = data.decode('cp949').replace('\r','').replace('\n','')
+            data = urllib2.urlopen('http://203.247.66.10/cgi-bin/aws/nph-aws_txt_min?&0&MINDB_60M&0&a', None, 3).read()
+            data = data.decode('cp949').replace('\r', '').replace('\n', '')
     except:
         bot.con.query(
             'PRIVMSG',
@@ -31,15 +32,8 @@ def cmd_aws(bot, line, args):
         )
         return
 
-    time = re.search(u'\[ 매분관측자료 \] \d+\.\d+\.\d+\.(\d+:\d+)',data)
+    time = time_pattern.search(data)
     data = re.search(ur'<tr[^>]+><td[^>]+><a[^>]+>\d+</a></td><td[^>]+><a[^>]+>%s</a></td><td[^>]+>\d+m</td><td>(<font color=red>○</font>|<font color=blue>●</font>|-)</td><td[^>]*>([^<]*)</td><td[^>]*>[^<]*</td><td[^>]*>[^<]*</td><td[^>]*>[^<]*</td><td[^>]*>([^<]*)</td><td>([^<]*)</td><td class=textg>[^<]*</td><td class=textg>([^<]*)</td><td class=textg>([^<]*)</td><td[^>]*>[^<]*</td><td[^>]*>[^<]*</td><td[^>]*>[^<]*</td><td>([^<]*)</td><td>([^<]*)</td><td align=left class=text2 nowrap>([^<]*)</td></tr>' % args,data)
-    """
-<tr align=center bgcolor=#F2F2F2 class=text><td bgcolor=#BBDDFF><a href='javascript:parent.parent.menu.stn_select(957);'>957</a></td>
-<td bgcolor=#BBDDFF width=50 nowrap><a href='javascript:parent.parent.menu.stn_select(957);'>십이동파</a></td>
-<td align=right width=40>91m</td><td>-</td>
-<td>.</td><td>.</td><td>.</td><td>.</td><td>.</td><td>0.6</td><td class=textg>338.0</td><td class=textg>NNW</td><td class=textg>6.3</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>.</td><td>1016.4</td><td align=left class=text2 nowrap>전라북도 군산시 옥도면 연도리</td></tr>
-    """
-
 
     if data:
         if data.group(1) == '-' or data.group(1) == '.':

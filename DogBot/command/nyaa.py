@@ -8,6 +8,12 @@ import re
 import HTMLParser
 
 
+find_pattern = re.compile(r'<tr[^>]+><td[^>]+><a[^>]+><img[^>]+></a></td><td[^>]+><a[^>]+>(.+?)</a></td><td[^>]+><a href="([^"]+)"[^>]+><img[^>]+></a></td><td[^>]+>(.+?)</td>(?:<td[^>]+>(\d+)</td><td[^>]+>(\d+)</td>|<td class="tlistfailed" colspan="2">.+?</td>)<td[^>]+>(.+?)</td><td[^>]+>\d+</td></tr>')
+title_pattern = re.compile('<td class="viewtorrentname">(.+?)</td>')
+info_pattern = re.compile('<td class="thead">Seeders:</td><td class="vtop">(.+?)</td></tr><tr><td class="thead">Tracker:</td><td>.+?</td><td class="thead">Leechers:</td><td class="vtop">(.+?)</td></tr><tr><td class="thead">Information:</td><td>.*?</td><td class="thead">Downloads:</td><td class="vtop">(.+?)</td></tr><tr><td class="thead">Stardom:</td><td>.+?</td><td class="thead">File size:</td><td class="vtop">(.+?)</td>')
+url_pattern = re.compile('<div class="viewdownloadbutton"><a href="(.+?)" rel="nofollow"><img src="http://files.nyaa.se/www-download.png" alt="Download"></a>')
+
+
 def cmd_nyaa(bot, line, args):
     if args and args.startswith('-all '):
         cats = '0'
@@ -24,7 +30,7 @@ def cmd_nyaa(bot, line, args):
         return
 
     try:
-        data = urllib.urlopen('http://www.nyaa.eu/?%s' % urllib.urlencode({'page':'search','cats':cats,'filter':0,'term':args.encode('u8')})).read()
+        data = urllib.urlopen('http://www.nyaa.eu/?%s' % urllib.urlencode({'page': 'search','cats': cats,'filter': 0,'term': args.encode('u8')})).read()
     except IOError:
         bot.con.query(
             'PRIVMSG',
@@ -33,7 +39,7 @@ def cmd_nyaa(bot, line, args):
         )
         return
     data = data.decode('u8')
-    match = re.finditer(r'<tr[^>]+><td[^>]+><a[^>]+><img[^>]+></a></td><td[^>]+><a[^>]+>(.+?)</a></td><td[^>]+><a href="([^"]+)"[^>]+><img[^>]+></a></td><td[^>]+>(.+?)</td>(?:<td[^>]+>(\d+)</td><td[^>]+>(\d+)</td>|<td class="tlistfailed" colspan="2">.+?</td>)<td[^>]+>(.+?)</td><td[^>]+>\d+</td></tr>', data)
+    match = find_pattern.finditer(data)
 
     i = 1
     for x in match:
@@ -56,16 +62,16 @@ def cmd_nyaa(bot, line, args):
             break
         
     if i == 1:
-        match = re.search('<td class="viewtorrentname">(.+?)</td>', data)
+        match = title_pattern.search(data)
         if match:
             title = match.group(1)
             
-            match = re.search('<td class="thead">Seeders:</td><td class="vtop">(.+?)</td></tr><tr><td class="thead">Tracker:</td><td>.+?</td><td class="thead">Leechers:</td><td class="vtop">(.+?)</td></tr><tr><td class="thead">Information:</td><td>.*?</td><td class="thead">Downloads:</td><td class="vtop">(.+?)</td></tr><tr><td class="thead">Stardom:</td><td>.+?</td><td class="thead">File size:</td><td class="vtop">(.+?)</td>', data)
+            match = info_pattern.search(data)
             seeders = match.group(1)
             leechers = match.group(2)
             downloads = match.group(3)
             filesize = match.group(4)
-            url = re.search('<div class="viewdownloadbutton"><a href="(.+?)" rel="nofollow"><img src="http://files.nyaa.se/www-download.png" alt="Download"></a>', data).group(1)
+            url = url_pattern.search(data).group(1)
             
             res = u'%s (%s/S:%s/L:%s/DLs:%s) - %s' % (
                 title,

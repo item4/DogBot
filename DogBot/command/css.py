@@ -21,10 +21,10 @@ def cmd_css(bot, line, args):
     if args in [':after',':before',':first-letter',':first-line']:
         args = ':%s (%s)' % (args,args)
 
-    args = args.replace('<','&lt;').replace('>','&gt;').replace('(','\(').replace(')','\)')
+    args = args.replace('<', '&lt;').replace('>', '&gt;').replace('(', '\(').replace(')', '\)')
 
     data = urllib.urlopen('https://developer.mozilla.org/en-US/docs/Web/CSS/Reference').read()
-    data = data.decode('u8').replace('\r','').replace('\n','')
+    data = data.decode('u8').replace('\r', '').replace('\n', '')
     data = re.search(r'<li><a (class="new" )?href="([^"]+)" title=""><code>%s</code></a>' % args,data)
 
     if not data:
@@ -34,7 +34,7 @@ def cmd_css(bot, line, args):
             u'멍멍! 해당하는 CSS를 찾을 수 없어요!'
         )
     else:
-        res = u'{%s} - ' % args.replace('&lt;','<').replace('&gt;','>').replace('\(','(').replace('\)',')')
+        res = u'{%s} - ' % args.replace('&lt;', '<').replace('&gt;', '>').replace('\(', '(').replace('\)', ')')
 
         if data.group(1):
             res += u'MDN에 문서가 제작되지 않음'

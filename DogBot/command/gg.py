@@ -9,6 +9,10 @@ import re
 import HTMLParser
 
 
+base_pattern = re.compile(r'<li class="g"[^>]*><!--m-->(.+?)<!--n--></li>')
+temp_pattern = re.compile('<h3 class="r"><a href="([^"]+)"[^>]+>(.+?)</a></h3>')
+desciption_pattern = re.compile('<span class="st">(.+?)</span>')
+
 def cmd_gg(bot, line, args):
     if not args:
         bot.con.query(
@@ -40,8 +44,6 @@ def cmd_gg(bot, line, args):
             u'멍멍! 검색결과가 없어요!'
         )
     else:
-        base_pattern = re.compile(r'<li class="g"[^>]*><!--m-->(.+?)<!--n--></li>')
-
         result = base_pattern.findall(data[f:])[:3]
 
         if not result:
@@ -61,10 +63,10 @@ def cmd_gg(bot, line, args):
             return
 
         for x in result:
-            temp = re.search('<h3 class="r"><a href="([^"]+)"[^>]+>(.+?)</a></h3>', x)
+            temp = temp_pattern.search(x)
             url, title = temp.group(1), temp.group(2)
             try:
-                description = re.search('<span class="st">(.+?)</span>', x).group(1)
+                description = desciption_pattern.search(x).group(1)
             except AttributeError:
                 res = u'[ %s - %s ] 설명이 없습니다.' % (title, url)
             else:

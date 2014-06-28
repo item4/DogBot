@@ -17,20 +17,20 @@ def cmd_dns(bot, line, args):
         return
 
     server_list = [
-                ('168.126.63.1','KT'),
-                ('168.126.63.2','KT'),
-                ('210.220.163.82','SK'),
-                ('219.250.36.130','SK'),
-                ('164.124.101.2','Dacom'),
-                ('203.248.252.2','Dacom'),
-                ('164.124.107.9','Powercom'),
-                ('203.248.252.2','Powercom'),
-                ('210.181.1.24','Dreamline'),
-                ('210.181.4.25','Dreamline'),
-                ('8.8.8.8','Google'),
-                ('8.8.4.4','Google'),
-                ('208.67.222.222','OpenDNS'),
-                ('208.67.220.220','OpenDNS')
+                ('168.126.63.1', 'KT'),
+                ('168.126.63.2', 'KT'),
+                ('210.220.163.82', 'SK'),
+                ('219.250.36.130', 'SK'),
+                ('164.124.101.2', 'Dacom'),
+                ('203.248.252.2', 'Dacom'),
+                ('164.124.107.9', 'Powercom'),
+                ('203.248.252.2', 'Powercom'),
+                ('210.181.1.24', 'Dreamline'),
+                ('210.181.4.25', 'Dreamline'),
+                ('8.8.8.8', 'Google'),
+                ('8.8.4.4', 'Google'),
+                ('208.67.222.222', 'OpenDNS'),
+                ('208.67.220.220', 'OpenDNS')
                 ]
 
     if args[0] == '-':
@@ -42,7 +42,7 @@ def cmd_dns(bot, line, args):
     elif args.startswith('https://'):
         args = args[8:]
 
-    args = args.replace('/','')
+    args = args.replace('/', '')
 
     res = []
 
@@ -53,7 +53,8 @@ def cmd_dns(bot, line, args):
     )
 
     for server, name in server_list:
-        data = urllib.urlopen('http://checkdnskr.appspot.com/api/lookup?%s' % urllib.urlencode({'domain':args.encode('u8'),'ip':server})).read()
+        data = urllib.urlopen('http://checkdnskr.appspot.com/api/lookup?%s' %
+                              urllib.urlencode({'domain': args.encode('u8'),'ip': server})).read()
         data = data.decode('u8')
 
         try:
@@ -69,7 +70,7 @@ def cmd_dns(bot, line, args):
         except:
             res.append(u'%s(%s) → Error' % (name, server))
     else:
-        for i in xrange(0,len(server_list),4):
+        for i in xrange(0, len(server_list), 4):
             bot.con.query(
                 'PRIVMSG',
                 line.target,

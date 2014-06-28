@@ -82,6 +82,10 @@ for x in operator_function:
     operator_term[x] = 1
 
 
+term_pattern = re.compile('\s*(-?\s*(?:\d+\.\d+|\.\d+|\d+\.|\d+)|pi|e)\s*')
+operator_pattern = re.compile('\s*(,|\+|-|\^|\*\*|\*|/|%|\(\s*|\s*\)|' + '|'.join(operator_function) + ')\s*')
+
+
 def average(args):
     return sum(args) / len(args)
 
@@ -112,9 +116,6 @@ def calc(args):
         args = '0' + args
 
     args = args.replace('(+', '(0+').replace(',+', ',0+')
-
-    term_pattern = re.compile('\s*(-?\s*(?:\d+\.\d+|\.\d+|\d+\.|\d+)|pi|e)\s*')
-    operator_pattern = re.compile('\s*(,|\+|-|\^|\*\*|\*|/|%|\(\s*|\s*\)|' + '|'.join(operator_function) + ')\s*')
 
     result_stack = []
     operator_stack = []

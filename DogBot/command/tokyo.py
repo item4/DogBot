@@ -8,6 +8,9 @@ import urllib
 import re
 
 
+search_pattern = re.compile(r'<tr[^>]+><td[^>]+><a[^>]+><span[^>]+></span></a></td><td[^>]+><a[^>]+><span[^>]+></span></a> <a rel="nofollow" type="application/x-bittorrent" href="([^"]+)">(.+?)</a></td><td[^>]+>(?:<a[^>]+>Website</a> \| )?<a[^>]+>Details</a></td></tr><tr[^>]+><td[^>]+>(?:Authorized: <span class="auth_ok">Yes</span> )?Submitter: (?:<a[^>]+>.*?</a>|Anonymous) \| Size: ([^\|]+) \| Date: ([^\|]+)(?: \| Comment: .*?)?</td><td[^>]+>S: <span[^>]+>(\d+)</span> L: <span[^>]+>(\d+)</span> C: <span[^>]+>(\d+)</span> ID: \d+</td></tr>')
+
+
 def cmd_tokyo(bot, line, args):
     if args and args.startswith('-all '):
         search_type = 0
@@ -23,7 +26,7 @@ def cmd_tokyo(bot, line, args):
         )
         return
 
-    url = 'http://www.tokyotosho.info/search.php?%s' % urllib.urlencode({'terms':args.encode('u8'),'type':search_type})
+    url = 'http://www.tokyotosho.info/search.php?%s' % urllib.urlencode({'terms': args.encode('u8'),'type': search_type})
 
     try:
         data = urllib.urlopen(url).read()
@@ -34,15 +37,15 @@ def cmd_tokyo(bot, line, args):
             u'멍멍! 도쿄도서관에 접속할 수 없어요!'
         )
         return
-    data = data.decode('u8').replace('\r','').replace('\n','')
-    data = re.finditer(r'<tr[^>]+><td[^>]+><a[^>]+><span[^>]+></span></a></td><td[^>]+><a[^>]+><span[^>]+></span></a> <a rel="nofollow" type="application/x-bittorrent" href="([^"]+)">(.+?)</a></td><td[^>]+>(?:<a[^>]+>Website</a> \| )?<a[^>]+>Details</a></td></tr><tr[^>]+><td[^>]+>(?:Authorized: <span class="auth_ok">Yes</span> )?Submitter: (?:<a[^>]+>.*?</a>|Anonymous) \| Size: ([^\|]+) \| Date: ([^\|]+)(?: \| Comment: .*?)?</td><td[^>]+>S: <span[^>]+>(\d+)</span> L: <span[^>]+>(\d+)</span> C: <span[^>]+>(\d+)</span> ID: \d+</td></tr>',data)
+    data = data.decode('u8').replace('\r', '').replace('\n', '')
+    data = search_pattern.finditer(data)
 
     i = 1
     for x in data:
         res=u'%s (%s/%s/S:%s/L:%s/C:%s) - %s' % (\
             x.group(2).replace('<span class="s"> </span>',''),\
-            x.group(3),x.group(4),x.group(5),x.group(6),\
-            x.group(7),x.group(1).replace('&amp;','&'))
+            x.group(3), x.group(4), x.group(5), x.group(6),\
+            x.group(7), x.group(1).replace('&amp;','&'))
         bot.con.query(
             'PRIVMSG',
             line.target,

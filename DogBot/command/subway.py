@@ -20,7 +20,7 @@ def cmd_subway(bot, line, args):
         return
     
     if ' ' in args:
-        start, end = map(lambda x:x.strip(),args.split(' ',2))
+        start, end = map(lambda x:x.strip(), args.split(' ',2))
         start_id, end_id = 0, 0
     else:
         bot.con.query(
@@ -92,7 +92,7 @@ def cmd_subway(bot, line, args):
         return
     
     msg = data['path']['routes'][0]['stations'][0]['name'] + u' → ' + data['path']['routes'][-1]['stations'][-1]['name'] + \
-    u' : {} 소요, 정차역 {:d}개, 환승 {:d}회, 카드 요금 {:,d}원, 현금 요금 {:,d}원'.format(read_time(data['summary']['overallTravelTimeInSecond']),data['summary']['overallNumberOfStations'],data['summary']['overallNumberOfTransfers'],data['fareInfos'][0]['fare'],data['fareInfos'][1]['fare'])
+    u' : {} 소요, 정차역 {:d}개, 환승 {:d}회, 카드 요금 {:,d}원, 현금 요금 {:,d}원'.format(read_time(data['summary']['overallTravelTimeInSecond']),data['summary']['overallNumberOfStations'], data['summary']['overallNumberOfTransfers'], data['fareInfos'][0]['fare'], data['fareInfos'][1]['fare'])
     bot.con.query(
         'PRIVMSG',
         line.target,

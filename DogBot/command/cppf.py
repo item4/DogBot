@@ -7,6 +7,11 @@ import urllib
 import re
 
 
+data_pattern = re.compile(ur'<div id="I_type">(.+?)</div><div id="I_file"[^>]*>&lt;(.+?)&gt;\r?</div><h1>(.+?)</h1>(?:<div class="C_prototype">((?:<div[^>]+>.+?</div>)+|<pre>.+?</pre>|<table>.+?</table>)</div>)?<div id="I_description">(.+?)</div>')
+temp_pattern = re.compile(r'<div title="([^"]+)"[^>]*>(.+?)</div>')
+table_pattern = re.compile(r'<tr[^>]+><th>(.+?)</th><td><pre>(.+?)</pre></td></tr>')
+
+
 def cmd_cppf(bot, line, args):
     if not args:
         bot.con.query(
@@ -21,30 +26,16 @@ def cmd_cppf(bot, line, args):
     if '::' in args:
         if args.startswith('std::'):
             args = args[5:]
-        url = 'http://cplusplus.com/reference/%s' % args.replace('::','/')
+        url = 'http://cplusplus.com/reference/%s' % args.replace('::', '/')
         print url
     else:
-        url = 'http://cplusplus.com/search.do?%s' % urllib.urlencode({'q':args})
+        url = 'http://cplusplus.com/search.do?%s' % urllib.urlencode({'q': args})
 
     con = urllib.urlopen(url)
     data = con.read()
-    data = data.decode('u8').replace('\n','')
-    data = re.search(ur'<div id="I_type">(.+?)</div><div id="I_file"[^>]*>&lt;(.+?)&gt;\r?</div><h1>(.+?)</h1>(?:<div class="C_prototype">((?:<div[^>]+>.+?</div>)+|<pre>.+?</pre>|<table>.+?</table>)</div>)?<div id="I_description">(.+?)</div>',data)
-    """
-<div id="I_type">class template
-</div>
-<div id="I_file">&lt;array&gt;
-</div>
-<h1><span class="namespace" title="namespace std">std::</span>array<span class="C_ico cpp11warning" title="This page describes a feature introduced by the latest revision of the C++ standard (2011). Older compilers may not support it." alt="This page describes a feature introduced by the latest revision of the C++ standard (2011). Older compilers may not support it."></span></h1>
-<div class="C_prototype"><pre>template &lt; class T, size_t N &gt; class array;</pre></div><div id="I_description">Array class</div>
+    data = data.decode('u8').replace('\n', '')
+    data = data_pattern.search(data)
 
-<table><tr class="odd"><th>default (1)</th><td><pre>
-template &lt;class RandomAccessIterator&gt;
-  void sort (RandomAccessIterator first, RandomAccessIterator last);
-</pre></td></tr><tr class="even"><th>custom (2)</th><td><pre>
-template &lt;class RandomAccessIterator, class Compare&gt;
-  void sort (RandomAccessIterator first, RandomAccessIterator last, Compare comp);</pre></td></tr></table>
-    """
 
     if data:
         description = []
@@ -52,22 +43,22 @@ template &lt;class RandomAccessIterator, class Compare&gt;
             intable = []
             inpre = []
             if data.group(4).startswith('<div '):
-                temp = re.finditer(r'<div title="([^"]+)"[^>]*>(.+?)</div>',data.group(4))
+                temp = temp_pattern.finditer(data.group(4))
                 for x in temp:
                     if x.group(2).startswith('<table>'):
-                        intable.append((x.group(1),x.group(2)))
+                        intable.append((x.group(1), x.group(2)))
                     else:
-                        inpre.append((x.group(1),None,x.group(2)[5:-6]))
+                        inpre.append((x.group(1), None, x.group(2)[5:-6]))
             elif data.group(4).startswith('<table>'):
-                intable.append((None,data.group(4)))
+                intable.append((None, data.group(4)))
             else:
-                inpre.append((None,None,data.group(4)[5:-6]))
+                inpre.append((None, None, data.group(4)[5:-6]))
 
             if intable:
                 for version,temp in intable:
-                    sub = re.finditer(r'<tr[^>]+><th>(.+?)</th><td><pre>(.+?)</pre></td></tr>',temp)
+                    sub = table_pattern.finditer(temp)
                     for x in sub:
-                        inpre.append((version,x.group(1),x.group(2)))
+                        inpre.append((version, x.group(1), x.group(2)))
 
             if inpre:
                 for version, case, desc in inpre:
