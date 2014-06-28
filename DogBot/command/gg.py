@@ -13,6 +13,7 @@ base_pattern = re.compile(r'<li class="g"[^>]*><!--m-->(.+?)<!--n--></li>')
 temp_pattern = re.compile('<h3 class="r"><a href="([^"]+)"[^>]+>(.+?)</a></h3>')
 desciption_pattern = re.compile('<span class="st">(.+?)</span>')
 
+
 def cmd_gg(bot, line, args):
     if not args:
         bot.con.query(
