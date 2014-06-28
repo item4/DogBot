@@ -9,6 +9,7 @@ import re
 import HTMLParser
 
 
+content_type_pattern = re.compile('Content-Type: (.+)')
 charset_pattern1 = re.compile('charset=(.+)')
 charset_pattern2 = re.compile('charset=["\']?([^"\'/]+)[^"\']?')
 
@@ -35,7 +36,19 @@ def cmd_web(bot, line, args):
         )
         return
 
-    test = charset_pattern1.search(str(obj.info()))
+    header = str(obj.info())
+
+    content_type = content_type_pattern.search(header)
+
+    if not content_type or not content_type.group(1).startswith('text/'):
+        bot.con.query(
+            'PRIVMSG',
+            line.target,
+            '[%s] non-text content: %s' % (args, content_type.group(1))
+        )
+        return
+
+    test = charset_pattern1.search(header)
     if not test:
         test = charset_pattern2.search(data)
 
@@ -63,7 +76,6 @@ def cmd_web(bot, line, args):
                 u'멍멍! charset 감지에 실패하였습니다!'
             )
             return
-
 
     data = HTMLParser.HTMLParser().unescape(data)
     data = data.replace('\n', ' ').replace('\r', ' ')
