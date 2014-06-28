@@ -17,5 +17,5 @@ def cmd_md5(bot, line, args):
     bot.con.query(
         'PRIVMSG',
         line.target,
-        '[MD5] %s = %s' % (args,hashlib.md5(args).hexdigest())
+        '[MD5] %s = %s' % (args,hashlib.md5(args.encode('u8')).hexdigest())
     )

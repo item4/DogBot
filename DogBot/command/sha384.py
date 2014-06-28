@@ -17,5 +17,5 @@ def cmd_sha384(bot, line, args):
     bot.con.query(
         'PRIVMSG',
         line.target,
-        '[SHA384] %s = %s' % (args,hashlib.sha384(args).hexdigest())
+        '[SHA384] %s = %s' % (args,hashlib.sha384(args.encode('u8')).hexdigest())
     )
