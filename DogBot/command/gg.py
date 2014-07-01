@@ -46,7 +46,6 @@ def cmd_gg(bot, line, args):
         )
     else:
         result = base_pattern.findall(data[f:])[:3]
-        print result
 
         if not result:
             temp = data.find('<li class="g">') == -1 or data.find('<li class="g" ') == -1
