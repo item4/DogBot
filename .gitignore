@@ -27,6 +27,11 @@ config.json
 # C extensions
 *.so
 
+# Windows virtualenv files/directories
+Include/
+Lib/
+Scripts/
+
 # Packages
 *.egg
 *.egg-info
