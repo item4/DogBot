@@ -9,7 +9,7 @@ import re
 import HTMLParser
 
 
-base_pattern = re.compile(r'<li class="g"[^>]*><!--m-->(.+?)<!--n--></li>')
+base_pattern = re.compile('<li class="g"[^>]*>(?P<div><div>)?<!--m-->(.+?)(?(div)</li><!--n-->|<!--n--></li>)')
 temp_pattern = re.compile('<h3 class="r"><a href="([^"]+)"[^>]+>(.+?)</a></h3>')
 desciption_pattern = re.compile('<span class="st">(.+?)</span>')
 
@@ -63,7 +63,7 @@ def cmd_gg(bot, line, args):
                 )
             return
 
-        for x in result:
+        for _, x in result:
             temp = temp_pattern.search(x)
             url, title = temp.group(1), temp.group(2)
             try:

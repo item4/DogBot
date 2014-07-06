@@ -55,15 +55,22 @@ def cmd_pypi(bot, line, args):
     # each record has a unique name now, so we will convert the dict into a list sorted by score
     package_list = sorted(packages.values(), key=lambda x: x['score'], reverse=True)[:3]
 
-    for package in package_list:
-        res = '%s/%s' % (package['name'],highest_version(package['versions']))
-        if package['summary']:
-            res += ' - ' + package['summary']
+    if package_list:
+        for package in package_list:
+            res = '%s/%s' % (package['name'],highest_version(package['versions']))
+            if package['summary']:
+                res += ' - ' + package['summary']
 
+            bot.con.query(
+                'PRIVMSG',
+                line.target,
+                res
+            )
+    else:
         bot.con.query(
             'PRIVMSG',
             line.target,
-            res
+            u'멍멍! 검색 결과가 없어요!'
         )
 
 
