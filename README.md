@@ -10,6 +10,8 @@ DogBot is multipurpose IRC bot
 
 ## Need
 * Python2.x (not support 3.x)
+* websocket-client (for ?exa)
+* sphinx (for ?flask, ?wand)
 
 ## Basic Usage
 1. install Python2.x and download this source.
@@ -18,17 +20,22 @@ DogBot is multipurpose IRC bot
     $ cd DogBot
     $ git clone git@github.com:item4/DogBot.git .
     ```
-2. This is NOT need to pip install yet. just execute once.
+2. It need to pip install. install requirements.
+
+    ```
+    $ pip install -r requirements.txt
+    ```
+3. It will make configure file automatically when first runtime. just execute once.
 
     ```
      $ python run.py
     ```
-3. It will make configure file automatically. modify it.
+4.  modify config.json.
 
     ```
     $ vi config.json
     ```
-4. Execute again.
+5. Execute again and use it.
 
     ```
     $ python run.py
