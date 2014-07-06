@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
 
-alias = []
+alias = ['pyre27', 'py27']
 handler = []
 
 
