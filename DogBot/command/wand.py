@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
 
-alias = ['pyre2', 'pyre27', 'py2', 'py27']
+alias = []
 handler = []
 
 
@@ -9,31 +9,43 @@ import urllib
 from sphinx.ext.intersphinx import read_inventory_v1, read_inventory_v2
 
 
-def cmd_pyre(bot, line, args):
+def cmd_wand(bot, line, args):
     if not args:
         bot.con.query(
             'PRIVMSG',
             line.target,
-            u'Python 2.7 문서 링크 | usage: ?pyre library_name'
+            u'Wand 문서 링크 | usage: ?wand resize'
         )
         return
 
-    bot.con.query(
-        'PRIVMSG',
-        line.target,
-        u'http://docs.python.org/2.7/library/%s.html' % args
-    )
+    inv = get_inventory('http://docs.wand-py.org/en/0.3.7/')
+    i = 0
+    for key in inv.iterkeys():
+        for name in inv[key].iterkeys():
+            print name,
+            version, url = inv[key][name][1], inv[key][name][2]
+            if name.lower().find(args) != -1:
+                bot.con.query(
+                    'PRIVMSG',
+                    line.target,
+                    '[%s] %s(%s) - %s' % (key, name, version, url)
+                )
+                i += 1
+            if i > 2:
+                break
+        if i > 2:
+            break
 
+    if i == 0:
+        bot.con.query(
+            'PRIVMSG',
+            line.target,
+            u'멍멍! API 문서에서 검색어를 찾을 수 없어요!'
+        )
 
-
-
-PACKAGES = {
-    'flask': 'http://flask.pocoo.org/docs/',
-    'wand': 'http://docs.wand-py.org/en/0.3.7/'
-}
 
 def urljoin(*params):
-    return '/'.join(params).replace('//', '')
+    return '/'.join(params).replace('//', '/').replace(':/', '://')
 
 
 def get_inventory(url):
@@ -47,21 +59,3 @@ def get_inventory(url):
     else:
         raise ValueError(line)
     return invdata
-
-
-def main():
-    if len(sys.argv) < 2:
-        print('usage:', sys.argv[0], 'PACKAGE-NAME', file=sys.stderr)
-        raise SystemExit(1)
-    package = sys.argv[1]
-    try:
-        url = PACKAGES[package]
-    except KeyError:
-        print('unsupported package:', package, file=sys.stderr)
-        raise SystemExit(1)
-    result = get_inventory(url)
-    pprint.pprint(result['py:class'])
-
-
-if __name__ == '__main__':
-    main()
