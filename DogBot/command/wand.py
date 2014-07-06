@@ -14,7 +14,7 @@ def cmd_wand(bot, line, args):
         bot.con.query(
             'PRIVMSG',
             line.target,
-            u'Wand 문서 링크 | usage: ?wand resize'
+            u'Wand API 문서 링크 | usage: ?wand resize'
         )
         return
 
