@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
 
-alias = [u'냐토렌트']
+alias = [u'냐']
 handler = []
 
 import urllib
@@ -60,19 +60,19 @@ def cmd_nyaa(bot, line, args):
         i += 1
         if i > 3:
             break
-        
+
     if i == 1:
         match = title_pattern.search(data)
         if match:
             title = match.group(1)
-            
+
             match = info_pattern.search(data)
             seeders = match.group(1)
             leechers = match.group(2)
             downloads = match.group(3)
             filesize = match.group(4)
             url = url_pattern.search(data).group(1)
-            
+
             res = u'%s (%s/S:%s/L:%s/DLs:%s) - %s' % (
                 title,
                 filesize,
