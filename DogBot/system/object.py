@@ -317,7 +317,8 @@ class DogBotObject(object):
                     u'깨갱'
                 )
         else:
-            del self.db['channel'][chan]['member'][nick]
+            if nick in self.db['channel'][chan]['member']:
+                del self.db['channel'][chan]['member'][nick]
 
 
     def on_PART(self, line):
