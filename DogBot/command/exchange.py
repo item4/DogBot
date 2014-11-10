@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
 
-alias = [u'환율','money']
+alias = [u'환율', 'money']
 handler = []
 
-import urllib
+import json
 import re
+import urllib
+
+
+exchange_table_pattern = re.compile('var\s*exchangeData\s*=\s*\[(.+?)\];', re.S)
 
 
 def cmd_exchange(bot, line, args):
@@ -19,9 +23,9 @@ def cmd_exchange(bot, line, args):
     data = args.upper().split(' ')
 
     shortcut = {
-        '$':'USD','KRW':'WON','\\':'WON',u'원':'WON',
-        u'엔':'JPY100','JPY':'JPY100','IDR':'IDR100',
-        'VND':'VND100',u'달러':'USD',u'유로':'EUR'
+        '$': 'USD', '\\': 'KRW', u'원': 'KRW',
+        u'엔': 'JPY', 'JPY100': 'JPY', 'IDR100': 'IDR',
+        'VND100': 'VND' ,u'달러': 'USD', u'유로': 'EUR'
     }
 
     for x in shortcut:
@@ -36,7 +40,7 @@ def cmd_exchange(bot, line, args):
     if size == 2:
         temp = shortcut.get(data[1])
         ex_from = temp if temp else data[1]
-        ex_to = 'WON'
+        ex_to = 'KRW'
     elif size == 3:
         temp = shortcut.get(data[1])
         ex_from = temp if temp else data[1]
@@ -50,12 +54,22 @@ def cmd_exchange(bot, line, args):
         )
         return
 
-    data = urllib.urlopen('http://finance.daum.net/exchange/exchangeMain.daum').read().decode('u8')
+    data = urllib.urlopen('http://finance.daum.net/exchange/exchangeMain.daum').read().decode('cp949')
 
-    from_data = re.search(r"""ex\[\d+\] = '%s';ex_rate\[\d+\] = "(.+?)";country\[\d+\] = '(.+?)'; k_ex\[\d+\] = '(.+?)';full_k_ex\[\d+\] = '.+?';""" % ex_from,data)
-    to_data = re.search(r"""ex\[\d+\] = '%s';ex_rate\[\d+\] = "(.+?)";country\[\d+\] = '(.+?)'; k_ex\[\d+\] = '(.+?)';full_k_ex\[\d+\] = '.+?';""" % ex_to,data)
+    exchange_table = json.loads('[' + exchange_table_pattern.search(data).group(1) + ']')
+    from_data = None
+    to_data = None
+    for e in exchange_table:
+        if from_data is None and ex_from == e[1]:
+            from_data = e
 
-    if not from_data or not to_data:
+        if to_data is None and ex_to == e[1]:
+            to_data = e
+
+        if from_data and to_data:
+            break
+
+    if from_data is None or to_data is None:
         bot.con.query(
             'PRIVMSG',
             line.target,
@@ -63,8 +77,13 @@ def cmd_exchange(bot, line, args):
         )
         return
 
-    from_rate = float(from_data.group(1))
-    to_rate = float(to_data.group(1))
+    from_rate = float(from_data[3]) or 1.
+    to_rate = float(to_data[3]) or 1.
+
+    if from_data[1] in ['JPY', 'IDR', 'VND']:
+        from_rate /= 100.
+    if to_data[1] in ['JPY', 'IDR', 'VND']:
+        to_rate /= 100.
 
     exchange = money/to_rate*from_rate
 
@@ -72,6 +91,6 @@ def cmd_exchange(bot, line, args):
         'PRIVMSG',
         line.target,
         u'%.2f %s %s = %.2f %s %s' %
-         (money,from_data.group(2),from_data.group(3),
-        exchange,to_data.group(2),to_data.group(3))
+         (money,from_data[0],from_data[1],
+          exchange,to_data[0],to_data[1])
     )
