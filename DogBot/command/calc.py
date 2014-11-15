@@ -110,7 +110,7 @@ def need_term(op):
 
 
 def calc(args):
-    args = re.sub('(-(?:\.\d+|\d+\.\d+|\d+\.|\d+|pi|e))', '+(\\1)', args)
+    args = re.sub('(-\s*(?:\.\d+|\d+\.\d+|\d+\.|\d+|pi|e))', '+(\\1)', args)
 
     if args[0] == '+':
         args = '0' + args
