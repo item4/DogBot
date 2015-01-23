@@ -1,6 +1,8 @@
 DogBot
 ======
-DogBot is multipurpose IRC bot
+DogBot is multipurpose IRC bot.
+But I __do not__ upgrade anymore.
+I just maintenance until [bow-wow](https://github.com/item4/bow-wow), the next version with more clean code, released.
 
 ## Features
 * Multi-server connection by each encoding(charset)
