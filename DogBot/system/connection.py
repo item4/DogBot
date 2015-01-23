@@ -20,10 +20,9 @@ class DogBotConnection(object):
         self.running = True
         self.queue = Queue()
         self.connect = socket.socket()
-        #self.connect.settimeout(1)
+        self.connect.settimeout(121)
 
         self.connect.connect((self.host, self.port))
-        #self.connect.setblocking(0)
         Thread(target=self.run).start()
 
 

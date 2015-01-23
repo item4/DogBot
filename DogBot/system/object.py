@@ -5,7 +5,6 @@ __all__ = ['DogBotObject']
 import os
 import random
 import re
-import select
 import socket
 import sys
 import traceback
@@ -90,9 +89,7 @@ class DogBotObject(object):
             recv = ''
             while not recv:
                 try:
-                    ready = select.select([self.con.connect], [], [], 1) # http://stackoverflow.com/questions/2719017/how-to-set-timeout-on-pythons-socket-recv-method
-                    if ready[0]:
-                        recv = self.con.recv()
+                    recv = self.con.recv()
                 except socket.timeout:
                     time.sleep(10)
                     raise DogBotError()
