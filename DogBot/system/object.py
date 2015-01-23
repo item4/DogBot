@@ -124,6 +124,9 @@ class DogBotObject(object):
             else:
                 self.con.send(u'PONG %s' % msg[5:])
         elif msg.startswith(u'ERROR'):
+            if 'No more connections allowed from your host' in msg:
+                time.sleep(10)
+
             if self.running:
                 self.restart = True
         else:
